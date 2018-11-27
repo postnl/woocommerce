@@ -221,7 +221,9 @@ class WooCommerce_PostNL_Frontend {
 			'cutoff_time'			=> $cutoff_time,
 			'deliverydays_window'	=> isset(WooCommerce_PostNL()->checkout_settings['deliverydays_window']) ? max(1,WooCommerce_PostNL()->checkout_settings['deliverydays_window']) : '',
 			'dropoff_days'			=> isset(WooCommerce_PostNL()->checkout_settings['dropoff_days']) ? implode(';', WooCommerce_PostNL()->checkout_settings['dropoff_days'] ): '',
+			'monday_delivery'		=> isset(WooCommerce_PostNL()->checkout_settings['monday_delivery']) ? WooCommerce_PostNL()->checkout_settings['monday_delivery']: 0,
 		);
+
 		// remove empty options
 		$settings = array_filter($settings);
 

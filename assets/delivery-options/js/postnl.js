@@ -191,6 +191,7 @@
             dropoff_delay: settings.dropoff_delay != null ? settings.dropoff_delay : void 0,
             deliverydays_window: settings.deliverydays_window != null ? settings.deliverydays_window : void 0,
             exclude_delivery_type: settings.exclude_delivery_type != null ? settings.exclude_delivery_type : void 0,
+            monday_delivery: settings.monday_delivery,
             version: Math.random()
         },
         success: renderPage,
