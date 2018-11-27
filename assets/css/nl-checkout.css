@@ -22,3 +22,58 @@
 #billing_house_number, #shipping_house_number {
 	-moz-appearance: textfield;
 }
+
+#billing_address_1_field, #shipping_address_1_field, #shipping_address_2_field{
+	display:none;
+}
+
+#billing_house_number_field, #billing_house_number_suffix_field, #billing_postcode_field,
+#billing_street_name_field, #billing_city_field{
+	overflow:visible;
+	float:none;
+	display:inline-block;
+	vertical-align:top;
+}
+
+#billing_street_name_field{
+	width:calc(66% - 24px);
+	margin-right:10px !important;
+}
+
+#billing_house_number_field, #billing_house_number_suffix_field, #billing_postcode_field{
+	width:calc(22% - 24px);
+}
+
+#billing_house_number_suffix_field{
+	margin-right:0 !important;
+}
+
+#billing_city_field{
+	width:calc(88% - 38px);
+}
+
+#shipping_house_number_field, #shipping_house_number_suffix_field, #shipping_postcode_field,
+#shipping_street_name_field, #shipping_city_field{
+	overflow:visible;
+	float:none;
+	display:inline-block;
+	vertical-align:top;
+}
+
+#shipping_street_name_field{
+	width:calc(66% - 24px);
+	margin-right:10px !important;
+}
+
+#shipping_house_number_field, #shipping_house_number_suffix_field, #shipping_postcode_field{
+	width:calc(22% - 24px);
+	margin-right:10px !important;
+}
+
+#shipping_house_number_suffix_field{
+	margin-right:0 !important;
+}
+
+#shipping_city_field{
+	width:calc(88% - 38px);
+}
