@@ -1,4 +1,9 @@
 jQuery( function( $ ) {
+
+    setTimeout(function () {
+        $(':input.country_to_state').change();
+    }, 200);
+
 	var postnl_update_timer = false;
 	window.postnl_checkout_updating = false;
 	window.postnl_force_update = false;
