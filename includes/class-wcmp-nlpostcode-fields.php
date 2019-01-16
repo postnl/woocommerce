@@ -210,6 +210,7 @@ class WC_NLPostcode_Fields {
 			'placeholder'	=> __( 'Street name', 'woocommerce-postnl' ),
 			'class'			=> apply_filters( 'nl_custom_address_field_class', array( 'form-row-first' ), $form, 'street_name' ),
 			'required'		=> $required, // Only required for NL
+			'priority'      	=> 60,
 		);
 
 		// Add house number
@@ -219,6 +220,7 @@ class WC_NLPostcode_Fields {
 			'class'			=> apply_filters( 'nl_custom_address_field_class', array( 'form-row-quart-first' ), $form, 'house_number' ),
 			'required'		=> $required, // Only required for NL
 			'type'			=> 'number',
+			'priority'      	=> 61,
 		);
 
 		// Add house number Suffix
@@ -227,6 +229,7 @@ class WC_NLPostcode_Fields {
 			// 'placeholder'	=> __( 'Suffix', 'woocommerce-postnl' ),
 			'class'			=> apply_filters( 'nl_custom_address_field_class', array( 'form-row-quart' ), $form, 'house_number_suffix' ),
 			'required'		=> false,
+			'priority'      	=> 62,
 		);
 
 		// Create new ordering for checkout fields
