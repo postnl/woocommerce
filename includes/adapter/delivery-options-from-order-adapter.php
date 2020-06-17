@@ -2,7 +2,7 @@
 
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 
-class WCMP_DeliveryOptionsFromOrderAdapter extends AbstractDeliveryOptionsAdapter
+class WCPN_DeliveryOptionsFromOrderAdapter extends AbstractDeliveryOptionsAdapter
 {
     /**
      * WCMP_DeliveryOptionsFromOrderAdapter constructor.
