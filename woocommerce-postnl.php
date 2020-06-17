@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: WooCommerce MyParcel
-Plugin URI: https://myparcel.nl/
-Description: Export your WooCommerce orders to MyParcel (https://myparcel.nl/) and print labels directly from the WooCommerce admin
+Plugin Name: WooCommerce PostNL
+Plugin URI: https://postnl.nl/
+Description: Export your WooCommerce orders to PostNL (https://postnl.nl/) and print labels directly from the WooCommerce admin
 Author: Richard Perdaan
 Version: 4.0.0
-Text Domain: woocommerce-myparcel
+Text Domain: woocommerce-postnl
 
 License: GPLv3 or later
 License URI: http://www.opensource.org/licenses/gpl-license.php
@@ -15,15 +15,15 @@ if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (! class_exists('WCMP')) :
+if (! class_exists('WCPN')) :
 
-    class WCMP
+    class WCPN
     {
         /**
          * Translations domain
          */
-        const DOMAIN                  = 'woocommerce-myparcel';
-        const NONCE_ACTION            = 'wc_myparcel';
+        const DOMAIN                  = 'woocommerce-postnl';
+        const NONCE_ACTION            = 'wc_postnl';
         const MINIMUM_PHP_VERSION_5_4 = '5.4';
         const PHP_VERSION_7_1         = '7.1';
 
@@ -34,7 +34,7 @@ if (! class_exists('WCMP')) :
         protected static $_instance = null;
 
         /**
-         * @var WPO\WC\MyParcel\Collections\SettingsCollection
+         * @var WPO\WC\PostNL\Collections\SettingsCollection
          */
         public $setting_collection;
 
@@ -44,12 +44,12 @@ if (! class_exists('WCMP')) :
         public $includes;
 
         /**
-         * @var WCMP_Export
+         * @var WCPN_Export
          */
         public $export;
 
         /**
-         * @var WCMP_Admin
+         * @var WCPN_Admin
          */
         public $admin;
 
@@ -71,7 +71,7 @@ if (! class_exists('WCMP')) :
          */
         public function __construct()
         {
-            $this->define('WC_MYPARCEL_NL_VERSION', $this->version);
+            $this->define('WC_POST_NL_VERSION', $this->version);
             $this->plugin_basename = plugin_basename(__FILE__);
 
             // load the localisation & classes
@@ -108,14 +108,14 @@ if (! class_exists('WCMP')) :
 
             /**
              * Frontend/global Locale. Looks in:
-             *        - WP_LANG_DIR/woocommerce-myparcel/woocommerce-myparcel-LOCALE.mo
-             *        - WP_LANG_DIR/plugins/woocommerce-myparcel-LOCALE.mo
-             *        - woocommerce-myparcel/languages/woocommerce-myparcel-LOCALE.mo (which if not found falls back to:)
-             *        - WP_LANG_DIR/plugins/woocommerce-myparcel-LOCALE.mo
+             *        - WP_LANG_DIR/woocommerce-postnl/woocommerce-postnl-LOCALE.mo
+             *        - WP_LANG_DIR/plugins/woocommerce-postnl-LOCALE.mo
+             *        - woocommerce-postnl/languages/woocommerce-postnl-LOCALE.mo (which if not found falls back to:)
+             *        - WP_LANG_DIR/plugins/woocommerce-postnl-LOCALE.mo
              */
             load_textdomain(
                 self::DOMAIN,
-                $dir . 'woocommerce-myparcel/' . self::DOMAIN . '-' . $locale . '.mo'
+                $dir . 'woocommerce-postnl/' . self::DOMAIN . '-' . $locale . '.mo'
             );
             load_textdomain(self::DOMAIN, $dir . 'plugins/' . self::DOMAIN . '-' . $locale . '.mo');
             load_plugin_textdomain(self::DOMAIN, false, dirname(plugin_basename(__FILE__)) . '/languages');
@@ -127,7 +127,7 @@ if (! class_exists('WCMP')) :
         public function includes()
         {
             // Use php version 5.6
-            if (! $this->phpVersionMeets(\WCMP::PHP_VERSION_7_1)) {
+            if (! $this->phpVersionMeets(\WCPN::PHP_VERSION_7_1)) {
                 $this->includes = $this->plugin_path() . "/includes_php56";
 
                 // include compatibility classes
@@ -137,13 +137,13 @@ if (! class_exists('WCMP')) :
                 require_once($this->includes . "/compatibility/class-wc-order-compatibility.php");
                 require_once($this->includes . "/compatibility/class-wc-product-compatibility.php");
 
-                require_once($this->includes . "/class-wcmp-assets.php");
-                $this->admin = require_once($this->includes . "/class-wcmp-admin.php");
-                require_once($this->includes . "/class-wcmp-frontend-settings.php");
-                require_once($this->includes . "/class-wcmp-frontend.php");
-                require_once($this->includes . "/class-wcmp-settings.php");
-                $this->export = require_once($this->includes . "/class-wcmp-export.php");
-                require_once($this->includes . "/class-wcmp-nl-postcode-fields.php");
+                require_once($this->includes . "/class-WCPN-assets.php");
+                $this->admin = require_once($this->includes . "/class-WCPN-admin.php");
+                require_once($this->includes . "/class-WCPN-frontend-settings.php");
+                require_once($this->includes . "/class-WCPN-frontend.php");
+                require_once($this->includes . "/class-WCPN-settings.php");
+                $this->export = require_once($this->includes . "/class-WCPN-export.php");
+                require_once($this->includes . "/class-WCPN-nl-postcode-fields.php");
 
                 return;
             }
@@ -161,25 +161,25 @@ if (! class_exists('WCMP')) :
             require_once($this->includes . "/compatibility/class-ce-compatibility.php");
             require_once($this->includes . "/compatibility/class-wcpdf-compatibility.php");
 
-            require_once($this->includes . "/class-wcmp-data.php");
+            require_once($this->includes . "/class-WCPN-data.php");
             require_once($this->includes . "/collections/settings-collection.php");
             require_once($this->includes . "/entities/setting.php");
             require_once($this->includes . "/entities/settings-field-arguments.php");
 
-            require_once($this->includes . "/class-wcmp-assets.php");
-            require_once($this->includes . "/frontend/class-wcmp-cart-fees.php");
-            require_once($this->includes . "/frontend/class-wcmp-frontend-track-trace.php");
-            require_once($this->includes . "/frontend/class-wcmp-checkout.php");
-            require_once($this->includes . "/frontend/class-wcmp-frontend.php");
-            $this->admin = require_once($this->includes . "/admin/class-wcmp-admin.php");
-            require_once($this->includes . "/admin/settings/class-wcmp-settings.php");
-            require_once($this->includes . "/class-wcmp-log.php");
-            require_once($this->includes . "/admin/class-wcmp-country-codes.php");
-            $this->export = require_once($this->includes . "/admin/class-wcmp-export.php");
-            require_once($this->includes . "/class-wcmp-postcode-fields.php");
+            require_once($this->includes . "/class-WCPN-assets.php");
+            require_once($this->includes . "/frontend/class-WCPN-cart-fees.php");
+            require_once($this->includes . "/frontend/class-WCPN-frontend-track-trace.php");
+            require_once($this->includes . "/frontend/class-WCPN-checkout.php");
+            require_once($this->includes . "/frontend/class-WCPN-frontend.php");
+            $this->admin = require_once($this->includes . "/admin/class-WCPN-admin.php");
+            require_once($this->includes . "/admin/settings/class-WCPN-settings.php");
+            require_once($this->includes . "/class-WCPN-log.php");
+            require_once($this->includes . "/admin/class-WCPN-country-codes.php");
+            $this->export = require_once($this->includes . "/admin/class-WCPN-export.php");
+            require_once($this->includes . "/class-WCPN-postcode-fields.php");
             require_once($this->includes . "/adapter/delivery-options-from-order-adapter.php");
             require_once($this->includes . "/adapter/shipment-options-from-order-adapter.php");
-            require_once($this->includes . "/admin/class-wcmp-export-consignments.php");
+            require_once($this->includes . "/admin/class-WCPN-export-consignments.php");
         }
 
         /**
@@ -199,7 +199,7 @@ if (! class_exists('WCMP')) :
                 return;
             }
 
-            if (! $this->phpVersionMeets(\WCMP::PHP_VERSION_7_1)) {
+            if (! $this->phpVersionMeets(\WCPN::PHP_VERSION_7_1)) {
                 // php 5.6
                 $this->initSettings();
                 $this->includes();
@@ -232,8 +232,8 @@ if (! class_exists('WCMP')) :
         public function need_woocommerce()
         {
             $error = sprintf(
-                __("WooCommerce MyParcel requires %sWooCommerce%s to be installed & activated!",
-                    "woocommerce-myparcel"
+                __("WooCommerce PostNL requires %sWooCommerce%s to be installed & activated!",
+                    "woocommerce-postnl"
                 ),
                 '<a href="http://wordpress.org/extend/plugins/woocommerce/">',
                 '</a>'
@@ -250,10 +250,10 @@ if (! class_exists('WCMP')) :
 
         public function required_php_version()
         {
-            $error         = __("WooCommerce MyParcel requires PHP 5.4 or higher (5.6 or later recommended).",
-                "woocommerce-myparcel"
+            $error         = __("WooCommerce PostNL requires PHP 5.4 or higher (5.6 or later recommended).",
+                "woocommerce-postnl"
             );
-            $how_to_update = __("How to update your PHP version", "woocommerce-myparcel");
+            $how_to_update = __("How to update your PHP version", "woocommerce-postnl");
             $message       = sprintf(
                 '<div class="error"><p>%s</p><p><a href="%s">%s</a></p></div>',
                 $error,
@@ -275,7 +275,7 @@ if (! class_exists('WCMP')) :
          */
         public function do_install()
         {
-            $version_setting   = "woocommerce_myparcel_version";
+            $version_setting   = "woocommerce_postnl_version";
             $installed_version = get_option($version_setting);
 
             // installed version lower than plugin version?
@@ -297,8 +297,8 @@ if (! class_exists('WCMP')) :
         protected function install()
         {
             // Pre 2.0.0
-            if (! empty(get_option('wcmyparcel_settings'))) {
-                require_once('migration/wcmp-installation-migration-v2-0-0.php');
+            if (! empty(get_option('wcpostnl_settings'))) {
+                require_once('migration/WCPN-installation-migration-v2-0-0.php');
             }
             // todo: Pre 4.0.0?
         }
@@ -311,20 +311,20 @@ if (! class_exists('WCMP')) :
         protected function upgrade($installed_version)
         {
             if (version_compare($installed_version, '2.4.0-beta-4', '<')) {
-                require_once('migration/wcmp-upgrade-migration-v2-4-0-beta-4.php');
+                require_once('migration/WCPN-upgrade-migration-v2-4-0-beta-4.php');
             }
 
             if (version_compare($installed_version, '3.0.4', '<=')) {
-                require_once('migration/wcmp-upgrade-migration-v3-0-4.php');
+                require_once('migration/WCPN-upgrade-migration-v3-0-4.php');
             }
 
-            if ($this->phpVersionMeets(\WCMP::PHP_VERSION_7_1)) {
+            if ($this->phpVersionMeets(\WCPN::PHP_VERSION_7_1)) {
                 // Import the migration class base
-                require_once('migration/wcmp-upgrade-migration.php');
+                require_once('migration/WCPN-upgrade-migration.php');
 
                 // Migrate php 7.1+ only version settings
                 if (version_compare($installed_version, '4.0.0', '<=')) {
-                    require_once('migration/wcmp-upgrade-migration-v4-0-0.php');
+                    require_once('migration/WCPN-upgrade-migration-v4-0-0.php');
                 }
             }
         }
@@ -355,19 +355,19 @@ if (! class_exists('WCMP')) :
          */
         public function initSettings()
         {
-            if (! $this->phpVersionMeets(\WCMP::PHP_VERSION_7_1)) {
-                $this->general_settings  = get_option('woocommerce_myparcel_general_settings');
-                $this->export_defaults   = get_option('woocommerce_myparcel_export_defaults_settings');
-                $this->checkout_settings = get_option('woocommerce_myparcel_checkout_settings');
+            if (! $this->phpVersionMeets(\WCPN::PHP_VERSION_7_1)) {
+                $this->general_settings  = get_option('woocommerce_postnl_general_settings');
+                $this->export_defaults   = get_option('woocommerce_postnl_export_defaults_settings');
+                $this->checkout_settings = get_option('woocommerce_postnl_checkout_settings');
 
                 return;
             }
 
             // Create the settings collection by importing this function, because we can't use the sdk
             // imports in the legacy version.
-            require_once('includes/wcmp-initialize-settings-collection.php');
+            require_once('includes/WCPN-initialize-settings-collection.php');
             if (empty($this->setting_collection)) {
-                $this->setting_collection = (new WCMP_Initialize_Settings_Collection())->initialize();
+                $this->setting_collection = (new WCPN_Initialize_Settings_Collection())->initialize();
             }
         }
 
@@ -387,22 +387,22 @@ endif;
 /**
  * Returns the main instance of the plugin class to prevent the need to use globals.
  *
- * @return WCMP
+ * @return WCPN
  * @since  2.0
  */
-function WCMP()
+function WCPN()
 {
-    return WCMP::instance();
+    return WCPN::instance();
 }
 
 /**
  * For PHP < 7.1 support.
  *
- * @return WCMP
+ * @return WCPN
  */
-function WooCommerce_MyParcel()
+function WooCommerce_PostNL()
 {
-    return WCMP();
+    return WCPN();
 }
 
-WCMP(); // load plugin
+WCPN(); // load plugin
