@@ -1,16 +1,16 @@
 <?php
 
-use WPO\WC\MyParcel\Entity\SettingsFieldArguments;
+use WPO\WC\PostNL\Entity\SettingsFieldArguments;
 
 if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCMP_Settings_Callbacks')) {
-    return new WCMP_Settings_Callbacks();
+if (class_exists('WCPN_Settings_Callbacks')) {
+    return new WCPN_Settings_Callbacks();
 }
 
-class WCMP_Settings_Callbacks
+class WCPN_Settings_Callbacks
 {
     /**
      * @return array
@@ -150,7 +150,7 @@ class WCMP_Settings_Callbacks
         }
 
         // Return the array processing any additional functions filtered by this action.
-        return apply_filters('wcmp_settings_validate_input', $input, $input);
+        return apply_filters('wcpn_settings_validate_input', $input, $input);
     }
 
     /**
@@ -158,9 +158,9 @@ class WCMP_Settings_Callbacks
      */
     public function enhanced_select(array $args): void
     {
-        include("class-wcmp-settings-callbacks-enhanced-select.php");
+        include("class-wcpn-settings-callbacks-enhanced-select.php");
 
-        new WCMP_Settings_Callbacks_Enhanced_Select($args);
+        new WCPN_Settings_Callbacks_Enhanced_Select($args);
     }
 
     /**
@@ -249,4 +249,4 @@ class WCMP_Settings_Callbacks
     }
 }
 
-return new WCMP_Settings_Callbacks();
+return new WCPN_Settings_Callbacks();
