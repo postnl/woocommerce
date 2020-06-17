@@ -5,7 +5,7 @@ use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 class WCPN_DeliveryOptionsFromOrderAdapter extends AbstractDeliveryOptionsAdapter
 {
     /**
-     * WCMP_DeliveryOptionsFromOrderAdapter constructor.
+     * WCPN_DeliveryOptionsFromOrderAdapter constructor.
      *
      * @param AbstractDeliveryOptionsAdapter|null $originAdapter
      * @param array                               $inputData
