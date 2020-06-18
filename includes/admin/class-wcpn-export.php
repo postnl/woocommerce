@@ -6,19 +6,19 @@ use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
-use WPO\WC\MyParcel\Compatibility\WC_Core as WCX;
-use WPO\WC\MyParcel\Compatibility\Order as WCX_Order;
-use WPO\WC\MyParcel\Compatibility\WCMP_ChannelEngine_Compatibility as ChannelEngine;
+use WPO\WC\PostNL\Compatibility\WC_Core as WCX;
+use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
+use WPO\WC\PostNL\Compatibility\WCPN_ChannelEngine_Compatibility as ChannelEngine;
 
 if (! defined("ABSPATH")) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists("WCMP_Export")) {
-    return new WCMP_Export();
+if (class_exists("WCPN_Export")) {
+    return new WCPN_Export();
 }
 
-class WCMP_Export
+class WCPN_Export
 {
     // Package types
     public const PACKAGE       = 1;
@@ -26,7 +26,7 @@ class WCMP_Export
     public const LETTER        = 3;
     public const DIGITAL_STAMP = 4;
 
-    public const EXPORT = "wcmp_export";
+    public const EXPORT = "wcpn_export";
 
     public const ADD_SHIPMENTS = "add_shipments";
     public const ADD_RETURN    = "add_return";
@@ -53,8 +53,8 @@ class WCMP_Export
         $this->success = [];
         $this->errors  = [];
 
-        require_once("class-wcmp-rest.php");
-        require_once("class-wcmp-api.php");
+        require_once("class-wcpn-rest.php");
+        require_once("class-wcpn-api.php");
 
         add_action("admin_notices", [$this, "admin_notices"]);
 
@@ -69,7 +69,7 @@ class WCMP_Export
      */
     public function exportByOrderId(int $orderId): void
     {
-        $automaticExport = WCMP()->setting_collection->isEnabled(WCMP_Settings::SETTING_AUTOMATIC_EXPORT);
+        $automaticExport = WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_AUTOMATIC_EXPORT);
 
         if ($orderId && $automaticExport) {
             $export = new self();
@@ -88,7 +88,7 @@ class WCMP_Export
      */
     public static function getChosenOrDefaultShipmentOption($option, string $settingName)
     {
-        if ($valueFromSetting = WCMP()->setting_collection->getByName($settingName)) {
+        if ($valueFromSetting = WCPN()->setting_collection->getByName($settingName)) {
             return $valueFromSetting;
         }
 
@@ -118,9 +118,9 @@ class WCMP_Export
     public function admin_notices()
     {
         // only do this when the user that initiated this
-        if (isset($_GET["myparcel_done"])) {
-            $action_return = get_option("wcmyparcel_admin_notices");
-            $print_queue   = get_option("wcmyparcel_print_queue", []);
+        if (isset($_GET["postnl_done"])) {
+            $action_return = get_option("wcpostnl_admin_notices");
+            $print_queue   = get_option("wcpostnl_print_queue", []);
 
             if (! empty($action_return)) {
                 foreach ($action_return as $type => $message) {
@@ -130,7 +130,7 @@ class WCMP_Export
 
                     if ($type === "success" && ! empty($print_queue)) {
                         $print_queue_store = sprintf(
-                            '<input type="hidden" value=\'%s\' class="wcmp__print-queue">',
+                            '<input type="hidden" value=\'%s\' class="wcpn__print-queue">',
                             json_encode(
                                 [
 	                                "shipment_ids" => $print_queue["shipment_ids"],
@@ -141,30 +141,30 @@ class WCMP_Export
                         );
 
                         // Empty queue
-                        delete_option("wcmyparcel_print_queue");
+                        delete_option("wcpostnl_print_queue");
                     }
 
                     printf(
-                        '<div class="wcmp__notice notice notice-%s"><p>%s</p>%s</div>',
+                        '<div class="wcpn__notice notice notice-%s"><p>%s</p>%s</div>',
                         $type,
                         $message,
                         $print_queue_store ?? ""
                     );
                 }
                 // destroy after reading
-                delete_option("wcmyparcel_admin_notices");
-                wp_cache_delete("wcmyparcel_admin_notices", "options");
+                delete_option("wcpostnl_admin_notices");
+                wp_cache_delete("wcpostnl_admin_notices", "options");
             }
         }
 
-        if (isset($_GET["myparcel"])) {
-            switch ($_GET["myparcel"]) {
+        if (isset($_GET["postnl"])) {
+            switch ($_GET["postnl"]) {
                 case "no_consignments":
                     $message = __(
-                        "You have to export the orders to MyParcel before you can print the labels!",
-                        "woocommerce-myparcel"
+                        "You have to export the orders to PostNL before you can print the labels!",
+                        "woocommerce-postnl"
                     );
-                    printf('<div class="wcmp__notice notice notice-error"><p>%s</p></div>', $message);
+                    printf('<div class="wcpn__notice notice notice-error"><p>%s</p></div>', $message);
                     break;
                 default:
                     break;
@@ -184,24 +184,24 @@ class WCMP_Export
     public function export()
     {
         // Check the nonce
-        if (! check_ajax_referer(WCMP::NONCE_ACTION, "_wpnonce", false)) {
+        if (! check_ajax_referer(WCPN::NONCE_ACTION, "_wpnonce", false)) {
             die("Ajax security check failed. Did you pass a valid nonce in \$_REQUEST['_wpnonce']?");
         }
 
         if (! is_user_logged_in()) {
-            wp_die(__("You do not have sufficient permissions to access this page.", "woocommerce-myparcel"));
+            wp_die(__("You do not have sufficient permissions to access this page.", "woocommerce-postnl"));
         }
 
         $return = [];
 
         // Check the user privileges (maybe use order ids for filter?)
         if (apply_filters(
-            "wc_myparcel_check_privs",
+            "wc_postnl_check_privs",
             ! current_user_can("manage_woocommerce_orders") && ! current_user_can("edit_shop_orders")
         )) {
             $return["error"] = __(
                 "You do not have sufficient permissions to access this page.",
-                "woocommerce-myparcel"
+                "woocommerce-postnl"
             );
             echo json_encode($return);
             die();
@@ -219,7 +219,7 @@ class WCMP_Export
         $shipment_ids = $this->sanitize_posted_array($_REQUEST["shipment_ids"] ?? []);
 
         if (empty($shipment_ids) && empty($order_ids)) {
-            $this->errors[] = __("You have not selected any orders!", "woocommerce-myparcel");
+            $this->errors[] = __("You have not selected any orders!", "woocommerce-postnl");
         } else {
             try {
                 switch ($request) {
@@ -231,7 +231,7 @@ class WCMP_Export
                     // Creating a return shipment.
                     case self::ADD_RETURN:
                         if (empty($order_ids)) {
-                            $this->errors[] = __("You have not selected any orders!", "woocommerce-myparcel");
+                            $this->errors[] = __("You have not selected any orders!", "woocommerce-postnl");
                             break;
                         }
 
@@ -308,9 +308,9 @@ class WCMP_Export
         $return                   = [];
         $orderIdsWithNewShipments = [];
         $collection               = new MyParcelCollection();
-        $processDirectly          = WCMP()->setting_collection->isEnabled(WCMP_Settings::SETTING_PROCESS_DIRECTLY) || $process === true;
+        $processDirectly          = WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_PROCESS_DIRECTLY) || $process === true;
 
-        WCMP_Log::add("*** Creating shipments started ***");
+        WCPN_Log::add("*** Creating shipments started ***");
 
         /**
          * Loop over the order ids and create consignments for each order.
@@ -319,26 +319,26 @@ class WCMP_Export
             $order                      = WCX::get_order($order_id);
             $orderIdsWithNewShipments[] = $order_id;
 
-            $extra_params = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EXTRA);
+            $extra_params = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENT_OPTIONS_EXTRA);
             $collo_amount = isset($extra_params["collo_amount"]) ? $extra_params["collo_amount"] : 1;
 
             /**
              * Create a real multi collo shipment if available, otherwise loop over the collo_amount and add separate
              * consignments to the collection.
              */
-            if (WCMP_Data::HAS_MULTI_COLLO) {
-                $consignment = (new WCMP_Export_Consignments($order))->getConsignment();
+            if (WCPN_Data::HAS_MULTI_COLLO) {
+                $consignment = (new WCPN_Export_Consignments($order))->getConsignment();
 
                 $collection->addMultiCollo($consignment, $collo_amount);
             } else {
                 for ($i = 0; $i < $collo_amount; $i++) {
-                    $consignment = (new WCMP_Export_Consignments($order))->getConsignment();
+                    $consignment = (new WCPN_Export_Consignments($order))->getConsignment();
 
                     $collection->addConsignment($consignment);
                 }
             }
 
-            WCMP_Log::add("Shipment data for order {$order_id}.");
+            WCPN_Log::add("Shipment data for order {$order_id}.");
         }
 
         $collection = $collection->createConcepts();
@@ -366,20 +366,20 @@ class WCMP_Export
 
             WCX_Order::update_meta_data(
                 $order,
-                WCMP_Admin::META_LAST_SHIPMENT_IDS,
+                WCPN_Admin::META_LAST_SHIPMENT_IDS,
                 $consignmentIds
             );
         }
 
         if (! empty($this->success)) {
             $return["success"]     = sprintf(
-                __("%s shipments successfully exported to MyParcel", "woocommerce-myparcel"),
+                __("%s shipments successfully exported to PostNL", "woocommerce-postnl"),
                 count($collection->getConsignmentIds())
             );
             $return["success_ids"] = $collection->getConsignmentIds();
 
-            WCMP_Log::add($return["success"]);
-            WCMP_Log::add("ids: " . implode(", ", $return["success_ids"]));
+            WCPN_Log::add($return["success"]);
+            WCPN_Log::add("ids: " . implode(", ", $return["success_ids"]));
         }
 
         return $return;
@@ -395,17 +395,17 @@ class WCMP_Export
     {
         $return = [];
 
-        WCMP_Log::add("*** Creating return shipments started ***");
+        WCPN_Log::add("*** Creating return shipments started ***");
 
         foreach ($order_ids as $order_id) {
             try {
                 $return_shipments = [$this->prepareReturnShipmentData($order_id)];
-                WCMP_Log::add("Return shipment data for order {$order_id}:", print_r($return_shipments, true));
+                WCPN_Log::add("Return shipment data for order {$order_id}:", print_r($return_shipments, true));
 
                 $api      = $this->init_api();
                 $response = $api->add_shipments($return_shipments, "return");
 
-                WCMP_Log::add("API response (order {$order_id}):\n" . print_r($response, true));
+                WCPN_Log::add("API response (order {$order_id}):\n" . print_r($response, true));
 
                 $ids = Arr::get($response, "body.data.ids");
 
@@ -422,7 +422,7 @@ class WCMP_Export
                     // save shipment data in order meta
                     $this->saveShipmentData($order, $shipment);
                 } else {
-                    WCMP_Log::add("\$response\[\"body.data.ids\"] empty or not found.", print_r($response, true));
+                    WCPN_Log::add("\$response\[\"body.data.ids\"] empty or not found.", print_r($response, true));
                     throw new Exception("\$response\[\"body.data.ids\"] empty or not found.");
                 }
             } catch (Exception $e) {
@@ -450,8 +450,8 @@ class WCMP_Export
     ) {
         $return = [];
 
-        WCMP_Log::add("*** downloadOrGetUrlOfLabels() ***");
-        WCMP_Log::add("Shipment IDs: " . implode(", ", $shipment_ids));
+        WCPN_Log::add("*** downloadOrGetUrlOfLabels() ***");
+        WCPN_Log::add("Shipment IDs: " . implode(", ", $shipment_ids));
 
         try {
             $api = $this->init_api();
@@ -459,7 +459,7 @@ class WCMP_Export
             // positions are defined on landscape, but paper is filled portrait-wise
             $positions = array_slice(self::DEFAULT_POSITIONS, $offset % 4);
 
-            $displaySetting = WCMP()->setting_collection->getByName(WCMP_Settings::SETTING_DOWNLOAD_DISPLAY);
+            $displaySetting = WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_DOWNLOAD_DISPLAY);
             $display        = ($displayOverride ?? $displaySetting) === "display";
             $api->getShipmentLabels($shipment_ids, $order_ids, $positions, $display);
         } catch (Exception $e) {
@@ -482,11 +482,11 @@ class WCMP_Export
         $shipment_ids = $this->getShipmentIds($order_ids, ["only_last" => true]);
 
         if (empty($shipment_ids)) {
-            WCMP_Log::add(" *** Failed label request(not exported yet) ***");
+            WCPN_Log::add(" *** Failed label request(not exported yet) ***");
 
             throw new Exception(__(
-                "The selected orders have not been exported to MyParcel yet! ",
-                "woocommerce-myparcel"
+                "The selected orders have not been exported to PostNL yet! ",
+                "woocommerce-postnl"
             ));
         }
 
@@ -525,18 +525,18 @@ class WCMP_Export
     }
 
     /**
-     * @return WCMP_API
+     * @return WCPN_API
      * @throws Exception
      */
     public function init_api()
     {
-        $key = $this->getSetting(WCMP_Settings::SETTING_API_KEY);
+        $key = $this->getSetting(WCPN_Settings::SETTING_API_KEY);
 
         if (! ($key)) {
-            throw new ErrorException(__("No API key found in MyParcel settings", "woocommerce-myparcel"));
+            throw new ErrorException(__("No API key found in PostNL settings", "woocommerce-postnl"));
         }
 
-        return new WCMP_API($key);
+        return new WCPN_API($key);
     }
 
     /**
@@ -564,7 +564,7 @@ class WCMP_Export
         ];
 
         if (! Arr::get($return_shipment_data, "email")) {
-            throw new Exception(__("No e-mail address found in order.", "woocommerce-myparcel"));
+            throw new Exception(__("No e-mail address found in order.", "woocommerce-postnl"));
         }
 
         // add options if available
@@ -622,7 +622,7 @@ class WCMP_Export
      */
     public static function getRecipientFromOrder(WC_Order $order)
     {
-        $isUsingMyParcelFields = WCX_Order::has_meta($order, "_billing_street_name")
+        $isUsingPostNLFields = WCX_Order::has_meta($order, "_billing_street_name")
                                || WCX_Order::has_meta($order, "_billing_house_number");
 
         $shipping_name =
@@ -630,8 +630,8 @@ class WCMP_Export
                 : trim($order->get_shipping_first_name() . " " . $order->get_shipping_last_name());
 
 
-        $connectEmail = WCMP()->setting_collection->isEnabled(WCMP_Settings::SETTING_CONNECT_EMAIL);
-        $connectPhone = WCMP()->setting_collection->isEnabled(WCMP_Settings::SETTING_CONNECT_PHONE);
+        $connectEmail = WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_CONNECT_EMAIL);
+        $connectPhone = WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_CONNECT_PHONE);
 
         $address = [
             "cc"                     => (string) WCX_Order::get_prop($order, "shipping_country"),
@@ -646,7 +646,7 @@ class WCMP_Export
         $shipping_country = WCX_Order::get_prop($order, "shipping_country");
         if ($shipping_country === "NL") {
             // use billing address if old "pakjegemak" (1.5.6 and older)
-            $pgAddress = WCX_Order::get_meta($order, WCMP_Admin::META_PGADDRESS);
+            $pgAddress = WCX_Order::get_meta($order, WCPN_Admin::META_PGADDRESS);
 
             if ($pgAddress) {
                 $billing_name = method_exists($order, "get_formatted_billing_full_name")
@@ -661,7 +661,7 @@ class WCMP_Export
                     "postal_code" => (string) WCX_Order::get_prop($order, "billing_postcode"),
                 ];
 
-                if ($isUsingMyParcelFields) {
+                if ($isUsingPostNLFields) {
                     $address_intl["street"]        = (string) WCX_Order::get_meta($order, "_billing_street_name");
                     $address_intl["number"]        = (string) WCX_Order::get_meta($order, "_billing_house_number");
                     $address_intl["number_suffix"] =
@@ -669,7 +669,7 @@ class WCMP_Export
                 } else {
                     // Split the address line 1 into three parts
                     preg_match(
-                        WCMP_NL_Postcode_Fields::SPLIT_STREET_REGEX,
+                        WCPN_NL_Postcode_Fields::SPLIT_STREET_REGEX,
                         WCX_Order::get_prop($order, "billing_address_1"),
                         $address_parts
                     );
@@ -685,7 +685,7 @@ class WCMP_Export
                     "postal_code" => (string) WCX_Order::get_prop($order, "shipping_postcode"),
                 ];
                 // If not using old fields
-                if ($isUsingMyParcelFields) {
+                if ($isUsingPostNLFields) {
                     $address_intl["street"]        = (string) WCX_Order::get_meta($order, "_shipping_street_name");
                     $address_intl["number"]        = (string) WCX_Order::get_meta($order, "_shipping_house_number");
                     $address_intl["number_suffix"] =
@@ -693,7 +693,7 @@ class WCMP_Export
                 } else {
                     // Split the address line 1 into three parts
                     preg_match(
-                        WCMP_NL_Postcode_Fields::SPLIT_STREET_REGEX,
+                        WCPN_NL_Postcode_Fields::SPLIT_STREET_REGEX,
                         WCX_Order::get_prop($order, "shipping_address_1"),
                         $address_parts
                     );
@@ -721,7 +721,7 @@ class WCMP_Export
 
         $address = array_merge($address, $address_intl);
 
-        return apply_filters("wc_myparcel_recipient", $address, $order);
+        return apply_filters("wc_postnl_recipient", $address, $order);
     }
 
     /**
@@ -732,13 +732,13 @@ class WCMP_Export
      */
     public static function addTrackTraceNoteToOrder(int $order_id, array $track_traces): void
     {
-        if (! WCMP()->setting_collection->isEnabled(WCMP_Settings::SETTING_BARCODE_IN_NOTE)) {
+        if (! WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_BARCODE_IN_NOTE)) {
             return;
         }
 
-        $prefix_message = WCMP()->setting_collection->getByName(WCMP_Settings::SETTING_BARCODE_IN_NOTE_TITLE);
+        $prefix_message = WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_BARCODE_IN_NOTE_TITLE);
 
-        // Select the barcode text of the MyParcel settings
+        // Select the barcode text of the PostNL settings
         $prefix_message = $prefix_message ? $prefix_message . " " : "";
 
         $order = WCX::get_order($order_id);
@@ -752,7 +752,7 @@ class WCMP_Export
      */
     private function getSetting(string $name)
     {
-        return WCMP()->setting_collection->getByName($name);
+        return WCPN()->setting_collection->getByName($name);
     }
 
     /**
@@ -767,7 +767,7 @@ class WCMP_Export
 
         foreach ($order_ids as $order_id) {
             $order           = WCX::get_order($order_id);
-            $order_shipments = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENTS);
+            $order_shipments = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENTS);
 
             if (empty($order_shipments)) {
                 continue;
@@ -787,7 +787,7 @@ class WCMP_Export
             }
 
             if (isset($args["only_last"])) {
-                $last_shipment_ids = WCX_Order::get_meta($order, WCMP_Admin::META_LAST_SHIPMENT_IDS);
+                $last_shipment_ids = WCX_Order::get_meta($order, WCPN_Admin::META_LAST_SHIPMENT_IDS);
 
                 if (! empty($last_shipment_ids) && is_array($last_shipment_ids)) {
                     foreach ($order_shipment_ids as $order_shipment_id) {
@@ -823,13 +823,13 @@ class WCMP_Export
         $new_shipments                           = [];
         $new_shipments[$shipment["shipment_id"]] = $shipment;
 
-        if (WCX_Order::has_meta($order, WCMP_Admin::META_SHIPMENTS)) {
-            $old_shipments = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENTS);
+        if (WCX_Order::has_meta($order, WCPN_Admin::META_SHIPMENTS)) {
+            $old_shipments = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENTS);
         }
 
         $new_shipments = array_replace_recursive($old_shipments, $new_shipments);
 
-        WCX_Order::update_meta_data($order, WCMP_Admin::META_SHIPMENTS, $new_shipments);
+        WCX_Order::update_meta_data($order, WCPN_Admin::META_SHIPMENTS, $new_shipments);
     }
 
     /**
@@ -889,12 +889,12 @@ class WCMP_Export
             $orderShippingMethod = array_shift($orderShippingMethods);
             $orderShippingMethod = $orderShippingMethod['method_id'];
 
-            $orderShippingClass = WCX_Order::get_meta($order, WCMP_Admin::META_HIGHEST_SHIPPING_CLASS);
+            $orderShippingClass = WCX_Order::get_meta($order, WCPN_Admin::META_HIGHEST_SHIPPING_CLASS);
             if (empty($orderShippingClass)) {
                 $orderShippingClass = $this->getOrderShippingClass($order, $orderShippingMethod);
             }
 
-            $packageType = WCMP_Export::getPackageTypeFromShippingMethod(
+            $packageType = WCPN_Export::getPackageTypeFromShippingMethod(
                 $orderShippingMethod,
                 $orderShippingClass
             );
@@ -934,9 +934,9 @@ class WCMP_Export
                 $shipping_method_id_class = "{$shipping_method_id}:{$shipping_class}";
             }
         }
-        foreach (WCMP()->setting_collection->getByName(WCMP_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES) as $package_type_key => $package_type_shipping_methods) {
+        foreach (WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES) as $package_type_key => $package_type_shipping_methods) {
 
-            if (WCMP_Export::isActiveMethod(
+            if (WCPN_Export::isActiveMethod(
                 $shipping_method_id,
                 $package_type_shipping_methods,
                 $shipping_method_id_class,
@@ -947,7 +947,7 @@ class WCMP_Export
             }
         }
 
-        $package_type = WCMP_Data::getPackageTypeId($package_type);
+        $package_type = WCPN_Data::getPackageTypeId($package_type);
 
         return $package_type;
     }
@@ -959,7 +959,7 @@ class WCMP_Export
      */
     public function getPackageType(string $package_type): string
     {
-        return WCMP_Data::getPackageTypeHuman($package_type) ?? __("Unknown", "woocommerce-myparcel");
+        return WCPN_Data::getPackageTypeHuman($package_type) ?? __("Unknown", "woocommerce-postnl");
     }
 
     /**
@@ -976,7 +976,7 @@ class WCMP_Export
             if ($key > 10) {
                 $parsed_errors[] = sprintf(
                     "<strong>%s %s:</strong> %s",
-                    __("Order", "woocommerce-myparcel"),
+                    __("Order", "woocommerce-postnl"),
                     $key,
                     $error
                 );
@@ -1000,31 +1000,31 @@ class WCMP_Export
     public function getShipmentStatusName($status_code)
     {
         $shipment_statuses = [
-            1  => __("pending - concept", "woocommerce-myparcel"),
-            2  => __("pending - registered", "woocommerce-myparcel"),
-            3  => __("enroute - handed to carrier", "woocommerce-myparcel"),
-            4  => __("enroute - sorting", "woocommerce-myparcel"),
-            5  => __("enroute - distribution", "woocommerce-myparcel"),
-            6  => __("enroute - customs", "woocommerce-myparcel"),
-            7  => __("delivered - at recipient", "woocommerce-myparcel"),
-            8  => __("delivered - ready for pickup", "woocommerce-myparcel"),
-            9  => __("delivered - package picked up", "woocommerce-myparcel"),
-            30 => __("inactive - concept", "woocommerce-myparcel"),
-            31 => __("inactive - registered", "woocommerce-myparcel"),
-            32 => __("inactive - enroute - handed to carrier", "woocommerce-myparcel"),
-            33 => __("inactive - enroute - sorting", "woocommerce-myparcel"),
-            34 => __("inactive - enroute - distribution", "woocommerce-myparcel"),
-            35 => __("inactive - enroute - customs", "woocommerce-myparcel"),
-            36 => __("inactive - delivered - at recipient", "woocommerce-myparcel"),
-            37 => __("inactive - delivered - ready for pickup", "woocommerce-myparcel"),
-            38 => __("inactive - delivered - package picked up", "woocommerce-myparcel"),
-            99 => __("inactive - unknown", "woocommerce-myparcel"),
+            1  => __("pending - concept", "woocommerce-postnl"),
+            2  => __("pending - registered", "woocommerce-postnl"),
+            3  => __("enroute - handed to carrier", "woocommerce-postnl"),
+            4  => __("enroute - sorting", "woocommerce-postnl"),
+            5  => __("enroute - distribution", "woocommerce-postnl"),
+            6  => __("enroute - customs", "woocommerce-postnl"),
+            7  => __("delivered - at recipient", "woocommerce-postnl"),
+            8  => __("delivered - ready for pickup", "woocommerce-postnl"),
+            9  => __("delivered - package picked up", "woocommerce-postnl"),
+            30 => __("inactive - concept", "woocommerce-postnl"),
+            31 => __("inactive - registered", "woocommerce-postnl"),
+            32 => __("inactive - enroute - handed to carrier", "woocommerce-postnl"),
+            33 => __("inactive - enroute - sorting", "woocommerce-postnl"),
+            34 => __("inactive - enroute - distribution", "woocommerce-postnl"),
+            35 => __("inactive - enroute - customs", "woocommerce-postnl"),
+            36 => __("inactive - delivered - at recipient", "woocommerce-postnl"),
+            37 => __("inactive - delivered - ready for pickup", "woocommerce-postnl"),
+            38 => __("inactive - delivered - package picked up", "woocommerce-postnl"),
+            99 => __("inactive - unknown", "woocommerce-postnl"),
         ];
 
         if (isset($shipment_statuses[$status_code])) {
             return $shipment_statuses[$status_code];
         } else {
-            return __("Unknown status", "woocommerce-myparcel");
+            return __("Unknown status", "woocommerce-postnl");
         }
     }
 
@@ -1113,7 +1113,7 @@ class WCMP_Export
      */
     public static function getDigitalStampRanges(int $weight, string $names = null): array
     {
-        foreach (WCMP_Data::getDigitalStampWeight() as $tierRange) {
+        foreach (WCPN_Data::getDigitalStampWeight() as $tierRange) {
             $names[$tierRange['average']] = $tierRange['min'] . " - " . $tierRange['max'] . " gram";
 
             if ($weight > $tierRange['min'] && $weight <= $tierRange['max']) {
@@ -1313,7 +1313,7 @@ class WCMP_Export
             $order            = WCX::get_order($order_id);
             $shipping_country = WCX_Order::get_prop($order, "shipping_country");
 
-            if (! WCMP_Country_Codes::isAllowedDestination($shipping_country)) {
+            if (! WCPN::isAllowedDestination($shipping_country)) {
                 unset($order_ids[$key]);
             }
         }
@@ -1334,7 +1334,7 @@ class WCMP_Export
         $response = $api->get_shipments($shipment_id);
 
         if (! isset($response["body"]["data"]["shipments"][0]["barcode"])) {
-            throw new ErrorException("No MyParcel barcode found for shipment id; " . $shipment_id);
+            throw new ErrorException("No PostNL barcode found for shipment id; " . $shipment_id);
         }
 
         return $response["body"]["data"]["shipments"][0]["barcode"];
@@ -1394,10 +1394,10 @@ class WCMP_Export
      */
     private function updateOrderStatus(WC_Order $order): void
     {
-        if (WCMP()->setting_collection->isEnabled(WCMP_Settings::SETTING_ORDER_STATUS_AUTOMATION)) {
+        if (WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_ORDER_STATUS_AUTOMATION)) {
             $order->update_status(
-                $this->getSetting(WCMP_Settings::SETTING_AUTOMATIC_ORDER_STATUS),
-                __("MyParcel shipment created:", "woocommerce-myparcel")
+                $this->getSetting(WCPN_Settings::SETTING_AUTOMATIC_ORDER_STATUS),
+                __("PostNL shipment created:", "woocommerce-postnl")
             );
         }
     }
@@ -1445,7 +1445,7 @@ class WCMP_Export
             $this->errors[] =
                 __(
                     "The order(s) you have selected have invalid shipping countries.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 );
 
             return;
@@ -1458,14 +1458,14 @@ class WCMP_Export
         // When adding shipments, store $return for use in admin_notice
         // This way we can refresh the page (JS) to show all new buttons
         if ($print === "no" || $print === "after_reload") {
-            update_option("wcmyparcel_admin_notices", $return);
+            update_option("wcpostnl_admin_notices", $return);
             if ($print === "after_reload") {
 	            $print_queue = [
 		            "order_ids"    => $order_ids,
 		            "shipment_ids" => $return["success_ids"],
 		            "offset"       => isset( $offset ) && is_numeric( $offset ) ? $offset % 4 : 0,
 	            ];
-                update_option("wcmyparcel_print_queue", $print_queue);
+                update_option("wcpostnl_print_queue", $print_queue);
             }
         }
 
@@ -1490,9 +1490,9 @@ class WCMP_Export
                 array_push($trackTraces, $consignment->getBarcode());
             }
 
-            WCMP_Export::addTrackTraceNoteToOrder($order_id, $trackTraces);
+            WCPN_Export::addTrackTraceNoteToOrder($order_id, $trackTraces);
         }
     }
 }
 
-return new WCMP_Export();
+return new WCPN_Export();
