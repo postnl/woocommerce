@@ -4,11 +4,11 @@ if (! defined("ABSPATH")) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists("WCMP_Country_Codes")) {
-    return new WCMP_Country_Codes();
+if (class_exists("WCPN_Country_Codes")) {
+    return new WCPN_Country_Codes();
 }
 
-class WCMP_Country_Codes
+class WCPN_Country_Codes
 {
 
     private const EURO_COUNTRIES = [
@@ -265,12 +265,12 @@ class WCMP_Country_Codes
      */
     public static function isAllowedDestination(string $country_code): bool
     {
-        return ($country_code === WCMP_Data::DEFAULT_COUNTRY_CODE
-                || WCMP_Country_Codes::isEuCountry($country_code)
-                || WCMP_Country_Codes::isWorldShipmentCountry(
+        return ($country_code === WCPN_Data::DEFAULT_COUNTRY_CODE
+                || WCPN_Country_Codes::isEuCountry($country_code)
+                || WCPN_Country_Codes::isWorldShipmentCountry(
                 $country_code
             ));
     }
 }
 
-return new WCMP_Country_Codes();
+return new WCPN_Country_Codes();
