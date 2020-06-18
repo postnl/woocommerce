@@ -5,22 +5,22 @@ if (! defined('ABSPATH')) {
 } // Exit if accessed directly
 
 /** @noinspection PhpUnhandledExceptionInspection */
-$deliveryOptions = WCMP_Admin::getDeliveryOptionsFromOrder($order);
+$deliveryOptions = WCPN_Admin::getDeliveryOptionsFromOrder($order);
 
 ?>
-<table class="wcmp__settings-table" style="width: auto">
+<table class="wcpn__settings-table" style="width: auto">
     <tr>
         <td>
-            <?php _e("Shipment type", "woocommerce-myparcel") ?>:<br/> <small class="calculated_weight">
+            <?php _e("Shipment type", "woocommerce-postnl") ?>:<br/> <small class="calculated_weight">
                 <?php printf(
-                    __("Calculated weight: %s", "woocommerce-myparcel"),
-                    wc_format_weight($order->get_meta(WCMP_Admin::META_ORDER_WEIGHT))
+                    __("Calculated weight: %s", "woocommerce-postnl"),
+                    wc_format_weight($order->get_meta(WCPN_Admin::META_ORDER_WEIGHT))
                 ) ?>
             </small>
         </td>
         <td>
             <?php
-            $name = "myparcel_options[{$order_id}][package_type]";
+            $name = "postnl_options[{$order_id}][package_type]";
             printf('<select name="%s" class="package_type">', $name);
             foreach ($package_types as $key => $label) {
                 printf(
@@ -35,9 +35,9 @@ $deliveryOptions = WCMP_Admin::getDeliveryOptionsFromOrder($order);
     </tr>
 </table><br>
 <?php if (! isset($skip_save)): ?>
-    <div class="wcmp__d--flex">
-        <a class="button save" data-order="<?php echo $order_id; ?>"><?php _e("Save", "woocommerce-myparcel") ?>
-            <?php WCMP_Admin::renderSpinner() ?>
+    <div class="wcpn__d--flex">
+        <a class="button save" data-order="<?php echo $order_id; ?>"><?php _e("Save", "woocommerce-postnl") ?>
+            <?php WCPN_Admin::renderSpinner() ?>
         </a>
     </div>
 <?php endif ?>
