@@ -3,9 +3,8 @@
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
-use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
-use WPO\WC\MyParcel\Compatibility\Order as WCX_Order;
-use WPO\WC\MyParcel\Entity\SettingsFieldArguments;
+use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
+use WPO\WC\PostNL\Entity\SettingsFieldArguments;
 
 /**
  * @var int      $order_id
@@ -17,22 +16,22 @@ if (! defined('ABSPATH')) {
 } // Exit if accessed directly
 
 try {
-    $deliveryOptions = WCMP_Admin::getDeliveryOptionsFromOrder($order);
+    $deliveryOptions = WCPn_Admin::getDeliveryOptionsFromOrder($order);
 } catch (Exception $e) {
     return;
 }
 
-$extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EXTRA);
+$extraOptions = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENT_OPTIONS_EXTRA);
 
 ?>
-<div class="wcmp wcmp__change-order">
+<div class="wcpn wcpn__change-order">
     <?php
     if ($deliveryOptions->isPickup()) {
         $pickup = $deliveryOptions->getPickupLocation();
 
         printf(
             "<div class=\"pickup-location\"><strong>%s:</strong><br /> %s<br />%s %s<br />%s %s</div>",
-            __("Pickup location", "woocommerce-myparcel"),
+            __("Pickup location", "woocommerce-postnl"),
             $pickup->getLocationName(),
             $pickup->getStreet(),
             $pickup->getNumber(),
@@ -44,11 +43,11 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
     }
 
     $isCarrierDisabled     = $deliveryOptions->getCarrier();
-    $isPackageTypeDisabled = count(WCMP_Data::getPackageTypes()) === 1 || $deliveryOptions->isPickup();
+    $isPackageTypeDisabled = count(WCPN_Data::getPackageTypes()) === 1 || $deliveryOptions->isPickup();
     $shipment_options      = $deliveryOptions->getShipmentOptions();
 
     $packageTypes        = array_flip(AbstractConsignment::PACKAGE_TYPES_NAMES_IDS_MAP);
-    $selectedPackageType = WCMP()->export->getPackageTypeForOrder($order_id);
+    $selectedPackageType = WCPN()->export->getPackageTypeForOrder($order_id);
 
     $postnl          = PostNLConsignment::CARRIER_NAME;
     $insurance       = false;
@@ -58,61 +57,61 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
     $ageCheck        = false;
     $returnShipment  = false;
 
-    $insurance = WCMP_Export::getChosenOrDefaultShipmentOption(
+    $insurance = WCPN_Export::getChosenOrDefaultShipmentOption(
         $shipment_options->getInsurance(),
-        "{$postnl}_" . WCMP_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED
+        "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED
     );
 
-    $signature = WCMP_Export::getChosenOrDefaultShipmentOption(
+    $signature = WCPN_Export::getChosenOrDefaultShipmentOption(
         $shipment_options->hasSignature(),
-        "{$postnl}_" . WCMP_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE
+        "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE
     );
 
-    $onlyRecipient = WCMP_Export::getChosenOrDefaultShipmentOption(
+    $onlyRecipient = WCPN_Export::getChosenOrDefaultShipmentOption(
         $shipment_options->hasOnlyRecipient(),
-        "{$postnl}_" . WCMP_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT
+        "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT
     );
 
-    $ageCheck = WCMP_Export::getChosenOrDefaultShipmentOption(
+    $ageCheck = WCPN_Export::getChosenOrDefaultShipmentOption(
         $shipment_options->hasAgeCheck(),
-        "{$postnl}_" . WCMP_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK
+        "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK
     );
 
-    $largeFormat = WCMP_Export::getChosenOrDefaultShipmentOption(
+    $largeFormat = WCPN_Export::getChosenOrDefaultShipmentOption(
         $shipment_options->hasLargeFormat(),
-        "{$postnl}_" . WCMP_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT
+        "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT
     );
 
-    $returnShipment = WCMP_Export::getChosenOrDefaultShipmentOption(
+    $returnShipment = WCPN_Export::getChosenOrDefaultShipmentOption(
         $shipment_options->isReturn(),
-        "{$postnl}_" . WCMP_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN
+        "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN
     );
 
-    $insuranceAmount = WCMP_Export::getChosenOrDefaultShipmentOption(
+    $insuranceAmount = WCPN_Export::getChosenOrDefaultShipmentOption(
         $shipment_options->getInsurance(),
-        "{$postnl}_" . WCMP_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT
+        "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT
     );
 
-    $digitalStampWeight = WCMP_Export::getDigitalStampRanges((int) $order->get_meta(WCMP_Admin::META_ORDER_WEIGHT));
+    $digitalStampWeight = WCPN_Export::getDigitalStampRanges((int) $order->get_meta(WCPN_Admin::META_ORDER_WEIGHT));
 
     $option_rows = [
         [
             "name"              => "[carrier]",
-            "label"             => __("Carrier", "woocommerce-myparcel"),
+            "label"             => __("Carrier", "woocommerce-postnl"),
             "type"              => "select",
-            "options"           => WCMP_Data::CARRIERS_HUMAN,
+            "options"           => WCPN_Data::CARRIERS_HUMAN,
             "custom_attributes" => ($isCarrierDisabled ?? $postnl) ? ["disabled" => "disabled"] : [],
             "value"             => $deliveryOptions->getCarrier(),
         ],
         [
             "name"              => "[package_type]",
-            "label"             => __("Shipment type", "woocommerce-myparcel"),
+            "label"             => __("Shipment type", "woocommerce-postnl"),
             "description"       => sprintf(
-                __("Calculated weight: %s", "woocommerce-myparcel"),
-                wc_format_weight($order->get_meta(WCMP_Admin::META_ORDER_WEIGHT))
+                __("Calculated weight: %s", "woocommerce-postnl"),
+                wc_format_weight($order->get_meta(WCPN_Admin::META_ORDER_WEIGHT))
             ),
             "type"              => "select",
-            "options"           => array_combine(WCMP_Data::getPackageTypes(), WCMP_Data::getPackageTypesHuman()),
+            "options"           => array_combine(WCPN_Data::getPackageTypes(), WCPN_Data::getPackageTypesHuman()),
             "value"             => $packageTypes[$selectedPackageType],
             "custom_attributes" => [
                 "disabled" => $isPackageTypeDisabled ? "disabled" : null,
@@ -120,7 +119,7 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
         ],
         [
             "name"              => "[extra_options][collo_amount]",
-            "label"             => __("Number of labels", "woocommerce-myparcel"),
+            "label"             => __("Number of labels", "woocommerce-postnl"),
             "type"              => "number",
             "value"             => isset($extraOptions["collo_amount"]) ? $extraOptions["collo_amount"] : 1,
             "custom_attributes" => [
@@ -135,10 +134,10 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
             "condition" => [
                 "name"         => "[carrier]",
                 "type"         => "disable",
-                "parent_value" => WCMP_Data::getPostnlName(),
-                "set_value"    => WCMP_Settings_Data::DISABLED,
+                "parent_value" => WCPN_Data::getPostnlName(),
+                "set_value"    => WCPN_Settings_Data::DISABLED,
             ],
-            "label"     => __("Home address only", "woocommerce-myparcel"),
+            "label"     => __("Home address only", "woocommerce-postnl"),
             "value"     => $onlyRecipient,
         ],
         [
@@ -147,10 +146,10 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
             "condition" => [
                 "name"         => "[carrier]",
                 "type"         => "disable",
-                "parent_value" => WCMP_Data::getPostnlName(),
-                "set_value"    => WCMP_Settings_Data::DISABLED,
+                "parent_value" => WCPN_Data::getPostnlName(),
+                "set_value"    => WCPN_Settings_Data::DISABLED,
             ],
-            "label"     => __("Signature on delivery", "woocommerce-myparcel"),
+            "label"     => __("Signature on delivery", "woocommerce-postnl"),
             "value"     => $signature,
         ],
         [
@@ -159,10 +158,10 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
             "condition" => [
                 "name"         => "[carrier]",
                 "type"         => "disable",
-                "parent_value" => WCMP_Data::getPostnlName(),
-                "set_value"    => WCMP_Settings_Data::DISABLED,
+                "parent_value" => WCPN_Data::getPostnlName(),
+                "set_value"    => WCPN_Settings_Data::DISABLED,
             ],
-            "label"     => __("Large format", "woocommerce-myparcel"),
+            "label"     => __("Large format", "woocommerce-postnl"),
             "value"     => $largeFormat,
         ],
         [
@@ -171,10 +170,10 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
             "condition" => [
                 "name"         => "[carrier]",
                 "type"         => "disable",
-                "parent_value" => WCMP_Data::getPostnlName(),
-                "set_value"    => WCMP_Settings_Data::DISABLED,
+                "parent_value" => WCPN_Data::getPostnlName(),
+                "set_value"    => WCPN_Settings_Data::DISABLED,
             ],
-            "label"     => __("Age check", "woocommerce-myparcel"),
+            "label"     => __("Age check", "woocommerce-postnl"),
             "value"     => $ageCheck,
         ],
         [
@@ -183,10 +182,10 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
             "condition" => [
                 "name"         => "[carrier]",
                 "type"         => "disable",
-                "parent_value" => WCMP_Data::getPostnlName(),
-                "set_value"    => WCMP_Settings_Data::DISABLED,
+                "parent_value" => WCPN_Data::getPostnlName(),
+                "set_value"    => WCPN_Settings_Data::DISABLED,
             ],
-            "label"     => __("Return shipment", "woocommerce-myparcel"),
+            "label"     => __("Return shipment", "woocommerce-postnl"),
             "value"     => $returnShipment,
         ],
         [
@@ -195,29 +194,29 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
             "condition" => [
                 "name"         => "[carrier]",
                 "type"         => "disable",
-                "parent_value" => WCMP_Data::getPostnlName(),
-                "set_value"    => WCMP_Settings_Data::ENABLED,
+                "parent_value" => WCPN_Data::getPostnlName(),
+                "set_value"    => WCPN_Settings_Data::ENABLED,
             ],
-            "label"     => __("Insured", "woocommerce-myparcel"),
+            "label"     => __("Insured", "woocommerce-postnl"),
             "value"     => (bool) $insurance,
         ],
         [
             "name"    => "[shipment_options][insured_amount]",
-            "label"   => __("Insurance amount", "woocommerce-myparcel"),
+            "label"   => __("Insurance amount", "woocommerce-postnl"),
             "type"    => "select",
-            "options" => WCMP_Data::getInsuranceAmount(),
+            "options" => WCPN_Data::getInsuranceAmount(),
             "value"   => (int) $insuranceAmount,
         ],
         [
             "name"      => "[shipment_options][weight]",
-            "label"     => __("Weight", "woocommerce-myparcel"),
+            "label"     => __("Weight", "woocommerce-postnl"),
             "type"      => "select",
             "options"   => $digitalStampWeight['names'],
             "condition" => [
                 "name"         => "[carrier]",
                 "type"         => "disable",
-                "parent_value" => WCMP_Data::getPostnlName(),
-                "set_value"    => WCMP_Settings_Data::DISABLED,
+                "parent_value" => WCPN_Data::getPostnlName(),
+                "set_value"    => WCPN_Settings_Data::DISABLED,
             ],
             "value"     => $digitalStampWeight['weight'],
         ],
@@ -228,7 +227,7 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
         unset($option_rows["[only_recipient]"]);
     }
 
-    $namePrefix = WCMP_Admin::SHIPMENT_OPTIONS_FORM_NAME . "[$order_id]";
+    $namePrefix = WCPN_Admin::SHIPMENT_OPTIONS_FORM_NAME . "[$order_id]";
 
     foreach ($option_rows as $option_row) {
         if (isset($option_row["condition"])) {
@@ -239,7 +238,7 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
 
         // Cast boolean values to the correct enabled/disabled values.
         if (is_bool($option_row["value"])) {
-            $option_row["value"] = $option_row["value"] ? WCMP_Settings_Data::ENABLED : WCMP_Settings_Data::DISABLED;
+            $option_row["value"] = $option_row["value"] ? WCPN_Settings_Data::ENABLED : WCPN_Settings_Data::DISABLED;
         }
 
         woocommerce_form_field(
@@ -250,10 +249,10 @@ $extraOptions = WCX_Order::get_meta($order, WCMP_Admin::META_SHIPMENT_OPTIONS_EX
     }
     ?>
     <div>
-        <div class="button wcmp__shipment-settings__save">
+        <div class="button wcpm__shipment-settings__save">
             <?php
-            _e("Save", "woocommerce-myparcel");
-            WCMP_Admin::renderSpinner();
+            _e("Save", "woocommerce-postnl");
+            WCPN_Admin::renderSpinner();
             ?>
         </div>
     </div>
