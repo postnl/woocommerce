@@ -1,7 +1,7 @@
 <?php
 
-use WPO\WC\MyParcel\Compatibility\WC_Core as WCX;
-use WPO\WC\MyParcel\Compatibility\Order as WCX_Order;
+use WPO\WC\PostNL\Compatibility\WC_Core as WCX;
+use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
 
 defined('ABSPATH') or die();
 
@@ -11,25 +11,25 @@ include('html-start.php');
  * @var array $order_ids
  */
 
-$add_return = WCMP_Export::ADD_RETURN;
-$export     = WCMP_Export::EXPORT;
+$add_return = WCPN::ADD_RETURN;
+$export     = WCPN_Export::EXPORT;
 
 $order_ids_string = implode(';', $order_ids);
 
 $target_url = wp_nonce_url(
     admin_url("admin-ajax.php?action=$export&request=$add_return&modal=true&order_ids=$order_ids_string"),
-    WCMP::NONCE_ACTION
+    WCPN::NONCE_ACTION
 );
 
-?>
+?>postnl
   <form
     method="post"
-    class="page-form wcmp__bulk-options wcmp__return-dialog"
+    class="page-form wcpn__bulk-options wcpn__return-dialog"
     action="<?php echo $target_url; ?>">
     <table class="widefat">
       <thead>
       <tr>
-        <th><?php _e("Export options", "woocommerce-myparcel"); ?></th>
+        <th><?php _e("Export options", "woocommerce-postnl"); ?></th>
       </tr>
       </thead>
       <tbody>
@@ -37,14 +37,14 @@ $target_url = wp_nonce_url(
       $c = true;
       foreach ($order_ids as $order_id) :
           $order = WCX::get_order($order_id);
-          // skip non-myparcel destinations
+          // skip non-postnl destinations
           $shipping_country = WCX_Order::get_prop($order, 'shipping_country');
-          if (! WCMP_Country_Codes::isAllowedDestination($shipping_country)) {
+          if (! WCPN_Country_Codes::isAllowedDestination($shipping_country)) {
               continue;
           }
 
-          $recipient     = WCMP_Export::getRecipientFromOrder($order);
-          $package_types = WCMP_Data::getPackageTypes();
+          $recipient     = WCPN_Export::getRecipientFromOrder($order);
+          $package_types = WCPN_Data::getPackageTypes();
           ?>
         <tr class="order-row <?php echo(($c = ! $c) ? 'alternate' : ''); ?>">
           <td>
@@ -52,7 +52,7 @@ $target_url = wp_nonce_url(
               <tr>
                 <td colspan="2">
                   <strong>
-                      <?php echo __("Order", "woocommerce-myparcel") . $order->get_order_number(); ?>
+                      <?php echo __("Order", "woocommerce-postnl") . $order->get_order_number(); ?>
                   </strong>
                 </td>
               </tr>
@@ -62,18 +62,18 @@ $target_url = wp_nonce_url(
                     <thead>
                     <tr>
                       <th>#</th>
-                      <th><?php _e("Product name", "woocommerce-myparcel"); ?></th>
-                      <th align="right"><?php _e("Weight (kg)", "woocommerce-myparcel"); ?></th>
+                      <th><?php _e("Product name", "woocommerce-postnl"); ?></th>
+                      <th align="right"><?php _e("Weight (kg)", "woocommerce-postnl"); ?></th>
                     </tr>
                     </thead>
                     <tbody>
                     <?php foreach ($order->get_items() as $item_id => $item) : ?>
                       <tr>
                         <td><?php echo $item['qty'] . 'x'; ?></td>
-                        <td><?php echo WCMP_Export::get_item_display_name($item, $order) ?></td>
+                        <td><?php echo WCPN_Export::get_item_display_name($item, $order) ?></td>
                         <td align="right">
                             <?php echo wc_format_weight(
-                                WCMP_Export::getItemWeight_kg($item, $order)
+                                WCPN_Export::getItemWeight_kg($item, $order)
                             ); ?>
                         </td>
                       </tr>
@@ -82,9 +82,9 @@ $target_url = wp_nonce_url(
                     <tfoot>
                     <tr>
                       <td>&nbsp;</td>
-                      <td><?php _e("Total weight", "woocommerce-myparcel"); ?></td>
+                      <td><?php _e("Total weight", "woocommerce-postnl"); ?></td>
                       <td align="right"><?php echo wc_format_weight(
-                              $order->get_meta(WCMP_Admin::META_ORDER_WEIGHT)
+                              $order->get_meta(WCPN_Admin::META_ORDER_WEIGHT)
                           ); ?></td>
                     </tr>
                     </tfoot>
@@ -96,8 +96,8 @@ $target_url = wp_nonce_url(
                     && (empty($recipient['street'])
                         || empty($recipient['number']))) { ?>
                   <p><span style="color:red"><?php __(
-                              "This order does not contain valid street and house number data and cannot be exported because of this! This order was probably placed before the MyParcel plugin was activated. The address data can still be manually entered in the order screen.",
-                              "woocommerce-myparcel"
+                              "This order does not contain valid street and house number data and cannot be exported because of this! This order was probably placed before the PostNL plugin was activated. The address data can still be manually entered in the order screen.",
+                              "woocommerce-postnl"
                           ); ?></span></p>
                 </td>
               </tr> <!-- last row -->
@@ -113,7 +113,7 @@ $target_url = wp_nonce_url(
                   <tr>
                     <td
                       colspan="2"
-                      class="wcmp__shipment-options">
+                      class="wcpn__shipment-options">
                         <?php
                         $skip_save = true; // dont show save button for each order
                         if (isset($dialog) && $dialog === 'shipment') {
@@ -135,17 +135,17 @@ $target_url = wp_nonce_url(
     <div>
         <?php
         if (isset($dialog) && $dialog === 'shipment') {
-            $button_text = __("Export to MyParcel", "woocommerce-myparcel");
+            $button_text = __("Export to PostNL", "woocommerce-postnl");
         } else {
-            $button_text = __("Send email", "woocommerce-myparcel");
+            $button_text = __("Send email", "woocommerce-postnl");
         }
         ?>
-      <div class="wcmp__d--flex">
+      <div class="wcpn__d--flex">
         <input
           type="submit"
           value="<?php echo $button_text; ?>"
-          class="button wcmp__return-dialog__save">
-          <?php WCMP_Admin::renderSpinner() ?>
+          class="button wcpn__return-dialog__save">
+          <?php WCPN_Admin::renderSpinner() ?>
       </div>
     </div>
   </form>
