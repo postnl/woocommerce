@@ -2,18 +2,18 @@
 
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use WPO\WC\MyParcel\Compatibility\WC_Core;
-use WPO\WC\MyParcel\Compatibility\Order as WC_Order;
-use WPO\WC\MyParcel\Compatibility\WCMP_ChannelEngine_Compatibility as ChannelEngine;
+use WPO\WC\PostNL\Compatibility\Order as WC_Order;
+use WPO\WC\PostNL\Compatibility\WCPN_ChannelEngine_Compatibility as ChannelEngine;
 
 if (! defined("ABSPATH")) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCMP_API')) {
+if (class_exists('WCPN_API')) {
     return;
 }
 
-class WCMP_API extends WCMP_Rest
+class WCPN_API extends WCPN_Rest
 {
     /**
      * @var string
@@ -33,7 +33,7 @@ class WCMP_API extends WCMP_Rest
     /**
      * Default constructor
      *
-     * @param string $key API Key provided by MyParcel
+     * @param string $key API Key provided by PostNL
      *
      * @throws Exception
      */
@@ -41,7 +41,7 @@ class WCMP_API extends WCMP_Rest
     {
         parent::__construct();
 
-        $this->apiUrl    = WCMP_Data::API_URL;
+        $this->apiUrl    = WCPN_Data::API_URL;
         $this->userAgent = $this->getUserAgent();
         $this->key       = (string) $key;
     }
@@ -123,7 +123,7 @@ class WCMP_API extends WCMP_Rest
     }
 
     /**
-     * Get Wordpress, WooCommerce, MyParcel version and place theme in a array. Implode the array to get an UserAgent.
+     * Get Wordpress, WooCommerce, PostNL version and place theme in a array. Implode the array to get an UserAgent.
      *
      * @return string
      */
@@ -132,7 +132,7 @@ class WCMP_API extends WCMP_Rest
         $userAgents = [
             "Wordpress/" . get_bloginfo("version"),
             "WooCommerce/" . WOOCOMMERCE_VERSION,
-            "MyParcel-WooCommerce/" . WC_MYPARCEL_NL_VERSION,
+            "PostNL-WooCommerce/" . WC_POST_NL_VERSION,
         ];
 
         // Place white space between the array elements
@@ -156,20 +156,20 @@ class WCMP_API extends WCMP_Rest
         /**
          * @see https://github.com/MyParcelNL/Sdk#label-format-and-position
          */
-        if (WCMP()->setting_collection->getByName(WCMP_Settings::SETTING_LABEL_FORMAT) === "A6") {
+        if (WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_LABEL_FORMAT) === "A6") {
             $positions = false;
         }
 
         if ($display) {
             $collection->setPdfOfLabels($positions);
-            WCMP_Export::saveTrackTracesToOrders($collection, $order_ids);
+            WCPN_Export::saveTrackTracesToOrders($collection, $order_ids);
             $this->updateOrderBarcode($order_ids, $collection);
             $collection->downloadPdfOfLabels($display);
         }
 
         if (! $display) {
             $collection->setLinkOfLabels($positions);
-            WCMP_Export::saveTrackTracesToOrders($collection, $order_ids);
+            WCPN_Export::saveTrackTracesToOrders($collection, $order_ids);
             $this->updateOrderBarcode($order_ids, $collection);
             echo $collection->getLinkOfLabels();
             die();
@@ -185,12 +185,12 @@ class WCMP_API extends WCMP_Rest
     {
         foreach ($orderIds as $orderId) {
             $order = WC_Core::get_order($orderId);
-            $lastShipmentIds = unserialize($order->get_meta('_myparcel_last_shipment_ids'));
-            $shipmentData = (new WCMP_Export())->getShipmentData($lastShipmentIds, $order);
+            $lastShipmentIds = unserialize($order->get_meta('_postnl_last_shipment_ids'));
+            $shipmentData = (new WCPN_Export())->getShipmentData($lastShipmentIds, $order);
             $trackTrace = $shipmentData["track_trace"];
             ChannelEngine::updateMetaOnExport($order, $trackTrace);
         }
 
-        WCMP_Export::saveTrackTracesToOrders($collection, $orderIds);
+        WCPN_Export::saveTrackTracesToOrders($collection, $orderIds);
     }
 }
