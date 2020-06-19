@@ -255,7 +255,7 @@ class WCPN_Checkout
      */
     public function output_delivery_options()
     {
-        do_action('woocommerce_posynl_before_delivery_options');
+        do_action('woocommerce_postnl_before_delivery_options');
         require_once(WCPN()->includes . '/views/html-delivery-options-template.php');
         do_action('woocommerce_postnl_after_delivery_options');
     }
