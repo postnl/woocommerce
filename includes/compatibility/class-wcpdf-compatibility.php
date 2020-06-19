@@ -11,7 +11,7 @@ use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
  *
  * @package WPO\WC\MyParcel\Compatibility
  */
-class WCMP_WCPDF_Compatibility
+class WCPN_WCPDF_Compatibility
 {
     public static function add_filters()
     {
