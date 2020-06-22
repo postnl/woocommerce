@@ -4,21 +4,21 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-if (class_exists('WCMP_Installation_Migration_v2_0_0')) {
-    return new WCMP_Installation_Migration_v2_0_0();
+if (class_exists('WCPN_Installation_Migration_v2_0_0')) {
+    return new WCPN_Installation_Migration_v2_0_0();
 }
 
 /**
  * Migrates pre v2.0 settings
  */
-class WCMP_Installation_Migration_v2_0_0
+class WCPN_Installation_Migration_v2_0_0
 {
     /**
      * Copy old settings if available (pre 2.0 didn't store the version, so technically, this is a new install)
      */
     public function __construct()
     {
-        $old_settings = get_option('wcmyparcel_settings');
+        $old_settings = get_option('wcpostnl_settings');
 
         // map old key => new_key
         $general_settings_keys = [
@@ -68,9 +68,9 @@ class WCMP_Installation_Migration_v2_0_0
         }
 
         // add options
-        update_option('woocommerce_myparcel_general_settings', $general_settings);
-        update_option('woocommerce_myparcel_export_defaults_settings', $defaults_settings);
+        update_option('woocommerce_postnl_general_settings', $general_settings);
+        update_option('woocommerce_postnl_export_defaults_settings', $defaults_settings);
     }
 }
 
-new WCMP_Installation_Migration_v2_0_0();
+new WCPN_Installation_Migration_v2_0_0();
