@@ -69,9 +69,9 @@ class WCPN_Upgrade_Migration_v4_0_0 extends WCPN_Upgrade_Migration
 
     protected function migrate(): void
     {
-        $this->oldCheckoutSettings       = get_option("woocommerce_myparcel_checkout_settings");
-        $this->oldExportDefaultsSettings = get_option("woocommerce_myparcel_export_defaults_settings");
-        $this->oldGeneralSettings        = get_option("woocommerce_myparcel_general_settings");
+        $this->oldCheckoutSettings       = get_option("woocommerce_postnl_checkout_settings");
+        $this->oldExportDefaultsSettings = get_option("woocommerce_postnl_export_defaults_settings");
+        $this->oldGeneralSettings        = get_option("woocommerce_postnl_general_settings");
 
         $this->newCheckoutSettings       = $this->oldCheckoutSettings;
         $this->newExportDefaultsSettings = $this->oldExportDefaultsSettings;
