@@ -3,23 +3,23 @@
  */
 
 /**
- * @var {Object} MyParcelDisplaySettings
+ * @var {Object} PostNLDisplaySettings
  *
- * @property {String} MyParcelDisplaySettings.isUsingSplitAddressFields
+ * @property {String} PostNLDisplaySettings.isUsingSplitAddressFields
  *
- * @see \wcmp_checkout::inject_delivery_options_variables
+ * @see \wcpn_checkout::inject_delivery_options_variables
  */
 
 /**
- * @var {Object} MyParcelDeliveryOptions
- * @property {String} MyParcelDeliveryOptions.allowedShippingMethods
- * @property {String} MyParcelDeliveryOptions.disallowedShippingMethods
- * @property {String} MyParcelDeliveryOptions.hiddenInputName
- * @see \wcmp_checkout::inject_delivery_options_variables
+ * @var {Object} PostNLDeliveryOptions
+ * @property {String} PostNLDeliveryOptions.allowedShippingMethods
+ * @property {String} PostNLDeliveryOptions.disallowedShippingMethods
+ * @property {String} PostNLDeliveryOptions.hiddenInputName
+ * @see \wcpn_checkout::inject_delivery_options_variables
  */
 /* eslint-disable-next-line max-lines-per-function */
 jQuery(function ($) {
-  var MyParcelFrontend = {
+  var PostNLFrontend = {
     /**
      * Whether the delivery options are currently shown or not. Defaults to true and can be set to false depending on
      *  shipping methods.
@@ -36,22 +36,22 @@ jQuery(function ($) {
     /**
      * @type {Boolean}
      */
-    isUsingSplitAddressFields: !!parseInt(MyParcelDisplaySettings.isUsingSplitAddressFields),
+    isUsingSplitAddressFields: !!parseInt(PostNLDisplaySettings.isUsingSplitAddressFields),
 
     /**
      * @type {Array}
      */
-    allowedShippingMethods: JSON.parse(MyParcelDeliveryOptions.allowedShippingMethods),
+    allowedShippingMethods: JSON.parse(PostNLDeliveryOptions.allowedShippingMethods),
 
     /**
      * @type {Array}
      */
-    disallowedShippingMethods: JSON.parse(MyParcelDeliveryOptions.disallowedShippingMethods),
+    disallowedShippingMethods: JSON.parse(PostNLDeliveryOptions.disallowedShippingMethods),
 
     /**
      * @type {Boolean}
      */
-    alwaysShow: Boolean(parseInt(MyParcelDeliveryOptions.alwaysShow)),
+    alwaysShow: Boolean(parseInt(PostNLDeliveryOptions.alwaysShow)),
 
     /**
      * @type {String}
@@ -92,12 +92,12 @@ jQuery(function ($) {
     /**
      * Delivery options events.
      */
-    updateDeliveryOptionsEvent: 'myparcel_update_delivery_options',
-    updatedDeliveryOptionsEvent: 'myparcel_updated_delivery_options',
-    updatedAddressEvent: 'myparcel_updated_address',
+    updateDeliveryOptionsEvent: 'postnl_update_delivery_options',
+    updatedDeliveryOptionsEvent: 'postnl_updated_delivery_options',
+    updatedAddressEvent: 'postnl_updated_address',
 
-    showDeliveryOptionsEvent: 'myparcel_show_delivery_options',
-    hideDeliveryOptionsEvent: 'myparcel_hide_delivery_options',
+    showDeliveryOptionsEvent: 'postnl_show_delivery_options',
+    hideDeliveryOptionsEvent: 'postnl_hide_delivery_options',
 
     /**
      * WooCommerce checkout events.
@@ -110,8 +110,8 @@ jQuery(function ($) {
      * Initialize the script.
      */
     init: function () {
-      MyParcelFrontend.addListeners();
-      MyParcelFrontend.injectHiddenInput();
+      PostNLFrontend.addListeners();
+      PostNLFrontend.injectHiddenInput();
     },
 
     /**
@@ -121,23 +121,23 @@ jQuery(function ($) {
      * @param {CustomEvent} event - The update event.
      */
     onDeliveryOptionsUpdate: function (event) {
-      MyParcelFrontend.hiddenDataInput.value = JSON.stringify(event.detail);
+      PostNLFrontend.hiddenDataInput.value = JSON.stringify(event.detail);
 
       /**
        * Remove this event before triggering and re-add it after because it will cause an infinite loop otherwise.
        */
-      $(document.body).off(MyParcelFrontend.updatedWooCommerceCheckoutEvent, MyParcelFrontend.updateShippingMethod);
-      MyParcelFrontend.triggerEvent(MyParcelFrontend.updateWooCommerceCheckoutEvent);
+      $(document.body).off(PostNLFrontend.updatedWooCommerceCheckoutEvent, PostNLFrontend.updateShippingMethod);
+      PostNLFrontend.triggerEvent(PostNLFrontend.updateWooCommerceCheckoutEvent);
 
       /**
        * After the "updated_checkout" event the shipping methods will be rendered, restore the event listener and delete
        *  this one in the process.
        */
-      $(document.body).on(MyParcelFrontend.updatedWooCommerceCheckoutEvent, restoreEventListener);
+      $(document.body).on(PostNLFrontend.updatedWooCommerceCheckoutEvent, restoreEventListener);
 
       function restoreEventListener() {
-        $(document.body).on(MyParcelFrontend.updatedWooCommerceCheckoutEvent, MyParcelFrontend.updateShippingMethod);
-        $(document.body).off(MyParcelFrontend.updatedWooCommerceCheckoutEvent, restoreEventListener);
+        $(document.body).on(PostNLFrontend.updatedWooCommerceCheckoutEvent, PostNLFrontend.updateShippingMethod);
+        $(document.body).off(PostNLFrontend.updatedWooCommerceCheckoutEvent, restoreEventListener);
       };
     },
 
@@ -147,53 +147,53 @@ jQuery(function ($) {
      * @returns {string}
      */
     getSplitField: function () {
-      return MyParcelFrontend.isUsingSplitAddressFields
-        ? MyParcelFrontend.houseNumberField
-        : MyParcelFrontend.addressField;
+      return PostNLFrontend.isUsingSplitAddressFields
+        ? PostNLFrontend.houseNumberField
+        : PostNLFrontend.addressField;
     },
 
     /**
      * Add all event listeners.
      */
     addListeners: function () {
-      MyParcelFrontend.addAddressListeners();
-      MyParcelFrontend.updateShippingMethod();
+      PostNLFrontend.addAddressListeners();
+      PostNLFrontend.updateShippingMethod();
 
-      document.querySelector(MyParcelFrontend.shipToDifferentAddressField)
-        .addEventListener('change', MyParcelFrontend.addAddressListeners);
+      document.querySelector(PostNLFrontend.shipToDifferentAddressField)
+        .addEventListener('change', PostNLFrontend.addAddressListeners);
 
-      document.addEventListener(MyParcelFrontend.updatedAddressEvent, MyParcelFrontend.onDeliveryOptionsAddressUpdate);
-      document.addEventListener(MyParcelFrontend.updatedDeliveryOptionsEvent, MyParcelFrontend.onDeliveryOptionsUpdate);
+      document.addEventListener(PostNLFrontend.updatedAddressEvent, PostNLFrontend.onDeliveryOptionsAddressUpdate);
+      document.addEventListener(PostNLFrontend.updatedDeliveryOptionsEvent, PostNLFrontend.onDeliveryOptionsUpdate);
 
       /*
        * jQuery events.
        */
-      $(document.body).on(MyParcelFrontend.countryToStateChangedEvent, MyParcelFrontend.updateAddress);
-      $(document.body).on(MyParcelFrontend.updatedWooCommerceCheckoutEvent, MyParcelFrontend.updateShippingMethod);
+      $(document.body).on(PostNLFrontend.countryToStateChangedEvent, PostNLFrontend.updateAddress);
+      $(document.body).on(PostNLFrontend.updatedWooCommerceCheckoutEvent, PostNLFrontend.updateShippingMethod);
     },
 
     /**
-     * Get field by name. Will return element with MyParcelFrontend selector: "#<billing|shipping>_<name>".
+     * Get field by name. Will return element with PostNLFrontend selector: "#<billing|shipping>_<name>".
      *
      * @param {string} name - The part after `shipping/billing` in the id of an element in WooCommerce.
      *
      * @returns {Element}
      */
     getField: function (name) {
-      if (!MyParcelFrontend.addressType) {
-        MyParcelFrontend.getAddressType();
+      if (!PostNLFrontend.addressType) {
+        PostNLFrontend.getAddressType();
       }
 
-      return document.querySelector('#' + MyParcelFrontend.addressType + '_' + name);
+      return document.querySelector('#' + PostNLFrontend.addressType + '_' + name);
     },
 
     /**
      * Update address type.
      */
     getAddressType: function () {
-      var useShipping = document.querySelector(MyParcelFrontend.shipToDifferentAddressField).checked;
+      var useShipping = document.querySelector(PostNLFrontend.shipToDifferentAddressField).checked;
 
-      MyParcelFrontend.addressType = useShipping ? 'shipping' : 'billing';
+      PostNLFrontend.addressType = useShipping ? 'shipping' : 'billing';
     },
 
     /**
@@ -203,12 +203,12 @@ jQuery(function ($) {
      * @returns {String}
      */
     getHouseNumber: function () {
-      var address = MyParcelFrontend.getField(MyParcelFrontend.addressField).value;
-      var result = MyParcelFrontend.splitStreetRegex.exec(address);
+      var address = PostNLFrontend.getField(PostNLFrontend.addressField).value;
+      var result = PostNLFrontend.splitStreetRegex.exec(address);
       var numberIndex = 2;
 
-      if (MyParcelFrontend.isUsingSplitAddressFields) {
-        return MyParcelFrontend.getField(MyParcelFrontend.houseNumberField).value;
+      if (PostNLFrontend.isUsingSplitAddressFields) {
+        return PostNLFrontend.getField(PostNLFrontend.houseNumberField).value;
       }
 
       return result ? result[numberIndex] : null;
@@ -228,40 +228,40 @@ jQuery(function ($) {
     },
 
     /**
-     * Check if the country changed by comparing the old value with the new value before overwriting the MyParcelConfig
+     * Check if the country changed by comparing the old value with the new value before overwriting the PostNLConfig
      *  with the new value. Returns true if none was set yet.
      *
      * @returns {Boolean}
      */
     countryHasChanged: function () {
-      if (window.MyParcelConfig.address && window.MyParcelConfig.address.hasOwnProperty('cc')) {
-        return window.MyParcelConfig.address.cc !== MyParcelFrontend.getField(MyParcelFrontend.countryField).value;
+      if (window.PostNLConfig.address && window.PostNLConfig.address.hasOwnProperty('cc')) {
+        return window.PostNLConfig.address.cc !== PostNLFrontend.getField(PostNLFrontend.countryField).value;
       }
 
       return true;
     },
 
     /**
-     * Get data from form fields, put it in the global MyParcelConfig, then trigger updating the delivery options.
+     * Get data from form fields, put it in the global PostNLConfig, then trigger updating the delivery options.
      */
     updateAddress: function () {
-      if (!window.hasOwnProperty('MyParcelConfig')) {
-        throw 'window.MyParcelConfig not found!';
+      if (!window.hasOwnProperty('PostNLConfig')) {
+        throw 'window.PostNLConfig not found!';
       }
 
-      if (typeof window.MyParcelConfig === 'string') {
-        window.MyParcelConfig = JSON.parse(window.MyParcelConfig);
+      if (typeof window.PostNLConfig === 'string') {
+        window.PostNLConfig = JSON.parse(window.PostNLConfig);
       }
 
-      window.MyParcelConfig.address = {
-        cc: MyParcelFrontend.getField(MyParcelFrontend.countryField).value,
-        postalCode: MyParcelFrontend.getField(MyParcelFrontend.postcodeField).value,
-        number: MyParcelFrontend.getHouseNumber(),
-        city: MyParcelFrontend.getField(MyParcelFrontend.cityField).value,
+      window.PostNLConfig.address = {
+        cc: PostNLFrontend.getField(PostNLFrontend.countryField).value,
+        postalCode: PostNLFrontend.getField(PostNLFrontend.postcodeField).value,
+        number: PostNLFrontend.getHouseNumber(),
+        city: PostNLFrontend.getField(PostNLFrontend.cityField).value,
       };
 
-      if (MyParcelFrontend.hasDeliveryOptions) {
-        MyParcelFrontend.triggerEvent(MyParcelFrontend.updateDeliveryOptionsEvent);
+      if (PostNLFrontend.hasDeliveryOptions) {
+        PostNLFrontend.triggerEvent(PostNLFrontend.updateDeliveryOptionsEvent);
       }
     },
 
@@ -272,15 +272,15 @@ jQuery(function ($) {
      */
     setAddress: function (address) {
       if (address.postalCode) {
-        MyParcelFrontend.getField(MyParcelFrontend.postcodeField).value = address.postalCode;
+        PostNLFrontend.getField(PostNLFrontend.postcodeField).value = address.postalCode;
       }
 
       if (address.city) {
-        MyParcelFrontend.getField(MyParcelFrontend.cityField).value = address.city;
+        PostNLFrontend.getField(PostNLFrontend.cityField).value = address.city;
       }
 
       if (address.number) {
-        MyParcelFrontend.setHouseNumber(address.number);
+        PostNLFrontend.setHouseNumber(address.number);
       }
     },
 
@@ -290,17 +290,17 @@ jQuery(function ($) {
      * @param {String|Number} number - New house number to set.
      */
     setHouseNumber: function (number) {
-      var address = MyParcelFrontend.getField(MyParcelFrontend.addressField).value;
-      var oldHouseNumber = MyParcelFrontend.getHouseNumber();
+      var address = PostNLFrontend.getField(PostNLFrontend.addressField).value;
+      var oldHouseNumber = PostNLFrontend.getHouseNumber();
 
-      if (MyParcelFrontend.isUsingSplitAddressFields) {
+      if (PostNLFrontend.isUsingSplitAddressFields) {
         if (oldHouseNumber) {
-          MyParcelFrontend.getField(MyParcelFrontend.addressField).value = address.replace(oldHouseNumber, number);
+          PostNLFrontend.getField(PostNLFrontend.addressField).value = address.replace(oldHouseNumber, number);
         } else {
-          MyParcelFrontend.getField(MyParcelFrontend.addressField).value = address + number;
+          PostNLFrontend.getField(PostNLFrontend.addressField).value = address + number;
         }
       } else {
-        MyParcelFrontend.getField(MyParcelFrontend.houseNumberField).value = number;
+        PostNLFrontend.getField(PostNLFrontend.houseNumberField).value = number;
       }
     },
 
@@ -308,14 +308,14 @@ jQuery(function ($) {
      * Create an input field in the checkout form to be able to pass the checkout data to the $_POST variable when
      * placing the order.
      *
-     * @see includes/class-wcmp-checkout.php::save_delivery_options();
+     * @see includes/class-wcpn-checkout.php::save_delivery_options();
      */
     injectHiddenInput: function () {
-      MyParcelFrontend.hiddenDataInput = document.createElement('input');
-      MyParcelFrontend.hiddenDataInput.setAttribute('hidden', 'hidden');
-      MyParcelFrontend.hiddenDataInput.setAttribute('name', MyParcelDeliveryOptions.hiddenInputName);
+      PostNLFrontend.hiddenDataInput = document.createElement('input');
+      PostNLFrontend.hiddenDataInput.setAttribute('hidden', 'hidden');
+      PostNLFrontend.hiddenDataInput.setAttribute('name', PostNLDeliveryOptions.hiddenInputName);
 
-      document.querySelector('form[name="checkout"]').appendChild(MyParcelFrontend.hiddenDataInput);
+      document.querySelector('form[name="checkout"]').appendChild(PostNLFrontend.hiddenDataInput);
     },
 
     /**
@@ -324,7 +324,7 @@ jQuery(function ($) {
      * @param {CustomEvent} event - The event containing the new address.
      */
     onDeliveryOptionsAddressUpdate: function (event) {
-      MyParcelFrontend.setAddress(event.detail);
+      PostNLFrontend.setAddress(event.detail);
     },
 
     /**
@@ -332,8 +332,8 @@ jQuery(function ($) {
      */
     updateShippingMethod: function () {
       var shipping_method;
-      var shippingMethodField = document.querySelectorAll(MyParcelFrontend.shippingMethodField);
-      var selectedShippingMethodField = document.querySelector(MyParcelFrontend.shippingMethodField + ':checked');
+      var shippingMethodField = document.querySelectorAll(PostNLFrontend.shippingMethodField);
+      var selectedShippingMethodField = document.querySelector(PostNLFrontend.shippingMethodField + ':checked');
 
       /**
        * Check if shipping method field exists. It doesn't exist if there are no shipping methods available for the
@@ -343,12 +343,12 @@ jQuery(function ($) {
        */
       if (shippingMethodField.length) {
         shipping_method = selectedShippingMethodField ? selectedShippingMethodField.value : shippingMethodField[0].value;
-        MyParcelFrontend.selectedShippingMethod = shipping_method;
+        PostNLFrontend.selectedShippingMethod = shipping_method;
       } else {
-        MyParcelFrontend.selectedShippingMethod = null;
+        PostNLFrontend.selectedShippingMethod = null;
       }
 
-      MyParcelFrontend.toggleDeliveryOptions();
+      PostNLFrontend.toggleDeliveryOptions();
     },
 
     /**
@@ -356,13 +356,13 @@ jQuery(function ($) {
      * unless necessary by checking if hasDeliveryOptions is true or false.
      */
     toggleDeliveryOptions: function () {
-      if (MyParcelFrontend.currentShippingMethodHasDeliveryOptions()) {
-        MyParcelFrontend.hasDeliveryOptions = true;
-        MyParcelFrontend.triggerEvent(MyParcelFrontend.showDeliveryOptionsEvent, document);
-        MyParcelFrontend.updateAddress();
+      if (PostNLFrontend.currentShippingMethodHasDeliveryOptions()) {
+        PostNLFrontend.hasDeliveryOptions = true;
+        PostNLFrontend.triggerEvent(PostNLFrontend.showDeliveryOptionsEvent, document);
+        PostNLFrontend.updateAddress();
       } else {
-        MyParcelFrontend.hasDeliveryOptions = false;
-        MyParcelFrontend.triggerEvent(MyParcelFrontend.hideDeliveryOptionsEvent, document);
+        PostNLFrontend.hasDeliveryOptions = false;
+        PostNLFrontend.triggerEvent(PostNLFrontend.hideDeliveryOptionsEvent, document);
       }
     },
 
@@ -375,10 +375,10 @@ jQuery(function ($) {
       var currentClass;
       var display = false;
       var invert = false;
-      var list = MyParcelFrontend.allowedShippingMethods;
+      var list = PostNLFrontend.allowedShippingMethods;
 
-      if (MyParcelFrontend.selectedShippingMethod) {
-        currentClass = MyParcelFrontend.getShippingMethodWithoutClass();
+      if (PostNLFrontend.selectedShippingMethod) {
+        currentClass = PostNLFrontend.getShippingMethodWithoutClass();
       } else {
         return false;
       }
@@ -387,8 +387,8 @@ jQuery(function ($) {
        * If "all" is selected for allowed shipping methods check if the current method is NOT in the
        *  disallowedShippingMethods array.
        */
-      if (MyParcelFrontend.alwaysShow) {
-        list = MyParcelFrontend.disallowedShippingMethods;
+      if (PostNLFrontend.alwaysShow) {
+        list = PostNLFrontend.disallowedShippingMethods;
         invert = true;
       }
 
@@ -403,7 +403,7 @@ jQuery(function ($) {
          *
          * @type {boolean}
          */
-        var currentMethodIsAllowed = method.indexOf(MyParcelFrontend.selectedShippingMethod) > -1;
+        var currentMethodIsAllowed = method.indexOf(PostNLFrontend.selectedShippingMethod) > -1;
 
         if (currentMethodGroupIsAllowed || currentMethodIsAllowed) {
           display = true;
@@ -426,22 +426,22 @@ jQuery(function ($) {
      *  function on the update event so it doesn't matter if we send 5 updates at once.
      */
     addAddressListeners: function () {
-      var fields = [MyParcelFrontend.countryField, MyParcelFrontend.postcodeField, MyParcelFrontend.getSplitField()];
+      var fields = [PostNLFrontend.countryField, PostNLFrontend.postcodeField, PostNLFrontend.getSplitField()];
 
       /* If address type is already set, remove the existing listeners before adding new ones. */
-      if (MyParcelFrontend.addressType) {
+      if (PostNLFrontend.addressType) {
         fields.forEach(function (field) {
-          MyParcelFrontend.getField(field).removeEventListener('change', MyParcelFrontend.updateAddress);
+          PostNLFrontend.getField(field).removeEventListener('change', PostNLFrontend.updateAddress);
         });
       }
 
-      MyParcelFrontend.getAddressType();
+      PostNLFrontend.getAddressType();
 
       fields.forEach(function (field) {
-        MyParcelFrontend.getField(field).addEventListener('change', MyParcelFrontend.updateAddress);
+        PostNLFrontend.getField(field).addEventListener('change', PostNLFrontend.updateAddress);
       });
 
-      MyParcelFrontend.updateAddress();
+      PostNLFrontend.updateAddress();
     },
 
     /**
@@ -450,7 +450,7 @@ jQuery(function ($) {
      * @returns {String}
      */
     getShippingMethodWithoutClass: function () {
-      var shippingMethod = MyParcelFrontend.selectedShippingMethod;
+      var shippingMethod = PostNLFrontend.selectedShippingMethod;
       var indexOfSemicolon = shippingMethod.indexOf(':');
 
       shippingMethod = shippingMethod.substring(0, indexOfSemicolon === -1 ? shippingMethod.length : indexOfSemicolon);
@@ -494,6 +494,6 @@ jQuery(function ($) {
     };
   }
 
-  window.MyParcelFrontend = MyParcelFrontend;
-  MyParcelFrontend.init();
+  window.PostNLFrontend = PostNLFrontend;
+  PostNLFrontend.init();
 });
