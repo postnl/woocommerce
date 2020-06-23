@@ -603,12 +603,8 @@ msgstr "Track & Trace in e-mail"
 #: includes/admin/settings/class-wcmp-settings-data.php:345
 msgid ""
 "Add the Track & Trace code to emails to the customer.<br/><strong>Note!"
-"</strong> When you select this option, make sure you have not enabled the "
-"Track & Trace email in your MyParcel backend."
 msgstr ""
 "Voeg de Track & Trace code toe aan e-mails aan de klant.<br/> <strong>Let op!"
-"</strong> Wanneer je voor deze optie kiest, zorg er dan voor dat je niet de "
-"Track & Trace e-mail in MyParcel backend hebt ingeschakeld."
 
 #: includes_php56/class-wcmp-settings.php:227
 #: includes/admin/settings/class-wcmp-settings-data.php:352
@@ -739,12 +735,8 @@ msgstr "Koppel e-mailadres klant"
 #, php-format
 msgid ""
 "When you connect the customer email, MyParcel can send a Track & Trace "
-"email to this address. In your %sMyParcel backend%s you can enable or "
-"disable this email and format it in your own style."
 msgstr ""
 "Wanneer je het e-mailadres van de klant koppelt, kan MyParcel een Track & "
-"Trace e-mail versturen naar dit adres. In je %sMyParcel backend%s kun je "
-"deze e-mail in- of uitschakelen en opmaken in je eigen stijl."
 
 #: includes_php56/class-wcmp-settings.php:411
 #: includes/admin/settings/class-wcmp-settings-data.php:662
