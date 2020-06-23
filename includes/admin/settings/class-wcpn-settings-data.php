@@ -315,8 +315,7 @@ class WCPN_Settings_Data
                 "label"     => __("Track & Trace in email", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "Add the Track & Trace code to emails to the customer.<br/><strong>Note!</strong> When you select this option, make sure you have not enabled the Track & Trace email in your PostNL backend.",
-                    "woocommerce-postnl"
+                    "Add the Track & Trace code to emails to the customer.", "woocommerce-postnl"
                 ),
             ],
             [
@@ -652,7 +651,7 @@ class WCPN_Settings_Data
                 "label"     => __("Connect customer email", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "When you connect the customer email, PostNL can send a Track & Trace email to this address. In your PostNL backend you can enable or disable this email and format it in your own style.",
+                    "When you connect the customer email, PostNL can send a Track & Trace email to this address.",
                     "woocommerce-postnl"
                 ),
             ],
