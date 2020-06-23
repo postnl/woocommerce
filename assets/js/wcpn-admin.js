@@ -1,16 +1,16 @@
 /**
- * @var {Object} wcmp
+ * @var {Object} wcpn
  *
- * @property {Object} wcmp.actions
- * @property {{export: String, add_shipments: String, add_return: String, get_labels: String, modal_dialog: String}} wcmp.actions
- * @property {String} wcmp.api_url - The API Url we use in MyParcel requests.
- * @property {String} wcmp.ajax_url
- * @property {String} wcmp.ask_for_print_position
- * @property {Object} wcmp.bulk_actions
- * @property {{export: String, print: String, export_print: String}} wcmp.bulk_actions
- * @property {String} wcmp.download_display
- * @property {String} wcmp.nonce
- * @property {Object.<String, String>} wcmp.strings
+ * @property {Object} wcpn.actions
+ * @property {{export: String, add_shipments: String, add_return: String, get_labels: String, modal_dialog: String}} wcpn.actions
+ * @property {String} wcpn.api_url - The API Url we use in PostNL requests.
+ * @property {String} wcpn.ajax_url
+ * @property {String} wcpn.ask_for_print_position
+ * @property {Object} wcpn.bulk_actions
+ * @property {{export: String, print: String, export_print: String}} wcpn.bulk_actions
+ * @property {String} wcpn.download_display
+ * @property {String} wcpn.nonce
+ * @property {Object.<String, String>} wcpn.strings
  */
 
 /* eslint-disable-next-line max-lines-per-function */
@@ -18,27 +18,27 @@ jQuery(function ($) {
   /**
    * @type {Boolean}
    */
-  var askForPrintPosition = Boolean(parseInt(wcmp.ask_for_print_position));
+  var askForPrintPosition = Boolean(parseInt(wcpn.ask_for_print_position));
 
   var selectors = {
-    offsetDialog: '.wcmp__offset-dialog',
-    offsetDialogButton: '.wcmp__offset-dialog__button',
-    offsetDialogClose: '.wcmp__offset-dialog__close',
-    offsetDialogInputOffset: '.wcmp__offset-dialog__offset',
-    printQueue: '.wcmp__print-queue',
-    printQueueOffset: '.wcmp__print-queue__offset',
-    saveShipmentSettings: '.wcmp__shipment-settings__save',
-    shipmentOptions: '.wcmp__shipment-options',
-    shipmentOptionsForm: '.wcmp__shipment-options__form',
-    shipmentSummary: '.wcmp__shipment-summary',
-    shipmentSummaryList: '.wcmp__shipment-summary__list',
-    showShipmentOptionsForm: '.wcmp__shipment-options__show',
-    showShipmentSummaryList: '.wcmp__shipment-summary__show',
-    spinner: '.wcmp__spinner',
-    notice: '.wcmp__notice',
-    orderAction: '.wcmp__action',
-    bulkSpinner: '.wcmp__bulk-spinner',
-    orderActionImage: '.wcmp__action__img',
+    offsetDialog: '.wcpn__offset-dialog',
+    offsetDialogButton: '.wcpn__offset-dialog__button',
+    offsetDialogClose: '.wcpn__offset-dialog__close',
+    offsetDialogInputOffset: '.wcpn__offset-dialog__offset',
+    printQueue: '.wcpn__print-queue',
+    printQueueOffset: '.wcpn__print-queue__offset',
+    saveShipmentSettings: '.wcpn__shipment-settings__save',
+    shipmentOptions: '.wcpn__shipment-options',
+    shipmentOptionsForm: '.wcpn__shipment-options__form',
+    shipmentSummary: '.wcpn__shipment-summary',
+    shipmentSummaryList: '.wcpn__shipment-summary__list',
+    showShipmentOptionsForm: '.wcpn__shipment-options__show',
+    showShipmentSummaryList: '.wcpn__shipment-summary__show',
+    spinner: '.wcpn__spinner',
+    notice: '.wcpn__notice',
+    orderAction: '.wcpn__action',
+    bulkSpinner: '.wcpn__bulk-spinner',
+    orderActionImage: '.wcpn__action__img',
   };
 
   var spinner = {
@@ -102,12 +102,12 @@ jQuery(function ($) {
    */
   function runTriggers() {
     /* init options on settings page and in bulk form */
-    $('#wcmp_settings :input, .wcmp__bulk-options :input').change();
+    $('#wcpn_settings :input, .wcpn__bulk-options :input').change();
 
     /**
      * Move the shipment options form and the shipment summary from the actions column to the shipping address column.
      *
-     * @see includes/admin/class-wcmp-admin.php:49
+     * @see includes/admin/class-wcpn-admin.php:49
      */
     $([selectors.shipmentOptions, selectors.shipmentSummary].join(',')).each(function () {
       var shippingAddressColumn = $(this).closest('tr')
@@ -319,11 +319,11 @@ jQuery(function ($) {
     var form = $(button).closest(selectors.shipmentOptionsForm);
 
     doRequest.bind(button)({
-      url: wcmp.ajax_url,
+      url: wcpn.ajax_url,
       data: {
-        action: 'wcmp_save_shipment_options',
+        action: 'wcpn_save_shipment_options',
         form_data: form.find(':input').serialize(),
-        security: wcmp.nonce,
+        security: wcpn.nonce,
       },
       afterDone: function () {
         setTimeout(function () {
@@ -342,7 +342,7 @@ jQuery(function ($) {
     /**
      * Check if our action is the selected one.
      */
-    if (wcmp.bulk_actions.hasOwnProperty(action)) {
+    if (wcpn.bulk_actions.hasOwnProperty(action)) {
       return;
     }
 
@@ -365,29 +365,29 @@ jQuery(function ($) {
       }
     );
 
-    $(rows.join(',')).addClass('wcmp__loading');
+    $(rows.join(',')).addClass('wcpn__loading');
 
     if (!order_ids.length) {
-      alert(wcmp.strings.no_orders_selected);
+      alert(wcpn.strings.no_orders_selected);
       return;
     } else {
       var button = this;
       $(button).prop('disabled', true);
-      $('.wcmp__spinner--bulk > .wcmp__spinner__loading').show();
+      $('.wcpn__spinner--bulk > .wcpn__spinner__loading').show();
     }
 
     switch (action) {
       /**
        * Export orders.
        */
-      case wcmp.bulk_actions.export:
-        exportToMyParcel(order_ids);
+      case wcpn.bulk_actions.export:
+        exportToPostNL(order_ids);
         break;
 
       /**
        * Print labels.
        */
-      case wcmp.bulk_actions.print:
+      case wcpn.bulk_actions.print:
         printLabel({
           order_ids: order_ids,
         });
@@ -396,8 +396,8 @@ jQuery(function ($) {
       /**
        * Export and print.
        */
-      case wcmp.bulk_actions.export_print:
-        exportToMyParcel(order_ids, 'after_reload');
+      case wcpn.bulk_actions.export_print:
+        exportToPostNL(order_ids, 'after_reload');
         break;
     }
   }
@@ -412,13 +412,13 @@ jQuery(function ($) {
     $(button).prop('disabled', true);
 
     if (typeof request.data !== 'undefined') {
-      $('.wcmp__spinner--bulkAction > .wcmp__spinner__loading').show();
+      $('.wcpn__spinner--bulkAction > .wcpn__spinner__loading').show();
     } else {
       setSpinner(button, spinner.loading);
     }
 
     if (!request.url) {
-      request.url = wcmp.ajax_url;
+      request.url = wcpn.ajax_url;
     }
 
     $.ajax({
@@ -482,18 +482,18 @@ jQuery(function ($) {
     var request = getParameterByName('request', button.href);
     var order_ids = getParameterByName('order_ids', button.href);
 
-    if (!wcmp.actions.hasOwnProperty(request)) {
+    if (!wcpn.actions.hasOwnProperty(request)) {
       return;
     }
 
     event.preventDefault();
 
     switch (request) {
-      case wcmp.actions.add_shipments:
-        exportToMyParcel.bind(button)();
+      case wcpn.actions.add_shipments:
+        exportToPostNL.bind(button)();
         break;
-      case wcmp.actions.get_labels:
-        if (askForPrintPosition && !$(button).hasClass('wcmp__offset-dialog__button')) {
+      case wcpn.actions.get_labels:
+        if (askForPrintPosition && !$(button).hasClass('wcpn__offset-dialog__button')) {
           showOffsetDialog.bind(button)();
         } else {
           printLabel.bind(button)({
@@ -501,8 +501,8 @@ jQuery(function ($) {
           });
         }
         break;
-      case wcmp.actions.add_return:
-        myparcel_modal_dialog(order_ids, 'return');
+      case wcpn.actions.add_return:
+        postnl_modal_dialog(order_ids, 'return');
         break;
     }
   }
@@ -590,7 +590,7 @@ jQuery(function ($) {
    * Show the offset dialog for bulk options that allow it.
    */
   function showBulkOffsetDialog() {
-    if ([wcmp.bulk_actions.print, wcmp.bulk_actions.export_print].indexOf(this.value) === -1) {
+    if ([wcpn.bulk_actions.print, wcpn.bulk_actions.export_print].indexOf(this.value) === -1) {
       hideOffsetDialog();
       return;
     }
@@ -615,8 +615,8 @@ jQuery(function ($) {
     });
   }
 
-  /* export orders to MyParcel via AJAX */
-  function exportToMyParcel(order_ids, print) {
+  /* export orders to PostNL via AJAX */
+  function exportToPostNL(order_ids, print) {
     var url;
     var data;
 
@@ -628,12 +628,12 @@ jQuery(function ($) {
       url = this.href;
     } else {
       data = {
-        action: wcmp.actions.export,
-        request: wcmp.actions.add_shipments,
+        action: wcpn.actions.export,
+        request: wcpn.actions.add_shipments,
         offset: getPrintOffset(),
         order_ids: order_ids,
         print: print,
-        _wpnonce: wcmp.nonce,
+        _wpnonce: wcpn.nonce,
       };
     }
 
@@ -641,7 +641,7 @@ jQuery(function ($) {
       url: url,
       data: data || {},
       afterDone: function (response) {
-        var redirect_url = updateUrlParameter(window.location.href, 'myparcel_done', 'true');
+        var redirect_url = updateUrlParameter(window.location.href, 'postnl_done', 'true');
 
         if (print === 'no' || print === 'after_reload') {
           /* refresh page, admin notices are stored in options and will be displayed automatically */
@@ -649,11 +649,11 @@ jQuery(function ($) {
         } else {
           /* when printing, output notices directly so that we can init print in the same run */
           if (response !== null && typeof response === 'object' && 'error' in response) {
-            myparcel_admin_notice(response.error, 'error');
+            postnl_admin_notice(response.error, 'error');
           }
 
           if (response !== null && typeof response === 'object' && 'success' in response) {
-            myparcel_admin_notice(response.success, 'success');
+            postnl_admin_notice(response.success, 'success');
           }
 
           /* load PDF */
@@ -665,20 +665,20 @@ jQuery(function ($) {
     });
   }
 
-  function myparcel_modal_dialog(order_ids, dialog) {
+  function postnl_modal_dialog(order_ids, dialog) {
     var data = {
-      action: wcmp.actions.export,
-      request: wcmp.actions.modal_dialog,
+      action: wcpn.actions.export,
+      request: wcpn.actions.modal_dialog,
       height: 380,
       width: 720,
       order_ids: order_ids,
       dialog: dialog,
-      _wpnonce: wcmp.nonce,
+      _wpnonce: wcpn.nonce,
       // LEAVE THIS AT THE BOTTOM! The awful code behind the thickbox splits the url on "TB_" for some reason.
       TB_iframe: true,
     };
 
-    var url = wcmp.ajax_url + '?' + $.param(data);
+    var url = wcpn.ajax_url + '?' + $.param(data);
 
     /* disable background scrolling */
     $('body').css({overflow: 'hidden'});
@@ -720,7 +720,7 @@ jQuery(function ($) {
         window.location.reload();
       }
     }
-    $('.wcmp__spinner--bulkAction > .wcmp__spinner__loading').hide();
+    $('.wcpn__spinner--bulkAction > .wcpn__spinner__loading').hide();
   }
 
   function fileExists(pdfUrl) {
@@ -753,7 +753,7 @@ jQuery(function ($) {
     return parseInt(askForPrintPosition ? $(selectors.offsetDialogInputOffset).val() : 0);
   }
 
-  /* Request MyParcel labels */
+  /* Request PostNL labels */
   function printLabel(data) {
     var button = this;
     var request;
@@ -765,10 +765,10 @@ jQuery(function ($) {
     } else {
       request = {
         data: Object.assign({
-          action: wcmp.actions.export,
-          request: wcmp.actions.get_labels,
+          action: wcpn.actions.export,
+          request: wcpn.actions.get_labels,
           offset: getPrintOffset(),
-          _wpnonce: wcmp.nonce,
+          _wpnonce: wcpn.nonce,
         }, data),
       };
     }
@@ -777,7 +777,7 @@ jQuery(function ($) {
       openPdf(data, response);
     };
 
-    if (wcmp.download_display === 'download') {
+    if (wcpn.download_display === 'download') {
       doRequest.bind(button)(request);
     } else {
       var url;
@@ -785,14 +785,14 @@ jQuery(function ($) {
       if (request.hasOwnProperty('url')) {
         url = request.url;
       } else {
-        url = wcmp.ajax_url + '?' + $.param(request.data);
+        url = wcpn.ajax_url + '?' + $.param(request.data);
       }
 
       openPdf(data, url, true);
     }
   }
 
-  function myparcel_admin_notice(message, type) {
+  function postnl_admin_notice(message, type) {
     var mainHeader = $('#wpbody-content > .wrap > h1:first');
     var notice = '<div class="' + selectors.notice + ' notice notice-' + type + '"><p>' + message + '</p></div>';
     mainHeader.after(notice);
@@ -832,15 +832,15 @@ jQuery(function ($) {
       summaryList.find(selectors.spinner).show();
 
       var data = {
-        security: wcmp.nonce,
-        action: 'wcmp_get_shipment_summary_status',
+        security: wcpn.nonce,
+        action: 'wcpn_get_shipment_summary_status',
         order_id: summaryList.data('order_id'),
         shipment_id: summaryList.data('shipment_id'),
       };
 
       $.ajax({
         type: 'POST',
-        url: wcmp.ajax_url,
+        url: wcpn.ajax_url,
         data: data,
         context: summaryList,
         success: function (response) {
