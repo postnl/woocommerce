@@ -78,7 +78,6 @@ class WCPN_Settings
     // Defaults
     public const SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE      = "export_signature";
     public const SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT = "export_only_recipient";
-    public const SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT   = "export_large_format";
     public const SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK      = "export_age_check";
     public const SETTING_CARRIER_DEFAULT_EXPORT_RETURN         = "export_return_shipments";
     public const SETTING_CARRIER_DEFAULT_EXPORT_INSURED        = "export_insured";

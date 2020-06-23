@@ -77,11 +77,6 @@ $extraOptions = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENT_OPTIONS_EX
         "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK
     );
 
-    $largeFormat = WCPN_Export::getChosenOrDefaultShipmentOption(
-        $shipment_options->hasLargeFormat(),
-        "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT
-    );
-
     $returnShipment = WCPN_Export::getChosenOrDefaultShipmentOption(
         $shipment_options->isReturn(),
         "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN
@@ -150,18 +145,6 @@ $extraOptions = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENT_OPTIONS_EX
             ],
             "label"     => __("Signature on delivery", "woocommerce-postnl"),
             "value"     => $signature,
-        ],
-        [
-            "name"      => "[shipment_options][large_format]",
-            "type"      => "toggle",
-            "condition" => [
-                "name"         => "[carrier]",
-                "type"         => "disable",
-                "parent_value" => WCPN_Data::getPostnlName(),
-                "set_value"    => WCPN_Settings_Data::DISABLED,
-            ],
-            "label"     => __("Large format", "woocommerce-postnl"),
-            "value"     => $largeFormat,
         ],
         [
             "name"      => "[shipment_options][age_check]",

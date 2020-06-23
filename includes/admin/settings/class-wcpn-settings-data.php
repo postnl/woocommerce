@@ -414,15 +414,6 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT,
-                "label"     => __("Extra large size", "woocommerce-postnl"),
-                "type"      => "toggle",
-                "help_text" => __(
-                    "Enable this option when your shipment is bigger than 100 x 70 x 50 cm, but smaller than 175 x 78 x 58 cm. An extra fee will be charged. Note! If the parcel is bigger than 175 x 78 x 58 of or heavier than 30 kg, the pallet rate will be charged.",
-                    "woocommerce-postnl"
-                ),
-            ],
-            [
                 "name"      => WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK,
                 "label"     => __("Age check 18+", "woocommerce-postnl"),
                 "type"      => "toggle",
@@ -727,7 +718,7 @@ class WCPN_Settings_Data
         return [
             [
                 "name"      => WCPN_Settings::SETTING_USE_SPLIT_ADDRESS_FIELDS,
-                "label"     => __("PostNLPostNL address fields", "woocommerce-postnl"),
+                "label"     => __("PostNL address fields", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "When enabled the checkout will use the PostNLPostNL address fields. This means there will be three separate fields for street name, number and suffix. Want to use the WooCommerce default fields? Leave this option unchecked.",
@@ -745,7 +736,7 @@ class WCPN_Settings_Data
             ],
             [
                 "name"      => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Enable PostNLPostNL delivery options", "woocommerce-postnl"),
+                "label"     => __("Enable PostNL delivery options", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "The PostNL delivery options allow your customers to select whether they want their parcel delivered at home or to a pickup point. Depending on the settings you can allow them to select a date, time and even options like requiring a signature on delivery.",

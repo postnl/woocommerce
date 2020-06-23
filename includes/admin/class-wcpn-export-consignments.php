@@ -250,17 +250,6 @@ class WCPN_Export_Consignments
     }
 
     /**
-     * @return bool
-     */
-    private function getLargeFormat(): bool
-    {
-        return WCPN_Export::getChosenOrDefaultShipmentOption(
-            $this->deliveryOptions->getShipmentOptions()->hasLargeFormat(),
-            "{$this->carrier}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT
-        );
-    }
-
-    /**
      * @return int
      */
     private function getContents(): int
@@ -407,7 +396,6 @@ class WCPN_Export_Consignments
             ->setOnlyRecipient($this->getOnlyRecipient())
             ->setInsurance($this->getInsurance())
             ->setAgeCheck($this->getAgeCheck())
-            ->setLargeFormat($this->getLargeFormat())
             ->setContents($this->getContents())
             ->setInvoice($this->order->get_id())
             ->setReturn($this->getReturnShipment());
