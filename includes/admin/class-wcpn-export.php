@@ -24,7 +24,6 @@ class WCPN_Export
     public const PACKAGE       = 1;
     public const MAILBOX       = 2;
     public const LETTER        = 3;
-    public const DIGITAL_STAMP = 4;
 
     public const EXPORT = "wcpn_export";
 
@@ -1103,25 +1102,6 @@ class WCPN_Export
         $item_weight = (float) $product_weight * (int) $item["qty"];
 
         return (float) $item_weight;
-    }
-
-    /**
-     * @param int         $weight
-     * @param string|null $names
-     *
-     * @return array
-     */
-    public static function getDigitalStampRanges(int $weight, string $names = null): array
-    {
-        foreach (WCPN_Data::getDigitalStampWeight() as $tierRange) {
-            $names[$tierRange['average']] = $tierRange['min'] . " - " . $tierRange['max'] . " gram";
-
-            if ($weight > $tierRange['min'] && $weight <= $tierRange['max']) {
-                $weight = $tierRange['average'];
-            }
-        }
-
-        return ['names' => $names, 'weight' => $weight];
     }
 
     /**

@@ -92,7 +92,6 @@ $extraOptions = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENT_OPTIONS_EX
         "{$postnl}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT
     );
 
-    $digitalStampWeight = WCPN_Export::getDigitalStampRanges((int) $order->get_meta(WCPN_Admin::META_ORDER_WEIGHT));
 
     $option_rows = [
         [
@@ -206,19 +205,6 @@ $extraOptions = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENT_OPTIONS_EX
             "type"    => "select",
             "options" => WCPN_Data::getInsuranceAmount(),
             "value"   => (int) $insuranceAmount,
-        ],
-        [
-            "name"      => "[shipment_options][weight]",
-            "label"     => __("Weight", "woocommerce-postnl"),
-            "type"      => "select",
-            "options"   => $digitalStampWeight['names'],
-            "condition" => [
-                "name"         => "[carrier]",
-                "type"         => "disable",
-                "parent_value" => WCPN_Data::getPostnlName(),
-                "set_value"    => WCPN_Settings_Data::DISABLED,
-            ],
-            "value"     => $digitalStampWeight['weight'],
         ],
     ];
 
