@@ -18,14 +18,14 @@ class WCPN_WCPDF_Compatibility
         // WooCommerce PDF Invoices & Packing Slips Premium Templates compatibility
         add_filter(
             "wpo_wcpdf_templates_replace_postnl_track_trace",
-            ["WCMP_WCPDF_Compatibility", "track_trace"],
+            ["WCPN_WCPDF_Compatibility", "track_trace"],
             10,
             2
         );
 
         add_filter(
             "wpo_wcpdf_templates_replace_postnl_track_trace_link",
-            ["WCMP_WCPDF_Compatibility", "track_trace_link"],
+            ["WCPN_WCPDF_Compatibility", "track_trace_link"],
             10,
             2
         );
