@@ -212,7 +212,7 @@ class WCPN_Checkout
             $priceMorningDelivery        = "{$carrier}_" . WCPN_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE;
             $priceSaturdayDelivery       = "{$carrier}_" . WCPN_Settings::SETTING_CARRIER_SATURDAY_DELIVERY_FEE;
 
-            $postNlConfigConfig["config"]["carrierSettings"][$carrier] = [
+            $postNlConfig["config"]["carrierSettings"][$carrier] = [
                 "allowDeliveryOptions" => $settings->isEnabled($allowDeliveryOptions),
                 "allowEveningDelivery" => $settings->isEnabled($allowEveningDeliveryOptions),
                 "allowMorningDelivery" => $settings->isEnabled($allowMorningDeliveryOptions),
