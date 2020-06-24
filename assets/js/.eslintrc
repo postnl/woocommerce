@@ -27,8 +27,8 @@
     {
       "files": [
         "checkout.js",
-        "wcmp-admin.js",
-        "wcmp-frontend.js"
+        "wcpn-admin.js",
+        "wcpn-frontend.js"
       ],
       "env": {
         "jquery": true
