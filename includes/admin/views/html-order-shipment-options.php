@@ -16,7 +16,7 @@ if (! defined('ABSPATH')) {
 } // Exit if accessed directly
 
 try {
-    $deliveryOptions = WCPn_Admin::getDeliveryOptionsFromOrder($order);
+    $deliveryOptions = WCPN_Admin::getDeliveryOptionsFromOrder($order);
 } catch (Exception $e) {
     return;
 }
