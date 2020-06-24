@@ -361,7 +361,7 @@ class WCPN_Admin
             ],
             $addReturn => [
                 "url" => admin_url("$baseUrl&request=$addReturn&order_ids=$order_id"),
-                "img" => WCPN()->plugin_url() . "/assets/img/postnl-retour.png",
+                "img" => WCPN()->plugin_url() . "/assets/img/postnl-up.png",
                 "alt" => __("Email return label", "woocommerce-postnl"),
             ],
         ];
