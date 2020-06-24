@@ -1293,7 +1293,7 @@ class WCPN_Export
             $order            = WCX::get_order($order_id);
             $shipping_country = WCX_Order::get_prop($order, "shipping_country");
 
-            if (! WCPN::isAllowedDestination($shipping_country)) {
+            if (! WCPN_Country_Codes::isAllowedDestination($shipping_country)) {
                 unset($order_ids[$key]);
             }
         }
