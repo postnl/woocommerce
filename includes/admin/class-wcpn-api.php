@@ -1,7 +1,7 @@
 <?php
 
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
-use WPO\WC\MyParcel\Compatibility\WC_Core;
+use WPO\WC\PostNL\Compatibility\WC_Core;
 use WPO\WC\PostNL\Compatibility\Order as WC_Order;
 use WPO\WC\PostNL\Compatibility\WCPN_ChannelEngine_Compatibility as ChannelEngine;
 

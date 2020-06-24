@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\WC\MyParcel\Compatibility;
+namespace WPO\WC\PostNL\Compatibility;
 
 use WC_Order;
 use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
