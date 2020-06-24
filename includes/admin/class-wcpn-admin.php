@@ -346,7 +346,6 @@ class WCPN_Admin
         $baseUrl      = "admin-ajax.php?action=" . WCPN_Export::EXPORT;
         $addShipments = WCPN_Export::ADD_SHIPMENTS;
         $getLabels    = WCPN_Export::GET_LABELS;
-        $addReturn    = WCPN_Export::ADD_RETURN;
 
         $listing_actions = [
             $addShipments => [
@@ -358,11 +357,6 @@ class WCPN_Admin
                 "url" => admin_url("$baseUrl&request=$getLabels&order_ids=$order_id"),
                 "img" => WCPN()->plugin_url() . "/assets/img/postnl-pdf.png",
                 "alt" => __("Print PostNL label", "woocommerce-postnl"),
-            ],
-            $addReturn => [
-                "url" => admin_url("$baseUrl&request=$addReturn&order_ids=$order_id"),
-                "img" => WCPN()->plugin_url() . "/assets/img/postnl-up.png",
-                "alt" => __("Email return label", "woocommerce-postnl"),
             ],
         ];
 
