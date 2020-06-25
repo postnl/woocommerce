@@ -22,7 +22,7 @@ class WCPN_Admin
 {
     public const META_CONSIGNMENTS           = "_postnl_consignments";
     public const META_CONSIGNMENT_ID         = "_postnl_consignment_id";
-    public const META_DELIVERY_OPTIONS       = "_postnl_delivery_options";
+    public const META_DELIVERY_OPTIONS       = "_myparcel_delivery_options";
     public const META_HIGHEST_SHIPPING_CLASS = "_postnl_highest_shipping_class";
     public const META_LAST_SHIPMENT_IDS      = "_postnl_last_shipment_ids";
     public const META_ORDER_VERSION          = "_postnl_order_version";

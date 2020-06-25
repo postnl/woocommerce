@@ -30,7 +30,7 @@ class WCPN_Frontend
         add_action("woocommerce_thankyou", [$this, "thankyou_pickup_html"], 10, 1);
 
         add_filter(
-            "wpo_wcpdf_templates_replace_postnl_delivery_options",
+            "wpo_wcpdf_templates_replace_myparcel_delivery_options",
             [$this, "wpo_wcpdf_delivery_options"],
             10,
             2

@@ -3,7 +3,7 @@
     "wcmp": "readonly",
     "PostNL": "readonly",
     "PostNLFrontend": "readonly",
-    "PostNLDisplaySettings": "readonly",
+    "MyParcelDisplaySettings": "readonly",
     "PostNLDeliveryOptions": "readonly"
   },
   "extends": [

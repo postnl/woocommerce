@@ -52,7 +52,6 @@ class WCPN_Checkout
                 true
             );
         }
-
         // Don"t load the delivery options scripts if it"s disabled
         if (! WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED)) {
             return;
@@ -96,7 +95,7 @@ class WCPN_Checkout
     {
         wp_localize_script(
             "wc-postnl-frontend",
-            "PostNLDisplaySettings",
+            "MyParcelDisplaySettings",
             [
                 // Convert true/false to int for JavaScript
                 "isUsingSplitAddressFields" => (int) WCPN()->setting_collection->isEnabled(
@@ -107,7 +106,7 @@ class WCPN_Checkout
 
         wp_localize_script(
             "wc-postnl",
-            "PostNLDeliveryOptions",
+            "MyParcelDeliveryOptions",
             [
                 "allowedShippingMethods"    => json_encode($this->getShippingMethodsForDeliveryOptions()),
                 "disallowedShippingMethods" => json_encode(["local_pickup"]),

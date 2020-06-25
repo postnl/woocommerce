@@ -453,7 +453,7 @@ class WCPN_Settings_Data
     /**
      * These are the unprefixed settings for postnl.
      * After the settings are generated every name will be prefixed with "postnl_"
-     * Example: delivery_enabled => postnl_delivery_enabled
+     * Example: delivery_enabled => myparcel_delivery_enabled
      *
      * @return array
      */
