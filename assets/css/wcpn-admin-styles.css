@@ -1,0 +1,340 @@
+/*
+ * Action buttons
+ */
+.post-type-shop_order .wp-list-table .column-wc_actions .button.wcpn__action,
+.button.wcpn__action {
+  width: auto;
+  min-width: 2em;
+  display: -ms-inline-flexbox;
+  display: -webkit-inline-box;
+  display: inline-flex;
+  padding: 0 0.3em !important
+}
+
+.wcpn__action + .wcpn__action {
+  margin-left: .3em;
+}
+
+.wcpn__action .wcpn__action__img {
+  margin: auto;
+}
+
+/*
+ * Shipment overview
+ */
+.wcpn__order__track-trace {
+  word-break: break-all;
+}
+
+/*
+ * Shipment overview: Track & Trace column
+ */
+.wcpn__barcodes {
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+     text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wcpn__box {
+  background-color: white;
+  border: 1px solid #ccc;
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+  position: absolute;
+  z-index: 999;
+  border-radius: 3px;
+}
+
+.wcpn__box .form-row {
+  margin: 0.3rem 0 !important;
+}
+
+/*
+ * Shipment overview: Print offset dialog
+ */
+.wcpn__offset-dialog {
+  position: absolute;
+}
+
+.wcpn__offset-dialog .button {
+  display: none;
+  margin-top: 4px;
+}
+
+.wcpn__offset-dialog__icon {
+  vertical-align: middle;
+}
+
+/*
+ * Shipment summary (overview and single order)
+ */
+.wcpn__shipment-summary, .wcpn__shipment-options {
+  display: inline;
+}
+
+.wcpn__shipment-summary .delivery-date,
+.wcpn__shipment-summary .delivery-options {
+  display: block;
+}
+
+.wcpn__shipment-summary {
+  list-style: none;
+}
+
+.wcpn__shipment-summary li:before {
+  content: "+";
+  margin-right: 4px;
+}
+
+/*
+ * Shipment options form styling
+ */
+.wcpn__shipment-options__form table {
+  width: 100%;
+}
+
+.wcpn__shipment-options__form input[type="checkbox"],
+.wcpn__shipment-options__form input[type="radio"] {
+  margin-right: 8px;
+}
+
+.wcpn__shipment-options__form .wcpn_settings-table td {
+  padding-bottom: 6px;
+  vertical-align: middle;
+}
+
+.wcpn__shipment-summary__list {
+  width: auto;
+}
+
+.wcpn__shipment-options__form td.wcpn_option_cost {
+  width: 60px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.wcpn__shipment-options__form .calculated_weight {
+  font-size: 80%;
+  color: #999;
+}
+
+.wcpn__shipment-settings__save {
+  margin-top: 8px;
+}
+
+/*
+ * Spinner
+ */
+.wcpn__spinner {
+  display: -ms-inline-flexbox;
+  display: -webkit-inline-box;
+  display: inline-flex;
+  margin: auto;
+}
+
+.wcpn__spinner > img {
+  width: 16px;
+  display: none;
+}
+
+.wcpn__spinner--loading .wcpn__spinner__loading,
+.wcpn__spinner--success .wcpn__spinner__success,
+.wcpn__spinner--failed .wcpn__spinner__failed {
+  margin-left: 4px;
+  display: block !important;
+}
+
+.button > .wcpn__spinner {
+  margin-left: 0;
+  -webkit-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.button + .wcpn__spinner, input + .wcpn__spinner {
+  margin-left: 5px;
+  margin-top: 5px;
+}
+
+.wcpn__bulk-spinner {
+  margin-top: 6px;
+}
+
+.widefat .column-order_actions .column-wc_actions .wcpn__spinner {
+  position: absolute;
+}
+
+.wcpn__spinner,
+.wcpn__shipment-settings__save input {
+  vertical-align: middle;
+}
+
+.wcpn__encircle {
+  display: inline-block;
+  text-decoration: none;
+
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  font-size: 10px;
+  line-height: 10px;
+
+  padding: 2px;
+
+  border: 1px solid #666;
+  color: #666;
+  text-align: center;
+}
+
+/*
+ * Track & Trace status
+ */
+.wcpn__table--track-trace {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-collapse: collapse;
+}
+
+.wcpn__table--track-trace th {
+  text-align: left
+}
+
+.wcpn__table--track-trace th,
+.wcpn__table--track-trace td {
+  vertical-align: top;
+  padding: 5px 2px;
+  border-bottom: 1px solid #ccc;
+}
+
+.wcpn__table--track-trace td.wcpn__td--create-label {
+  vertical-align: middle;
+}
+
+/*
+ * Bulk export options styling
+ */
+.wcpn__bulk-options .wcpn_settings-table td {
+  border: none;
+  padding: 0 7px 2px !important;
+  vertical-align: middle !important;
+}
+
+.wcpn__bulk-options td.ordercell {
+  width: 60%;
+}
+
+.wcpn__bulk-options input[type="checkbox"], input[type="radio"] {
+  margin-right: 8px;
+}
+
+.wcpn__bulk-options {
+  width: 96%;
+  margin: 10px auto;
+}
+
+.wcpn__bulk-options .wcpn__shipment-settings__save {
+  margin-top: 8px;
+  float: right;
+}
+
+/*
+ * Chosen delivery options styling
+ */
+#order_data .delivery-options {
+  margin-top: 10px;
+}
+
+#order_data .delivery-options strong {
+  display: block;
+}
+
+/*
+ * Delivery options
+ */
+.wcpn_delivery_option_details {
+  margin-top: 5px;
+}
+
+.wcpn_delivery_option_details td {
+  padding: 0;
+}
+
+.wcpn__shipment-options__form > a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* fix woocommerce column float */
+@media only screen and (min-width: 1280px) {
+  #order_data .order_data_column {
+    max-width: 31% !important;
+  }
+}
+
+/*
+ * Helpers
+ */
+.wcpn__d--block {
+  display: block;
+}
+
+.wcpn__d--inline-block {
+  display: inline-block;
+}
+
+.wcpn__d--flex {
+  display: -ms-flexbox;
+  display: -webkit-box;
+  display: flex;
+}
+
+.wcpn__white-space--nowrap {
+  white-space: nowrap;
+}
+
+/* Hide the "(optional)" spans on wcpn form labels in settings page and others*/
+.wcpn label span.optional {
+  display: none;
+}
+
+/*
+ * wcpn Settings page
+ */
+.woocommerce_page_wcpn_settings tr.wcpn__child {
+  background: #e5e5e5;
+}
+
+.woocommerce_page_wcpn_settings tr.wcpn__child * {
+  font-size: .95em !important;
+}
+
+.woocommerce_page_wcpn_settings tr.wcpn__child th {
+  padding: 12.5px 15px;
+}
+
+.woocommerce_page_wcpn_settings tr.wcpn__child td {
+  padding-top: 5px;
+  padding-bottom: 10px;
+}
+
+.woocommerce_page_wcpn_settings input,
+.woocommerce_page_wcpn_settings table.form-table .select2-container,
+.woocommerce_page_wcpn_settings select {
+  max-width: 360px;
+}
+
+.woocommerce_page_wcpn_settings table.form-table .select2-container {
+  min-width: auto !important;
+  width: 100% !important;
+}
+
+.woocommerce_page_wcpn_settings table.form-table th {
+  width: 280px;
+}
+
+.wcpn__close-button {
+  cursor: pointer;
+}

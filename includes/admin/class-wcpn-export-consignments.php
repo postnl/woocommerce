@@ -133,7 +133,7 @@ class WCPN_Export_Consignments
                 // Description
                 $description = $item["name"];
 
-                // GitHub issue https://github.com/myparcelnl/woocommerce/issues/190
+                // GitHub issue https://github.com/postnlnl/woocommerce/issues/190
                 if (strlen($description) >= WCPN_Export::DESCRIPTION_MAX_LENGTH) {
                     $description = substr($item["name"], 0, 47) . "...";
                 }

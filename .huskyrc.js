@@ -6,7 +6,7 @@ const preCommit = [
   `npm run postinstall`,
   'git add package.json',
   'git add package-lock.json',
-  'git add assets/js/myparcel.js',
+  'git add assets/js/postnl.js',
 ].join(' && ');
 
 module.exports = {

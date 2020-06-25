@@ -54,7 +54,7 @@ class WCPN_API extends WCPN_Rest
      *
      * @return array
      * @throws Exception
-     * @deprecated Use MyParcel SDK instead
+     * @deprecated Use PostNL SDK instead
      */
     public function add_shipments(array $shipments, string $type = "standard"): array
     {

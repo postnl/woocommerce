@@ -56,7 +56,7 @@ class WCPN_Assets
                 "wcpn-admin",
                 WCPN()->plugin_url() . "/assets/js/wcpn-admin.js",
                 ["jquery", "thickbox"],
-                WC_POSTNL_NL_VERSION
+                WC_POST_NL_VERSION
             );
 
             wp_localize_script(

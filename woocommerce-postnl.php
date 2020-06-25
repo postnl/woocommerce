@@ -126,28 +126,6 @@ if (! class_exists('WCPN')) :
          */
         public function includes()
         {
-            // Use php version 5.6
-            if (! $this->phpVersionMeets(\WCPN::PHP_VERSION_7_1)) {
-                $this->includes = $this->plugin_path() . "/includes_php56";
-
-                // include compatibility classes
-                require_once($this->includes . "/compatibility/abstract-wc-data-compatibility.php");
-                require_once($this->includes . "/compatibility/class-wc-date-compatibility.php");
-                require_once($this->includes . "/compatibility/class-wc-core-compatibility.php");
-                require_once($this->includes . "/compatibility/class-wc-order-compatibility.php");
-                require_once($this->includes . "/compatibility/class-wc-product-compatibility.php");
-
-                require_once($this->includes . "/class-WCPN-assets.php");
-                $this->admin = require_once($this->includes . "/class-WCPN-admin.php");
-                require_once($this->includes . "/class-WCPN-frontend-settings.php");
-                require_once($this->includes . "/class-WCPN-frontend.php");
-                require_once($this->includes . "/class-WCPN-settings.php");
-                $this->export = require_once($this->includes . "/class-WCPN-export.php");
-                require_once($this->includes . "/class-WCPN-nl-postcode-fields.php");
-
-                return;
-            }
-
             $this->includes = $this->plugin_path() . '/includes';
             // Use minimum php version 7.1
             require_once($this->includes . "/vendor/autoload.php");

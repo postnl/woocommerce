@@ -10,7 +10,7 @@ use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
  *
  * @see     https://wordpress.org/plugins/channelengine-woocommerce
  * @see     https://github.com/channelengine/woocommerce
- * @package WPO\WC\MyParcel\Compatibility
+ * @package WPO\WC\PostNL\Compatibility
  */
 class WCPN_ChannelEngine_Compatibility
 {

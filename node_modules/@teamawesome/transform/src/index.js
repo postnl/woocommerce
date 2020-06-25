@@ -1,4 +1,4 @@
-import { isPromise } from './util';
+import isPromise from './util';
 
 export default class Pipe extends Map {
   /**
@@ -35,7 +35,7 @@ export default class Pipe extends Map {
 
       if (isPromise(value)) {
         return Promise.resolve(value).then(
-          resolvedValue => func.call(thisArg, resolvedValue),
+          (resolvedValue) => func.call(thisArg, resolvedValue),
         );
       }
 
@@ -111,7 +111,7 @@ export default class Pipe extends Map {
    * @return {boolean}
    */
   delete(key) {
-    this.order.filter(entry => entry !== key);
+    this.order.filter((entry) => entry !== key);
 
     return super.delete(key);
   }
@@ -124,7 +124,6 @@ export default class Pipe extends Map {
 
     return super.clear();
   }
-
 
   /**
    * @inheritDoc

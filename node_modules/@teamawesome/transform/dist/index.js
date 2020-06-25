@@ -19,30 +19,34 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
-var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
-
 var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime/helpers/assertThisInitialized"));
-
-var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
 var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
 
 var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
 
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
 var _wrapNativeSuper2 = _interopRequireDefault(require("@babel/runtime/helpers/wrapNativeSuper"));
 
 var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
-var _util = require("./util");
+var _util = _interopRequireDefault(require("./util"));
 
 var _Symbol$iterator;
 
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
 _Symbol$iterator = Symbol.iterator;
 
-var Pipe =
-/*#__PURE__*/
-function (_Map) {
+var Pipe = /*#__PURE__*/function (_Map) {
   (0, _inherits2["default"])(Pipe, _Map);
+
+  var _super = _createSuper(Pipe);
 
   /**
    * @type {*[]}
@@ -57,7 +61,7 @@ function (_Map) {
 
     var wrapped = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     (0, _classCallCheck2["default"])(this, Pipe);
-    _this = (0, _possibleConstructorReturn2["default"])(this, (0, _getPrototypeOf2["default"])(Pipe).call(this));
+    _this = _super.call(this);
     (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "order", []);
     var entries;
 
@@ -92,7 +96,7 @@ function (_Map) {
       return this.order.reduce(function (value, action) {
         var func = _this2.get(action);
 
-        if ((0, _util.isPromise)(value)) {
+        if ((0, _util["default"])(value)) {
           return Promise.resolve(value).then(function (resolvedValue) {
             return func.call(thisArg, resolvedValue);
           });
@@ -214,9 +218,7 @@ function (_Map) {
 
   }, {
     key: _Symbol$iterator,
-    value:
-    /*#__PURE__*/
-    _regenerator["default"].mark(function value() {
+    value: /*#__PURE__*/_regenerator["default"].mark(function value() {
       var i, key;
       return _regenerator["default"].wrap(function value$(_context) {
         while (1) {
@@ -252,9 +254,7 @@ function (_Map) {
 
   }, {
     key: "entries",
-    value:
-    /*#__PURE__*/
-    _regenerator["default"].mark(function entries() {
+    value: /*#__PURE__*/_regenerator["default"].mark(function entries() {
       var i, key;
       return _regenerator["default"].wrap(function entries$(_context2) {
         while (1) {
@@ -290,9 +290,7 @@ function (_Map) {
 
   }, {
     key: "keys",
-    value:
-    /*#__PURE__*/
-    _regenerator["default"].mark(function keys() {
+    value: /*#__PURE__*/_regenerator["default"].mark(function keys() {
       var i;
       return _regenerator["default"].wrap(function keys$(_context3) {
         while (1) {
@@ -327,9 +325,7 @@ function (_Map) {
 
   }, {
     key: "values",
-    value:
-    /*#__PURE__*/
-    _regenerator["default"].mark(function values() {
+    value: /*#__PURE__*/_regenerator["default"].mark(function values() {
       var i;
       return _regenerator["default"].wrap(function values$(_context4) {
         while (1) {
@@ -360,6 +356,6 @@ function (_Map) {
     })
   }]);
   return Pipe;
-}((0, _wrapNativeSuper2["default"])(Map));
+}( /*#__PURE__*/(0, _wrapNativeSuper2["default"])(Map));
 
 exports["default"] = Pipe;

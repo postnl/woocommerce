@@ -168,7 +168,7 @@ class WCPN_Checkout
         $postNlConfig = [
             "config"  => [
                 "carriers" => $carriers,
-                "platform" => "postnl",
+                "platform" => "myparcel",
                 "locale"   => "nl-NL",
                 "currency" => get_woocommerce_currency(),
             ],

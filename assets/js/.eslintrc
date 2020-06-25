@@ -1,10 +1,10 @@
 {
   "globals": {
     "wcmp": "readonly",
-    "MyParcel": "readonly",
-    "MyParcelFrontend": "readonly",
-    "MyParcelDisplaySettings": "readonly",
-    "MyParcelDeliveryOptions": "readonly"
+    "PostNL": "readonly",
+    "PostNLFrontend": "readonly",
+    "PostNLDisplaySettings": "readonly",
+    "PostNLDeliveryOptions": "readonly"
   },
   "extends": [
     "@myparcel/eslint-config/preset-default"

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce MyParcel\n"
+"Project-Id-Version: WooCommerce PostNL\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-04-28 12:34+0000\n"
 "PO-Revision-Date: 2020-04-28 12:35+0000\n"
@@ -14,21 +14,21 @@ msgstr ""
 "X-Generator: Loco https://localise.biz/\n"
 "X-Loco-Version: 2.3.3; wp-5.4"
 
-#: woocommerce-myparcel.php:234
+#: woocommerce-postnl.php:234
 #, php-format
 msgid ""
-"WooCommerce MyParcel requires %sWooCommerce%s to be installed & activated!"
+"WooCommerce PostNL requires %sWooCommerce%s to be installed & activated!"
 msgstr ""
-"WooCommerce MyParcel heeft %sWooCommerce%s nodig om te worden geïnstalleerd "
+"WooCommerce PostNL heeft %sWooCommerce%s nodig om te worden geïnstalleerd "
 "en geactiveerd!"
 
-#: woocommerce-myparcel.php:252
+#: woocommerce-postnl.php:252
 msgid ""
-"WooCommerce MyParcel requires PHP 5.4 or higher (5.6 or later recommended)."
+"WooCommerce PostNL requires PHP 5.4 or higher (5.6 or later recommended)."
 msgstr ""
-"WooCommerce MyParcel vereist PHP 5.4 of hoger (5.6 of hoger aanbevolen)."
+"WooCommerce PostNL vereist PHP 5.4 of hoger (5.6 of hoger aanbevolen)."
 
-#: woocommerce-myparcel.php:255
+#: woocommerce-postnl.php:255
 msgid "How to update your PHP version"
 msgstr "Hoe uw PHP-versie bij te werken"
 
@@ -161,9 +161,9 @@ msgstr "DPD"
 #: includes_php56/class-wcmp-export.php:74
 #: includes/admin/class-wcmp-export.php:146
 msgid ""
-"You have to export the orders to MyParcel before you can print the labels!"
+"You have to export the orders to PostNL before you can print the labels!"
 msgstr ""
-"Je dient de orders eerst naar MyParcel te exporteren voordat je de labels "
+"Je dient de orders eerst naar PostNL te exporteren voordat je de labels "
 "kunt printen!"
 
 #: includes_php56/class-wcmp-export.php:94
@@ -175,8 +175,8 @@ msgstr "Je hebt onvoldoende rechten voor deze pagina."
 
 #: includes_php56/class-wcmp-export.php:257
 #: includes/admin/class-wcmp-export.php:1380
-msgid "MyParcel shipment created:"
-msgstr "MyParcel zending aangemaakt"
+msgid "PostNL shipment created:"
+msgstr "PostNL zending aangemaakt"
 
 #: includes_php56/class-wcmp-export.php:260
 #: includes_php56/class-wcmp-export.php:307
@@ -188,12 +188,12 @@ msgstr "Onbekende fout"
 #: includes_php56/class-wcmp-export.php:273
 #: includes/admin/class-wcmp-export.php:362
 #, php-format
-msgid "%s shipments successfully exported to MyParcel"
+msgid "%s shipments successfully exported to PostNL"
 msgstr "%s zendingen met succes geëxporteerd naar Myparcel"
 
 #: includes_php56/class-wcmp-export.php:381
-msgid "The selected orders have not been exported to MyParcel yet!"
-msgstr "De geselecteerde orders zijn nog niet naar MyParcel geëxporteerd!"
+msgid "The selected orders have not been exported to PostNL yet!"
+msgstr "De geselecteerde orders zijn nog niet naar PostNL geëxporteerd!"
 
 #: includes_php56/class-wcmp-export.php:995
 msgid "Parcel"
@@ -417,20 +417,20 @@ msgstr "zaterdag"
 #: includes_php56/class-wcmp-admin.php:125
 #: includes/admin/class-wcmp-admin.php:167
 #: includes/admin/class-wcmp-admin.php:189
-msgid "MyParcel: Export"
-msgstr "MyParcel: Exporteren"
+msgid "PostNL: Export"
+msgstr "PostNL: Exporteren"
 
 #: includes_php56/class-wcmp-admin.php:126
 #: includes/admin/class-wcmp-admin.php:168
 #: includes/admin/class-wcmp-admin.php:190
-msgid "MyParcel: Print"
-msgstr "MyParcel: Printen"
+msgid "PostNL: Print"
+msgstr "PostNL: Printen"
 
 #: includes_php56/class-wcmp-admin.php:127
 #: includes/admin/class-wcmp-admin.php:169
 #: includes/admin/class-wcmp-admin.php:191
-msgid "MyParcel: Export & Print"
-msgstr "MyParcel: Exporteren & Printen"
+msgid "PostNL: Export & Print"
+msgstr "PostNL: Exporteren & Printen"
 
 #: includes_php56/class-wcmp-admin.php:154
 #: includes_php56/class-wcmp-assets.php:111
@@ -447,15 +447,15 @@ msgstr "Print"
 #: includes/admin/class-wcmp-admin.php:296
 #: includes_php56/views/wcmp-bulk-options-form.php:158
 #: includes/admin/views/html-bulk-options-form.php:138
-msgid "Export to MyParcel"
-msgstr "Exporteer naar MyParcel"
+msgid "Export to PostNL"
+msgstr "Exporteer naar PostNL"
 
 #: includes_php56/class-wcmp-admin.php:198
 #: includes_php56/class-wcmp-admin.php:386
 #: includes/admin/class-wcmp-admin.php:301
 #: includes/admin/views/html-order-track-trace-table.php:63
-msgid "Print MyParcel label"
-msgstr "Print MyParcel label"
+msgid "Print PostNL label"
+msgstr "Print PostNL label"
 
 #: includes_php56/class-wcmp-admin.php:203
 #: includes/admin/class-wcmp-admin.php:306
@@ -469,8 +469,8 @@ msgstr "E-mail retourlabel"
 #: includes/admin/class-wcmp-admin.php:426
 #: includes/admin/settings/class-wcmp-settings.php:149
 #: includes/admin/settings/class-wcmp-settings.php:150
-msgid "MyParcel"
-msgstr "MyParcel"
+msgid "PostNL"
+msgstr "PostNL"
 
 #: includes_php56/class-wcmp-admin.php:374
 #: includes/admin/views/html-order-track-trace-table.php:37
@@ -486,8 +486,8 @@ msgstr "Status"
 
 #: includes_php56/class-wcmp-admin.php:438
 #: includes/admin/class-wcmp-admin.php:727
-msgid "MyParcel shipment:"
-msgstr "MyParcel zending:"
+msgid "PostNL shipment:"
+msgstr "PostNL zending:"
 
 #: includes_php56/class-wcmp-admin.php:472
 msgid "Delivery date"
@@ -525,17 +525,17 @@ msgstr "Checkout"
 
 #: includes_php56/class-wcmp-settings.php:69
 #: includes/admin/settings/class-wcmp-settings.php:193
-msgid "WooCommerce MyParcel Settings"
-msgstr "WooCommerce MyParcel Instellingen"
+msgid "WooCommerce PostNL Settings"
+msgstr "WooCommerce PostNL Instellingen"
 
 #: includes_php56/class-wcmp-settings.php:112
 #: includes/admin/settings/class-wcmp-settings.php:247
 #, php-format
 msgid ""
-"It looks like your shop is based in Netherlands. This plugin is for MyParcel."
-" If you are using MyParcel Netherlands, download the %s plugin instead!"
+"It looks like your shop is based in Netherlands. This plugin is for PostNL."
+" If you are using PostNL Netherlands, download the %s plugin instead!"
 msgstr ""
-"Het lijkt erop dat je winkel in Nederland is. Deze plugin is voor MyParcel. "
+"Het lijkt erop dat je winkel in Nederland is. Deze plugin is voor PostNL. "
 "Als je gebruik maakt van Myparcel Nederland, download dan de %s plugin!"
 
 #: includes_php56/class-wcmp-settings.php:118
@@ -611,11 +611,11 @@ msgstr "Track & Trace in e-mail"
 msgid ""
 "Add the Track & Trace code to emails to the customer.<br/><strong>Note!"
 "</strong> When you select this option, make sure you have not enabled the "
-"Track & Trace email in your MyParcel backend."
+"Track & Trace email in your PostNL backend."
 msgstr ""
 "Voeg de Track & Trace code toe aan e-mails aan de klant.<br/> <strong>Let op!"
 "</strong> Wanneer je voor deze optie kiest, zorg er dan voor dat je niet de "
-"Track & Trace e-mail in MyParcel backend hebt ingeschakeld."
+"Track & Trace e-mail in PostNL backend hebt ingeschakeld."
 
 #: includes_php56/class-wcmp-settings.php:227
 #: includes/admin/settings/class-wcmp-settings-data.php:354
@@ -636,10 +636,10 @@ msgstr "Verwerk zendingen direct"
 #: includes/admin/settings/class-wcmp-settings-data.php:362
 msgid ""
 "When you enable this option, shipments will be directly processed when sent "
-"to MyParcel."
+"to PostNL."
 msgstr ""
 "Wanneer je deze optie inschakelt, zullen zendingen direct worden verwerkt "
-"wanneer deze verzonden zijn naar MyParcel."
+"wanneer deze verzonden zijn naar PostNL."
 
 #: includes_php56/class-wcmp-settings.php:253
 #: includes/admin/settings/class-wcmp-settings-data.php:369
@@ -650,13 +650,13 @@ msgstr "Orderstatus automatisering"
 #: includes/admin/settings/class-wcmp-settings-data.php:371
 msgid ""
 "Automatically set order status to a predefined status after successful "
-"MyParcel export.<br/>Make sure <strong>Process shipments directly</strong> "
+"PostNL export.<br/>Make sure <strong>Process shipments directly</strong> "
 "is enabled when you use this option together with the <strong>Track & Trace "
 "in email</strong> option, otherwise the Track & Trace code will not be "
 "included in the customer email."
 msgstr ""
 "Wijzig automatisch de orderstatus na het succesvol exporteren van een order "
-"naar MyParcel.<br/>Let op dat <strong>Verwerk zendingen direct</strong> is "
+"naar PostNL.<br/>Let op dat <strong>Verwerk zendingen direct</strong> is "
 "ingeschakeld wanneer je deze optie gebruikt in combinatie met de <strong>"
 "Track & Trace in e-mail</strong> optie, anders wordt de Track & Trace code "
 "niet opgenomen in de e-mail naar de klant."
@@ -721,8 +721,8 @@ msgstr "Pakkettype"
 
 #: includes_php56/class-wcmp-settings.php:377
 #: includes/admin/settings/class-wcmp-settings-data.php:758
-msgid "Select one or more shipping methods for each MyParcel package type"
-msgstr "Selecteer een of meer verzendmethoden voor elk MyParcel pakkettype"
+msgid "Select one or more shipping methods for each PostNL package type"
+msgstr "Selecteer een of meer verzendmethoden voor elk PostNL pakkettype"
 
 #: includes_php56/class-wcmp-settings.php:383
 #: includes_php56/views/wcmp-order-return-shipment-options.php:6
@@ -742,12 +742,12 @@ msgstr "Koppel e-mailadres klant"
 #: includes_php56/class-wcmp-settings.php:405
 #, php-format
 msgid ""
-"When you connect the customer email, MyParcel can send a Track & Trace email "
-"to this address. In your %sMyParcel backend%s you can enable or disable this "
+"When you connect the customer email, PostNL can send a Track & Trace email "
+"to this address. In your %sPostNL backend%s you can enable or disable this "
 "email and format it in your own style."
 msgstr ""
-"Wanneer je het e-mailadres van de klant koppelt, kan MyParcel een Track & "
-"Trace e-mail versturen naar dit adres. In je %sMyParcel backend%s kun je "
+"Wanneer je het e-mailadres van de klant koppelt, kan PostNL een Track & "
+"Trace e-mail versturen naar dit adres. In je %sPostNL backend%s kun je "
 "deze e-mail in- of uitschakelen en opmaken in je eigen stijl."
 
 #: includes_php56/class-wcmp-settings.php:411
@@ -799,13 +799,13 @@ msgstr "Label omschrijving"
 msgid ""
 "With this option, you can add a description to the shipment. This will be "
 "printed on the top left of the label, and you can use this to search or sort "
-"shipments in the MyParcel Backend. Use <strong>[ORDER_NR]</strong> to "
+"shipments in the PostNL Backend. Use <strong>[ORDER_NR]</strong> to "
 "include the order number, <strong>[DELIVERY_DATE]</strong> to include the "
 "delivery date."
 msgstr ""
 "Met deze optie kun je een beschrijving toevoegen aan de zending. Dit zal "
 "worden afgedrukt op de linkerbovenhoek van het label, en je kunt dit "
-"gebruiken om zendingen in het MyParcel Backend te zoeken of te sorteren. "
+"gebruiken om zendingen in het PostNL Backend te zoeken of te sorteren. "
 "Gebruik <strong>[ORDER_NR]</strong> om het ordernummer te vermelden, "
 "[DELIVERY_DATE] voor de bezorgdatum."
 
@@ -842,25 +842,25 @@ msgstr "Retourzending"
 
 #: includes_php56/class-wcmp-settings.php:500
 #: includes/admin/settings/class-wcmp-settings-data.php:835
-msgid "MyParcel address fields"
-msgstr "MyParcel adresvelden"
+msgid "PostNL address fields"
+msgstr "PostNL adresvelden"
 
 #: includes_php56/class-wcmp-settings.php:508
 #: includes/admin/settings/class-wcmp-settings-data.php:837
 msgid ""
-"When enabled the checkout will use the MyParcel address fields. This means "
+"When enabled the checkout will use the PostNL address fields. This means "
 "there will be three separate fields for street name, number and suffix. Want "
 "to use the WooCommerce default fields? Leave this option unchecked."
 msgstr ""
-"Wanneer aangevinkt wordt er gebruik gemaakt van de MyParcel adresvelden. Dit "
+"Wanneer aangevinkt wordt er gebruik gemaakt van de PostNL adresvelden. Dit "
 "houdt in dat straat, huisnummer en toevoeging los komen te staan. Wil je de "
 "standaard WooCommerce adresvelden gebruiken? Laat deze optie uitgevinkt "
 "staan."
 
 #: includes_php56/class-wcmp-settings.php:514
 #: includes/admin/settings/class-wcmp-settings-data.php:844
-msgid "Enable MyParcel delivery options"
-msgstr "MyParcel bezorgopties inschakelen"
+msgid "Enable PostNL delivery options"
+msgstr "PostNL bezorgopties inschakelen"
 
 #: includes_php56/class-wcmp-settings.php:526
 #: includes/admin/settings/class-wcmp-settings-data.php:854
@@ -972,10 +972,10 @@ msgstr "Bezorgopties titel"
 #: includes_php56/class-wcmp-settings.php:643
 #: includes/admin/settings/class-wcmp-settings-data.php:941
 msgid ""
-"You can place a delivery title above the MyParcel options. When there is no "
+"You can place a delivery title above the PostNL options. When there is no "
 "title, it will not be visible."
 msgstr ""
-"Je kunt een bezorgtitel boven de MyParcel opties plaatsen. Als er geen titel "
+"Je kunt een bezorgtitel boven de PostNL opties plaatsen. Als er geen titel "
 "is, is deze niet zichtbaar."
 
 #: includes_php56/class-wcmp-settings.php:648
@@ -1067,14 +1067,14 @@ msgid "Only recipient"
 msgstr "Alleen ontvanger"
 
 #: includes/admin/class-wcmp-export.php:473
-msgid "The selected orders have not been exported to MyParcel yet! "
+msgid "The selected orders have not been exported to PostNL yet! "
 msgstr ""
-"De geselecteerde bestellingen zijn nog niet geëxporteerd naar MyParcel!"
+"De geselecteerde bestellingen zijn nog niet geëxporteerd naar PostNL!"
 
 #: includes/admin/class-wcmp-export.php:522
 #: includes/admin/class-wcmp-export-consignments.php:348
-msgid "No API key found in MyParcel settings"
-msgstr "Geen API key gevonden in MyParcel instellingen"
+msgid "No API key found in PostNL settings"
+msgstr "Geen API key gevonden in PostNL instellingen"
 
 #: includes/admin/class-wcmp-export.php:553
 msgid "No e-mail address found in order."
@@ -1097,10 +1097,10 @@ msgstr "HS Code"
 #: includes/admin/class-wcmp-admin.php:558
 #, php-format
 msgid ""
-"HS Codes are used for MyParcel world shipments, you can find the appropriate "
+"HS Codes are used for PostNL world shipments, you can find the appropriate "
 "code on the %ssite of the Dutch Customs%s."
 msgstr ""
-"HS Codes worden gebruikt voor MyParcel wereldzendingen, je kunt de juiste "
+"HS Codes worden gebruikt voor PostNL wereldzendingen, je kunt de juiste "
 "code vinden op de %ssite van de douane%s."
 
 #: includes/admin/class-wcmp-admin.php:589
@@ -1120,8 +1120,8 @@ msgid "(Unknown)"
 msgstr "(Onbekend)"
 
 #: includes/admin/class-wcmp-export-consignments.php:176
-msgid "No HS code found in MyParcel settings"
-msgstr "Geen HS code gevonden in de MyParcel instellingen"
+msgid "No HS code found in PostNL settings"
+msgstr "Geen HS code gevonden in de PostNL instellingen"
 
 #: includes/entities/settings-field-arguments.php:154
 msgid "Enabled"
@@ -1168,13 +1168,13 @@ msgstr "Totaal gewicht"
 #: includes/admin/views/html-bulk-options-form.php:98
 msgid ""
 "This order does not contain valid street and house number data and cannot be "
-"exported because of this! This order was probably placed before the MyParcel "
+"exported because of this! This order was probably placed before the PostNL "
 "plugin was activated. The address data can still be manually entered in the "
 "order screen."
 msgstr ""
 "Deze order bevat geen juiste straatnaam en huisnummer en kan niet "
 "geëxporteerd worden! Deze order is waarschijnlijk geplaatst voordat de "
-"MyParcel plugin geactiveerd is. De adres gegevens kunnen handmatig worden "
+"PostNL plugin geactiveerd is. De adres gegevens kunnen handmatig worden "
 "toegevoegd in het order scherm."
 
 #: includes_php56/views/wcmp-bulk-options-form.php:160
@@ -1382,12 +1382,12 @@ msgstr "DPD afhaallocaties inschakelen"
 
 #: includes/admin/settings/class-wcmp-settings-data.php:767
 msgid ""
-"When you connect the customer email, MyParcel can send a Track & Trace email "
-"to this address. In your MyParcel backend you can enable or disable this "
+"When you connect the customer email, PostNL can send a Track & Trace email "
+"to this address. In your PostNL backend you can enable or disable this "
 "email and format it in your own style."
 msgstr ""
-"Wanneer je een klant email adres koppelt stuurt MyParcel een Track & Trace "
-"email naar dit adres. In je MyParcel backoffice kun je deze email bewerken "
+"Wanneer je een klant email adres koppelt stuurt PostNL een Track & Trace "
+"email naar dit adres. In je PostNL backoffice kun je deze email bewerken "
 "of uitschakelen."
 
 #: includes/admin/settings/class-wcmp-settings-data.php:784
@@ -1416,10 +1416,10 @@ msgstr "Standaard HS Code"
 
 #: includes/admin/settings/class-wcmp-settings-data.php:800
 msgid ""
-"HS Codes are used for MyParcel world shipments, you can find the appropriate "
+"HS Codes are used for PostNL world shipments, you can find the appropriate "
 "code on the site of the Dutch Customs."
 msgstr ""
-"HS Codes worden gebruikt voor MyParcel wereldzendingen, je kunt de juiste "
+"HS Codes worden gebruikt voor PostNL wereldzendingen, je kunt de juiste "
 "code vinden op de site van de douane."
 
 #: includes/admin/settings/class-wcmp-settings-data.php:819
@@ -1436,12 +1436,12 @@ msgstr ""
 
 #: includes/admin/settings/class-wcmp-settings-data.php:846
 msgid ""
-"The MyParcel delivery options allow your customers to select whether they "
+"The PostNL delivery options allow your customers to select whether they "
 "want their parcel delivered at home or to a pickup point. Depending on the "
 "settings you can allow them to select a date, time and even options like "
 "requiring a signature on delivery."
 msgstr ""
-"Met de bezorgopties van MyParcel kunnen uw klanten kiezen of ze hun pakket "
+"Met de bezorgopties van PostNL kunnen uw klanten kiezen of ze hun pakket "
 "thuis of bij een afhaalpunt willen laten bezorgen. Afhankelijk van de "
 "instellingen kunt u ze een datum, tijd en zelfs opties laten selecteren, "
 "zoals een handtekening bij aflevering."
@@ -1552,20 +1552,20 @@ msgid "Weight"
 msgstr "Gewicht"
 
 #. Name of the plugin
-msgid "WooCommerce MyParcel"
-msgstr "WooCommerce MyParcel"
+msgid "WooCommerce PostNL"
+msgstr "WooCommerce PostNL"
 
 #. Description of the plugin
 msgid ""
-"Export your WooCommerce orders to MyParcel (https://myparcel.nl/) and print "
+"Export your WooCommerce orders to PostNL (https://postnl.nl/) and print "
 "labels directly from the WooCommerce admin"
 msgstr ""
-"Exporteer je WooCommerce orders naar MyParcel (https://myparcel.nl) en print "
+"Exporteer je WooCommerce orders naar PostNL (https://postnl.nl) en print "
 "verzendlabels direct vanuit WooCommerce"
 
 #. URI of the plugin
-msgid "https://myparcel.nl/"
-msgstr "https://myparcel.nl/"
+msgid "https://postnl.nl/"
+msgstr "https://postnl.nl/"
 
 #. Author of the plugin
 msgid "Richard Perdaan"

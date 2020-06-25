@@ -366,11 +366,6 @@ class WCPN_Admin
             unset($listing_actions[$getLabels]);
         }
 
-        $processed_shipments = WCPN_Admin::get_order_shipments($order);
-        if (empty($processed_shipments) || $shipping_country !== 'NL') {
-            unset($listing_actions[$addReturn]);
-        }
-
         $display = WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_DOWNLOAD_DISPLAY) === 'display';
 
         $attributes = [];

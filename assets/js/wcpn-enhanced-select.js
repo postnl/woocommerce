@@ -65,7 +65,7 @@ jQuery(function($) {
             return m;
           },
           ajax: {
-            url: wc_myparcel.ajax_url,
+            url: wc_postnl.ajax_url,
             dataType: 'json',
             quietMillis: 250,
             data: function(term) {

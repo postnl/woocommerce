@@ -9,7 +9,7 @@ use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
 /**
  * Class for compatibility with the WooCommerce PDF Invoices & Packing Slips Premium Templates plugin.
  *
- * @package WPO\WC\MyParcel\Compatibility
+ * @package WPO\WC\PostNL\Compatibility
  */
 class WCPN_WCPDF_Compatibility
 {
