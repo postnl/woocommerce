@@ -727,7 +727,7 @@ class WCPN_Settings_Data
             ],
             [
                 "name"      => WCPN_Settings::SETTING_SHOW_DELIVERY_DAY,
-                "label"     => __("Show delivery day", "woocommerce-postnlbe"),
+                "label"     => __("Show delivery day", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "Show delivery day options allow your customers to see the delivery day in order confirmation and My Account.",
