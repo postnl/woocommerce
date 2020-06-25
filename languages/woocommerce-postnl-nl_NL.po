@@ -14,6 +14,22 @@ msgstr ""
 "X-Generator: Loco https://localise.biz/\n"
 "X-Loco-Version: 2.3.3; wp-5.4"
 
+#: includes/admin/settings/class-wcmp-settings-data.php:730
+msgid "Show delivery day"
+msgstr "Toon bezorgdag"
+
+#: includes/admin/settings/class-wcmp-settings-data.php:733
+msgid "Show delivery day options allow your customers to see the delivery day in order confirmation and My Account."
+msgstr "Toon opties voor bezorgdag zodat uw klanten de bezorgdag kunnen zien in de orderbevestiging en Mijn account."
+
+msgid "Automatic export"
+msgstr "Automatische export"
+
+#: includes_php56/class-wcmp-settings.php:266
+#: includes/admin/settings/class-wcmp-settings-data.php:380
+msgid "With this setting enabled, orders are exported to PostNL automatically after payment."
+msgstr "Met deze instelling ingeschakeld, worden bestellingen na betaling automatisch naar PostNL geëxporteerd."
+
 #: woocommerce-postnl.php:234
 #, php-format
 msgid ""

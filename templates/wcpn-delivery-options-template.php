@@ -146,16 +146,6 @@
                     <span id="postnl-pickup-price"></span>
                 </td>
             </tr>
-            <tr id="postnl-pickup-express" class="postnl-is-pickup-element">
-                <td></td>
-                <td>
-                    <input name="method-postnl-pickup-selector" id="postnl-pickup-express-selector" type="radio" value="postnl-pickup-express-selector">
-                    <label for="postnl-pickup-express-selector"><span class="postnl-pickup-delivery-title"></span> 09:00</label>
-                </td>
-                <td>
-                    <span id="postnl-pickup-express-price"></span>
-                </td>
-            </tr>
             </tbody>
         </table>
     </div>

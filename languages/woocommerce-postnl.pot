@@ -641,9 +641,22 @@ msgid ""
 "included in the customer email."
 msgstr ""
 
+#: includes/admin/settings/class-wcmp-settings-data.php:730
+msgid "Show delivery day"
+msgstr ""
+
+#: includes/admin/settings/class-wcmp-settings-data.php:733
+msgid "Show delivery day options allow your customers to see the delivery day in order confirmation and My Account."
+msgstr ""
+
 #: includes_php56/class-wcmp-settings.php:266
 #: includes/admin/settings/class-wcmp-settings-data.php:380
-msgid "Automatic order status"
+msgid "Automatic export"
+msgstr ""
+
+#: includes_php56/class-wcmp-settings.php:266
+#: includes/admin/settings/class-wcmp-settings-data.php:380
+msgid "With this setting enabled, orders are exported to PostNL automatically after payment."
 msgstr ""
 
 #: includes_php56/class-wcmp-settings.php:279
