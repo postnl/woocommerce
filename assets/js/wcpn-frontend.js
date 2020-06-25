@@ -228,32 +228,32 @@ jQuery(function ($) {
     },
 
     /**
-     * Check if the country changed by comparing the old value with the new value before overwriting the PostNLConfig
+     * Check if the country changed by comparing the old value with the new value before overwriting the MyParcelConfig
      *  with the new value. Returns true if none was set yet.
      *
      * @returns {Boolean}
      */
     countryHasChanged: function () {
-      if (window.PostNLConfig.address && window.PostNLConfig.address.hasOwnProperty('cc')) {
-        return window.PostNLConfig.address.cc !== PostNLFrontend.getField(PostNLFrontend.countryField).value;
+      if (window.MyParcelConfig.address && window.MyParcelConfig.address.hasOwnProperty('cc')) {
+        return window.MyParcelConfig.address.cc !== PostNLFrontend.getField(PostNLFrontend.countryField).value;
       }
 
       return true;
     },
 
     /**
-     * Get data from form fields, put it in the global PostNLConfig, then trigger updating the delivery options.
+     * Get data from form fields, put it in the global MyParcelConfig, then trigger updating the delivery options.
      */
     updateAddress: function () {
-      if (!window.hasOwnProperty('PostNLConfig')) {
-        throw 'window.PostNLConfig not found!';
+      if (!window.hasOwnProperty('MyParcelConfig')) {
+        throw 'window.MyParcelConfig not found!';
       }
 
-      if (typeof window.PostNLConfig === 'string') {
-        window.PostNLConfig = JSON.parse(window.PostNLConfig);
+      if (typeof window.MyParcelConfig === 'string') {
+        window.MyParcelConfig = JSON.parse(window.MyParcelConfig);
       }
 
-      window.PostNLConfig.address = {
+      window.MyParcelConfig.address = {
         cc: PostNLFrontend.getField(PostNLFrontend.countryField).value,
         postalCode: PostNLFrontend.getField(PostNLFrontend.postcodeField).value,
         number: PostNLFrontend.getHouseNumber(),

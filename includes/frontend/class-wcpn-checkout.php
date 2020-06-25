@@ -118,7 +118,7 @@ class WCPN_Checkout
 
         wp_localize_script(
             'wc-postnl',
-            'PostNLConfig',
+            'MyParcelConfig',
             $this->get_delivery_options_config()
         );
 
@@ -165,7 +165,7 @@ class WCPN_Checkout
 
         $carriers = $this->get_carriers();
 
-        $postNlConfig = [
+        $MyParcelConfig = [
             "config"  => [
                 "carriers" => $carriers,
                 "platform" => "myparcel",
@@ -212,7 +212,7 @@ class WCPN_Checkout
             $priceMorningDelivery        = "{$carrier}_" . WCPN_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE;
             $priceSaturdayDelivery       = "{$carrier}_" . WCPN_Settings::SETTING_CARRIER_SATURDAY_DELIVERY_FEE;
 
-            $postNlConfig["config"]["carrierSettings"][$carrier] = [
+            $MyParcelConfig["config"]["carrierSettings"][$carrier] = [
                 "allowDeliveryOptions" => $settings->isEnabled($allowDeliveryOptions),
                 "allowEveningDelivery" => $settings->isEnabled($allowEveningDeliveryOptions),
                 "allowMorningDelivery" => $settings->isEnabled($allowMorningDeliveryOptions),
@@ -235,7 +235,7 @@ class WCPN_Checkout
             ];
         }
 
-        return json_encode($postNlConfig, JSON_UNESCAPED_SLASHES);
+        return json_encode($MyParcelConfig, JSON_UNESCAPED_SLASHES);
     }
 
     /**
