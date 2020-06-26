@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/postnl/woocommerce#readme",
   "devDependencies": {
-    "@postnl/eslint-config": "^1.2.3",
+    "@myparcel/eslint-config": "^1.2.3",
     "autoprefixer": "^9.7.6",
     "husky": "^3.1.0",
     "postcss-cli": "^6.1.3"
