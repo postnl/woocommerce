@@ -139,25 +139,25 @@ if (! class_exists('WCPN')) :
             require_once($this->includes . "/compatibility/class-ce-compatibility.php");
             require_once($this->includes . "/compatibility/class-wcpdf-compatibility.php");
 
-            require_once($this->includes . "/class-WCPN-data.php");
+            require_once($this->includes . "/class-wcpn-data.php");
             require_once($this->includes . "/collections/settings-collection.php");
             require_once($this->includes . "/entities/setting.php");
             require_once($this->includes . "/entities/settings-field-arguments.php");
 
-            require_once($this->includes . "/class-WCPN-assets.php");
-            require_once($this->includes . "/frontend/class-WCPN-cart-fees.php");
-            require_once($this->includes . "/frontend/class-WCPN-frontend-track-trace.php");
-            require_once($this->includes . "/frontend/class-WCPN-checkout.php");
-            require_once($this->includes . "/frontend/class-WCPN-frontend.php");
-            $this->admin = require_once($this->includes . "/admin/class-WCPN-admin.php");
-            require_once($this->includes . "/admin/settings/class-WCPN-settings.php");
-            require_once($this->includes . "/class-WCPN-log.php");
-            require_once($this->includes . "/admin/class-WCPN-country-codes.php");
-            $this->export = require_once($this->includes . "/admin/class-WCPN-export.php");
-            require_once($this->includes . "/class-WCPN-postcode-fields.php");
+            require_once($this->includes . "/class-wcpn-assets.php");
+            require_once($this->includes . "/frontend/class-wcpn-cart-fees.php");
+            require_once($this->includes . "/frontend/class-wcpn-frontend-track-trace.php");
+            require_once($this->includes . "/frontend/class-wcpn-checkout.php");
+            require_once($this->includes . "/frontend/class-wcpn-frontend.php");
+            $this->admin = require_once($this->includes . "/admin/class-wcpn-admin.php");
+            require_once($this->includes . "/admin/settings/class-wcpn-settings.php");
+            require_once($this->includes . "/class-wcpn-log.php");
+            require_once($this->includes . "/admin/class-wcpn-country-codes.php");
+            $this->export = require_once($this->includes . "/admin/class-wcpn-export.php");
+            require_once($this->includes . "/class-wcpn-postcode-fields.php");
             require_once($this->includes . "/adapter/delivery-options-from-order-adapter.php");
             require_once($this->includes . "/adapter/shipment-options-from-order-adapter.php");
-            require_once($this->includes . "/admin/class-WCPN-export-consignments.php");
+            require_once($this->includes . "/admin/class-wcpn-export-consignments.php");
         }
 
         /**
@@ -276,7 +276,7 @@ if (! class_exists('WCPN')) :
         {
             // Pre 2.0.0
             if (! empty(get_option('wcpostnl_settings'))) {
-                require_once('migration/WCPN-installation-migration-v2-0-0.php');
+                require_once('migration/wcpn-installation-migration-v2-0-0.php');
             }
             // todo: Pre 4.0.0?
         }
@@ -289,20 +289,20 @@ if (! class_exists('WCPN')) :
         protected function upgrade($installed_version)
         {
             if (version_compare($installed_version, '2.4.0-beta-4', '<')) {
-                require_once('migration/WCPN-upgrade-migration-v2-4-0-beta-4.php');
+                require_once('migration/wcpn-upgrade-migration-v2-4-0-beta-4.php');
             }
 
             if (version_compare($installed_version, '3.0.4', '<=')) {
-                require_once('migration/WCPN-upgrade-migration-v3-0-4.php');
+                require_once('migration/wcpn-upgrade-migration-v3-0-4.php');
             }
 
             if ($this->phpVersionMeets(\WCPN::PHP_VERSION_7_1)) {
                 // Import the migration class base
-                require_once('migration/WCPN-upgrade-migration.php');
+                require_once('migration/wcpn-upgrade-migration.php');
 
                 // Migrate php 7.1+ only version settings
                 if (version_compare($installed_version, '4.0.0', '<=')) {
-                    require_once('migration/WCPN-upgrade-migration-v4-0-0.php');
+                    require_once('migration/wcpn-upgrade-migration-v4-0-0.php');
                 }
             }
         }
@@ -343,7 +343,7 @@ if (! class_exists('WCPN')) :
 
             // Create the settings collection by importing this function, because we can't use the sdk
             // imports in the legacy version.
-            require_once('includes/WCPN-initialize-settings-collection.php');
+            require_once('includes/wcpn-initialize-settings-collection.php');
             if (empty($this->setting_collection)) {
                 $this->setting_collection = (new WCPN_Initialize_Settings_Collection())->initialize();
             }
