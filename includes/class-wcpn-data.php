@@ -24,8 +24,6 @@ class WCPN_Data
         PostNLConsignment::CARRIER_NAME => 'PostNL',
     ];
 
-    public const HAS_MULTI_COLLO = false;
-
     public const DEFAULT_COUNTRY_CODE = "NL";
     public const DEFAULT_CARRIER      = PostNLConsignment::CARRIER_NAME;
 

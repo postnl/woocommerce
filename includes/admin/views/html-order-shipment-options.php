@@ -218,7 +218,7 @@ $extraOptions = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENT_OPTIONS_EX
     }
     ?>
     <div>
-        <div class="button wcpm__shipment-settings__save">
+        <div class="button wcpn__shipment-settings__save">
             <?php
             _e("Save", "woocommerce-postnl");
             WCPN_Admin::renderSpinner();
