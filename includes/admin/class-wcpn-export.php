@@ -325,7 +325,7 @@ class WCPN_Export
              * Create a real multi collo shipment if available, otherwise loop over the collo_amount and add separate
              * consignments to the collection.
              */
-            if (WCPN_Data::HAS_MULTI_COLLO) {
+            if ($collo_amount > 1) {
                 $consignment = (new WCPN_Export_Consignments($order))->getConsignment();
 
                 $collection->addMultiCollo($consignment, $collo_amount);
