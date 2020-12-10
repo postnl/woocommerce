@@ -4,7 +4,7 @@
     "PostNL": "readonly",
     "PostNLFrontend": "readonly",
     "PostNLDisplaySettings": "readonly",
-    "PostNLDeliveryOptions": "readonly"
+    "MyParcelDeliveryOptions": "readonly"
   },
   "extends": [
     "@postnl/eslint-config/preset-default"

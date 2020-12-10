@@ -134,7 +134,7 @@ class WCPN_Checkout
 
         wp_localize_script(
             "wc-postnl",
-            "PostNLDeliveryOptions",
+            "MyParcelDeliveryOptions",
             [
                 "allowedShippingMethods"    => json_encode($this->getShippingMethodsAllowingDeliveryOptions()),
                 "disallowedShippingMethods" => json_encode(WCPN_Export::DISALLOWED_SHIPPING_METHODS),

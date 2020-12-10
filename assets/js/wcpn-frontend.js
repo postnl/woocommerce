@@ -18,10 +18,10 @@
  */
 
 /**
- * @property {Object} PostNLDeliveryOptions
- * @property {String} PostNLDeliveryOptions.allowedShippingMethods
- * @property {String} PostNLDeliveryOptions.disallowedShippingMethods
- * @property {String} PostNLDeliveryOptions.hiddenInputName
+ * @property {Object} MyParcelDeliveryOptions
+ * @property {String} MyParcelDeliveryOptions.allowedShippingMethods
+ * @property {String} MyParcelDeliveryOptions.disallowedShippingMethods
+ * @property {String} MyParcelDeliveryOptions.hiddenInputName
  * @see \wcpn_checkout::inject_delivery_options_variables
  */
 /* eslint-disable-next-line max-lines-per-function */
@@ -53,17 +53,17 @@ jQuery(function($) {
     /**
      * @type {Array}
      */
-    allowedShippingMethods: JSON.parse(PostNLDeliveryOptions.allowedShippingMethods),
+    allowedShippingMethods: JSON.parse(MyParcelDeliveryOptions.allowedShippingMethods),
 
     /**
      * @type {Array}
      */
-    disallowedShippingMethods: JSON.parse(PostNLDeliveryOptions.disallowedShippingMethods),
+    disallowedShippingMethods: JSON.parse(MyParcelDeliveryOptions.disallowedShippingMethods),
 
     /**
      * @type {Boolean}
      */
-    alwaysShow: Boolean(parseInt(PostNLDeliveryOptions.alwaysShow)),
+    alwaysShow: Boolean(parseInt(MyParcelDeliveryOptions.alwaysShow)),
 
     /**
      * @type {Object<String, String>}
@@ -401,7 +401,7 @@ jQuery(function($) {
     injectHiddenInput: function() {
       PostNLFrontend.hiddenDataInput = document.createElement('input');
       PostNLFrontend.hiddenDataInput.setAttribute('hidden', 'hidden');
-      PostNLFrontend.hiddenDataInput.setAttribute('name', PostNLDeliveryOptions.hiddenInputName);
+      PostNLFrontend.hiddenDataInput.setAttribute('name', MyParcelDeliveryOptions.hiddenInputName);
 
       document.querySelector('form[name="checkout"]').appendChild(PostNLFrontend.hiddenDataInput);
     },
