@@ -243,11 +243,6 @@ msgid ""
 "delivery."
 msgstr ""
 
-#: includes/admin/ShipmentOptions.php:207
-#: includes/admin/settings/class-wcpn-settings-data.php:421
-msgid "Extra large size"
-msgstr ""
-
 #: includes/admin/ShipmentOptions.php:208
 #: includes/admin/settings/class-wcpn-settings-data.php:423
 msgid ""
@@ -296,7 +291,7 @@ msgstr ""
 
 #: includes/admin/class-wcpn-export.php:383
 #, php-format
-msgid "%s shipments successfully exported to PostNL"
+msgid "%s shipments successfully prepare for PostNL"
 msgstr ""
 
 #: includes/admin/class-wcpn-export.php:497
@@ -838,10 +833,6 @@ msgstr ""
 msgid ""
 "Country of origin is required for world shipments. Defaults to shop base or "
 "NL. Example: 'NL', 'BE', 'DE'"
-msgstr ""
-
-#: includes/admin/settings/class-wcpn-settings-data.php:715
-msgid "Automatic export"
 msgstr ""
 
 #: includes/admin/settings/class-wcpn-settings-data.php:717

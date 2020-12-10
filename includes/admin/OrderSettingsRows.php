@@ -30,7 +30,6 @@ class OrderSettingsRows
     private const OPTION_SHIPMENT_OPTIONS_INSURED           = "[shipment_options][insured]";
     private const OPTION_SHIPMENT_OPTIONS_INSURED_AMOUNT    = "[shipment_options][insured_amount]";
     private const OPTION_SHIPMENT_OPTIONS_LABEL_DESCRIPTION = "[shipment_options][label_description]";
-    private const OPTION_SHIPMENT_OPTIONS_LARGE_FORMAT      = "[shipment_options][large_format]";
     private const OPTION_SHIPMENT_OPTIONS_ONLY_RECIPIENT    = "[shipment_options][only_recipient]";
     private const OPTION_SHIPMENT_OPTIONS_RETURN_SHIPMENT   = "[shipment_options][return_shipment]";
     private const OPTION_SHIPMENT_OPTIONS_SIGNATURE         = "[shipment_options][signature]";
@@ -116,24 +115,6 @@ class OrderSettingsRows
         // Only add extra options and shipment options to home country shipments.
         if ($isHomeCountry) {
             $rows = array_merge($rows, self::getAdditionalOptionsRows($orderSettings));
-        }
-
-        if ($isHomeCountry || $isEuCountry) {
-            $rows[] = [
-                "name"      => self::OPTION_SHIPMENT_OPTIONS_LARGE_FORMAT,
-                "type"      => "toggle",
-                "label"     => __("Extra large size", "woocommerce-postnl"),
-                "help_text" => __(
-                    "Enable this option when your shipment is bigger than 100 x 70 x 50 cm, but smaller than 175 x 78 x 58 cm. An extra fee will be charged. Note! If the parcel is bigger than 175 x 78 x 58 of or heavier than 30 kg, the pallet rate will be charged.",
-                    "woocommerce-postnl"
-                ),
-                "value"     => $orderSettings->hasLargeFormat(),
-                "condition" => [
-                    self::CONDITION_PACKAGE_TYPE_PACKAGE,
-                    self::CONDITION_DELIVERY_TYPE_DELIVERY,
-                    self::CONDITION_CARRIER_DEFAULT,
-                ],
-            ];
         }
 
         $rows[] = [

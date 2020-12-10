@@ -30,7 +30,6 @@ class WCPN_Checkout
         'shipmentOptions'                => 'shipment_options',
         'shipmentOptions.ageCheck'       => 'shipment_options.age_check',
         'shipmentOptions.insuredAmount'  => 'shipment_options.insured_amount',
-        'shipmentOptions.largeFormat'    => 'shipment_options.large_format',
         'shipmentOptions.onlyRecipient'  => 'shipment_options.only_recipient',
         'shipmentOptions.returnShipment' => 'shipment_options.return_shipment',
     ];

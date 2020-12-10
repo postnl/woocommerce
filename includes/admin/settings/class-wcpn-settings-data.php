@@ -420,15 +420,6 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT,
-                "label"     => __("Extra large size", "woocommerce-postnl"),
-                "type"      => "toggle",
-                "help_text" => __(
-                    "Enable this option when your shipment is bigger than 100 x 70 x 50 cm, but smaller than 175 x 78 x 58 cm. An extra fee will be charged. Note! If the parcel is bigger than 175 x 78 x 58 of or heavier than 30 kg, the pallet rate will be charged.",
-                    "woocommerce-postnl"
-                ),
-            ],
-            [
                 "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK,
                 "label"     => __("Age check 18+", "woocommerce-postnl"),
                 "type"      => "toggle",
@@ -652,15 +643,6 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPOST_Settings::SETTING_CONNECT_EMAIL,
-                "label"     => __("Connect customer email", "woocommerce-postnl"),
-                "type"      => "toggle",
-                "help_text" => __(
-                    "When you connect the customer email, PostNL can send a Track & Trace email to this address. In your PostNL backend you can enable or disable this email and format it in your own style.",
-                    "woocommerce-postnl"
-                ),
-            ],
-            [
                 "name"      => WCPOST_Settings::SETTING_CONNECT_PHONE,
                 "label"     => __("Connect customer phone", "woocommerce-postnl"),
                 "type"      => "toggle",
@@ -714,15 +696,6 @@ class WCPN_Settings_Data
                 "help-text" => __(
                   "Country of origin is required for world shipments. Defaults to shop base or NL. Example: 'NL', 'BE', 'DE'", "woocommerce-postnl"
               ),
-            ],
-            [
-                "name"      => WCPOST_Settings::SETTING_AUTOMATIC_EXPORT,
-                "label"     => __("Automatic export", "woocommerce-postnl"),
-                "type"      => "toggle",
-                "help_text" => __(
-                    "With this setting enabled, orders are exported to PostNL automatically after payment.",
-                    "woocommerce-postnl"
-                ),
             ],
         ];
     }

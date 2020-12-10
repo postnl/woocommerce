@@ -247,11 +247,6 @@ msgid ""
 "delivery."
 msgstr ""
 
-#: includes/admin/ShipmentOptions.php:207
-#: includes/admin/settings/class-wcpn-settings-data.php:421
-msgid "Extra large size"
-msgstr "Extra grote verpakking"
-
 #: includes/admin/ShipmentOptions.php:208
 #: includes/admin/settings/class-wcpn-settings-data.php:423
 msgid ""
@@ -310,8 +305,8 @@ msgstr "Je hebt onvoldoende rechten voor deze pagina."
 
 #: includes/admin/class-wcpn-export.php:383
 #, php-format
-msgid "%s shipments successfully exported to PostNL"
-msgstr "%s zendingen met succes geëxporteerd naar PostNL"
+msgid "%s shipments successfully prepare for PostNL"
+msgstr "%s zendingen met succes voorbereid voor PostNL"
 
 #: includes/admin/class-wcpn-export.php:497
 msgid "The selected orders have not been exported to PostNL yet! "
@@ -896,10 +891,6 @@ msgid ""
 msgstr ""
 "Land van herkomst is verplicht voor wereldzendingen. Standaard wordt de "
 "shoplocatie gebruikt. Voorbeeld: 'NL', 'BE', 'DE'"
-
-#: includes/admin/settings/class-wcpn-settings-data.php:715
-msgid "Automatic export"
-msgstr "Automatische export"
 
 #: includes/admin/settings/class-wcpn-settings-data.php:717
 msgid ""

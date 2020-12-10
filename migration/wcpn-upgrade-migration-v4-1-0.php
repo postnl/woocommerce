@@ -33,7 +33,7 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
     /**
      * @var array
      */
-    private $newPostNlSettings = [];
+    private $newPostNLSettings = [];
 
     /**
      * @var array
@@ -67,18 +67,18 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
         $this->oldGeneralSettings        = $this->getSettings("woocommerce_postnl_general_settings");
         $this->oldCheckoutSettings       = $this->getSettings("woocommerce_postnl_checkout_settings");
         $this->oldExportDefaultsSettings = $this->getSettings("woocommerce_postnl_export_defaults_settings");
-        $oldPostNlSettings               = $this->getSettings("woocommerce_postnl_postnl_settings");
+        $oldPostNLSettings               = $this->getSettings("woocommerce_postnl_postnl_settings");
 
         $this->newGeneralSettings        = $this->oldGeneralSettings;
         $this->newCheckoutSettings       = $this->oldCheckoutSettings;
         $this->newExportDefaultsSettings = $this->oldExportDefaultsSettings;
-        $this->newPostNlSettings         = $oldPostNlSettings;
+        $this->newPostNLSettings         = $oldPostNLSettings;
 
         $this->migrateGeneralSettings();
         $this->migrateCheckoutSettings();
         $this->migrateExportDefaultsSettings();
 
-        $this->correctPostNlInsurance();
+        $this->correctPostNLInsurance();
     }
 
     protected function setOptionSettingsMap(): void
@@ -87,7 +87,7 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
             "woocommerce_postnl_general_settings"         => $this->newGeneralSettings,
             "woocommerce_postnl_checkout_settings"        => $this->newCheckoutSettings,
             "woocommerce_postnl_export_defaults_settings" => $this->newExportDefaultsSettings,
-            "woocommerce_postnl_postnl_settings"          => $this->newPostNlSettings,
+            "woocommerce_postnl_postnl_settings"          => $this->newPostNLSettings,
         ];
     }
 
@@ -110,23 +110,23 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
         );
 
         // Migrate old checkout settings to PostNL
-        $this->newPostNlSettings = $this->migrateSettings(
+        $this->newPostNLSettings = $this->migrateSettings(
             self::getCheckoutPostnlMap(),
-            $this->newPostNlSettings,
+            $this->newPostNLSettings,
             $this->oldCheckoutSettings
         );
     }
 
     private function migrateExportDefaultsSettings(): void
     {
-        $this->newPostNlSettings = $this->migrateSettings(
-            self::getExportDefaultsPostnlMap(),
-            $this->newPostNlSettings,
+        $this->newPostNLSettings = $this->migrateSettings(
+            self::getExportDefaultsPostNLMap(),
+            $this->newPostNLSettings,
             $this->oldExportDefaultsSettings
         );
 
         $this->newExportDefaultsSettings = $this->removeOldSettings(
-            self::getExportDefaultsPostnlMap(),
+            self::getExportDefaultsPostNLMap(),
             $this->newExportDefaultsSettings
         );
     }
@@ -174,13 +174,12 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
     /**
      * @return array
      */
-    private static function getExportDefaultsPostnlMap(): array
+    private static function getExportDefaultsPostNLMap(): array
     {
         $postnl = WCPOST_Settings::SETTINGS_POSTNL;
 
         return [
             "insured_amount" => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT,
-            "large_format"   => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT,
             "only_recipient" => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT,
             "return"         => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN,
         ];
@@ -189,17 +188,17 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
     /**
      * In case the current amount is not valid, choose the closest value from the allowed values (rounded up).
      */
-    private function correctPostNlInsurance(): void
+    private function correctPostNLInsurance(): void
     {
         $postnl           = WCPOST_Settings::SETTINGS_POSTNL;
         $key              = "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT;
         $availableAmounts = WCPN_Data::getInsuranceAmounts();
-        $insuranceAmount  = $this->newPostNlSettings[$key];
+        $insuranceAmount  = $this->newPostNLSettings[$key];
 
         if (! in_array($insuranceAmount, $availableAmounts)) {
             $closestValue = $this->roundUpToMatch($insuranceAmount, $availableAmounts);
 
-            $this->newPostNlSettings[$key] = $closestValue;
+            $this->newPostNLSettings[$key] = $closestValue;
         }
     }
 

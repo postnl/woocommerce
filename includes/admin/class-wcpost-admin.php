@@ -302,9 +302,9 @@ class WCPOST_Admin
         $actions = array_merge(
             $actions,
             [
-                self::BULK_ACTION_EXPORT       => __("PostNL: Export", "woocommerce-postnl"),
+                self::BULK_ACTION_EXPORT       => __("PostNL: Prepare shipment", "woocommerce-postnl"),
                 self::BULK_ACTION_PRINT        => __("PostNL: Print", "woocommerce-postnl"),
-                self::BULK_ACTION_EXPORT_PRINT => __("PostNL: Export & Print", "woocommerce-postnl"),
+                self::BULK_ACTION_EXPORT_PRINT => __("PostNL: Prepare & print shipment", "woocommerce-postnl"),
             ]
         );
 
@@ -326,9 +326,9 @@ class WCPOST_Admin
     {
         global $post_type;
         $bulk_actions = [
-            self::BULK_ACTION_EXPORT       => __("PostNL: Export", "woocommerce-postnl"),
+            self::BULK_ACTION_EXPORT       => __("PostNL: Prepare shipment", "woocommerce-postnl"),
             self::BULK_ACTION_PRINT        => __("PostNL: Print", "woocommerce-postnl"),
-            self::BULK_ACTION_EXPORT_PRINT => __("PostNL: Export & Print", "woocommerce-postnl"),
+            self::BULK_ACTION_EXPORT_PRINT => __("PostNL: Prepare & print shipment", "woocommerce-postnl"),
         ];
 
         if ('shop_order' == $post_type) {
@@ -448,7 +448,6 @@ class WCPOST_Admin
         $baseUrl      = "admin-ajax.php?action=" . WCPN_Export::EXPORT;
         $addShipments = WCPN_Export::ADD_SHIPMENTS;
         $getLabels    = WCPN_Export::GET_LABELS;
-        $addReturn    = WCPN_Export::ADD_RETURN;
 
         $listing_actions = [
             $addShipments => [
@@ -461,22 +460,12 @@ class WCPOST_Admin
                 "img" => WCPOST()->plugin_url() . "/assets/img/postnl-pdf.png",
                 "alt" => __("Print PostNL label", "woocommerce-postnl"),
             ],
-            $addReturn    => [
-                "url" => admin_url("$baseUrl&request=$addReturn&order_ids=$order_id"),
-                "img" => WCPOST()->plugin_url() . "/assets/img/postnl-retour.png",
-                "alt" => __("Email return label", "woocommerce-postnl"),
-            ],
         ];
 
         $consignments = WCPOST_Admin::get_order_shipments($order);
 
         if (empty($consignments)) {
             unset($listing_actions[$getLabels]);
-        }
-
-        $processed_shipments = WCPOST_Admin::get_order_shipments($order);
-        if (empty($processed_shipments) || $shipping_country !== 'NL') {
-            unset($listing_actions[$addReturn]);
         }
 
         $display = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY) === 'display';
@@ -1056,10 +1045,6 @@ class WCPOST_Admin
             $data['shipment_options']['insured_amount']  = 0;
 
             $data['extra_options']['collo_amount'] = 1;
-        }
-
-        if (! $isPackage || (! $isHomeCountry && ! $isEuCountry)) {
-            $data['shipment_options']['large_format'] = false;
         }
 
         if (! $isDigitalStamp) {
