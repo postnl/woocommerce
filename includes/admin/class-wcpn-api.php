@@ -64,7 +64,7 @@ class WCPN_API extends WCPN_Rest
         switch ($type) {
             case "return":
                 $content_type = "application/vnd.return_shipment+json";
-                $data_key     = "return";
+                $data_key     = "return_shipments";
                 break;
             case "unrelated_return":
                 $content_type = "application/vnd.unrelated_return_shipment+json";
@@ -130,9 +130,9 @@ class WCPN_API extends WCPN_Rest
     private function getUserAgent(): string
     {
         $userAgents = [
-            "Wordpress/" . get_bloginfo("version"),
-            "WooCommerce/" . WOOCOMMERCE_VERSION,
-            "PostNL-WooCommerce/" . WC_POST_NL_VERSION,
+            'Wordpress', get_bloginfo('version').
+            'WooCommerce/' . WOOCOMMERCE_VERSION .
+            'PostNL-WooCommerce/' . WC_POSTNL_VERSION,
         ];
 
         // Place white space between the array elements
@@ -154,22 +154,20 @@ class WCPN_API extends WCPN_Rest
         $collection = MyParcelCollection::findMany($shipment_ids, $this->key);
 
         /**
-         * @see https://github.com/MyParcelNL/Sdk#label-format-and-position
+         * @see https://github.com/PostNL/Sdk#label-format-and-position
          */
-        if (WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_LABEL_FORMAT) === "A6") {
+        if (WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_LABEL_FORMAT) === "A6") {
             $positions = false;
         }
 
         if ($display) {
             $collection->setPdfOfLabels($positions);
-            WCPN_Export::saveTrackTracesToOrders($collection, $order_ids);
             $this->updateOrderBarcode($order_ids, $collection);
             $collection->downloadPdfOfLabels($display);
         }
 
         if (! $display) {
             $collection->setLinkOfLabels($positions);
-            WCPN_Export::saveTrackTracesToOrders($collection, $order_ids);
             $this->updateOrderBarcode($order_ids, $collection);
             echo $collection->getLinkOfLabels();
             die();
@@ -187,7 +185,7 @@ class WCPN_API extends WCPN_Rest
             $order = WC_Core::get_order($orderId);
             $lastShipmentIds = unserialize($order->get_meta('_postnl_last_shipment_ids'));
             $shipmentData = (new WCPN_Export())->getShipmentData($lastShipmentIds, $order);
-            $trackTrace = $shipmentData["track_trace"];
+            $trackTrace = $shipmentData["track_trace"] ?? null;
             ChannelEngine::updateMetaOnExport($order, $trackTrace);
         }
 

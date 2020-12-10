@@ -1,4 +1,4 @@
-const packageName = '@myparcel/checkout';
+const packageName = '@postnl/checkout';
 
 const preCommit = [
   `npm run postcss`,

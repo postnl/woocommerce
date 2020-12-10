@@ -13,7 +13,7 @@
 $shipments = [];
 
 try {
-    $shipments = WCPN()->export->getShipmentData(array_keys($consignments), $order);
+    $shipments = WCPOST()->export->getShipmentData(array_keys($consignments), $order);
 } catch (Exception $e) {
     $message = $e->getMessage();
 }
@@ -48,20 +48,20 @@ if (! count($shipments)) {
       ?>
     <tr>
       <td class="wcpn__order__track-trace">
-          <?php WCPN_Admin::renderTrackTraceLink($shipment, $order_id); ?>
+          <?php WCPOST_Admin::renderTrackTraceLink($shipment, $order_id); ?>
       </td>
       <td class="wcpn__order__status">
-          <?php WCPN_Admin::renderStatus($shipment, $order_id) ?>
+          <?php WCPOST_Admin::renderStatus($shipment, $order_id) ?>
       </td>
       <td class="wcpn__td--create-label">
           <?php
           $action    = WCPN_Export::EXPORT;
           $getLabels = WCPN_Export::GET_LABELS;
 
-          WCPN_Admin::renderAction(
+          WCPOST_Admin::renderAction(
               admin_url("admin-ajax.php?action=$action&request=$getLabels&shipment_ids=$shipment_id"),
               __("Print PostNL label", "woocommerce-postnl"),
-              WCPN()->plugin_url() . "/assets/img/postnl-pdf.png"
+              WCPOST()->plugin_url() . "/assets/img/postnl-pdf.png"
           );
           ?>
       </td>

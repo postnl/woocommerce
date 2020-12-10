@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4b26cabbcfe951e08e3aa4fd9e907962",
+    "content-hash": "0450e064f5b0bcb6c5edfa4f78a0c092",
     "packages": [
         {
             "name": "postnlnl/sdk",
-            "version": "v3.1.7",
+            "version": "v5.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/postnlnl/sdk.git",
-                "reference": "bca3a9571e2ecfff74f964b659fc0f9136c09e64"
+                "reference": "fa6889d604e17121c9682ce768e9d6f68ff80d8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/postnlnl/sdk/zipball/bca3a9571e2ecfff74f964b659fc0f9136c09e64",
-                "reference": "bca3a9571e2ecfff74f964b659fc0f9136c09e64",
+                "url": "https://api.github.com/repos/postnlnl/sdk/zipball/fa6889d604e17121c9682ce768e9d6f68ff80d8d",
+                "reference": "fa6889d604e17121c9682ce768e9d6f68ff80d8d",
                 "shasum": ""
             },
             "require": {
@@ -65,7 +65,7 @@
                 "postnl",
                 "postnl"
             ],
-            "time": "2020-03-06T10:18:42+00:00"
+            "time": "2020-10-22T15:15:22+00:00"
         }
     ],
     "packages-dev": [],
@@ -75,5 +75,6 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

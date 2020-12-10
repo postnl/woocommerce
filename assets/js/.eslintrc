@@ -1,13 +1,13 @@
 {
   "globals": {
-    "wcmp": "readonly",
+    "wcpn": "readonly",
     "PostNL": "readonly",
     "PostNLFrontend": "readonly",
-    "MyParcelDisplaySettings": "readonly",
+    "PostNLDisplaySettings": "readonly",
     "PostNLDeliveryOptions": "readonly"
   },
   "extends": [
-    "@myparcel/eslint-config/preset-default"
+    "@postnl/eslint-config/preset-default"
   ],
   "rules": {
     "no-console": "error",

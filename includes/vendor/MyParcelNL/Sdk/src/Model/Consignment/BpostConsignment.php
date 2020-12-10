@@ -62,6 +62,7 @@ class BpostConsignment extends AbstractConsignment
                         'street_additional_info' => $this->getStreetAdditionalInfo(),
                         'number'                 => $this->getNumber(),
                         'box_number'             => (string) $this->getBoxNumber(),
+                        'number_suffix'          => (string) $this->getNumberSuffix(),
                     ],
                 ]
             );
@@ -93,13 +94,13 @@ class BpostConsignment extends AbstractConsignment
      *
      * Required: no
      *
-     * @param string $boxNumber
+     * @param string|null $numberSuffix
      *
      * @return $this
      */
-    public function setBoxNumber(?string $boxNumber): AbstractConsignment
+    public function setNumberSuffix(?string $numberSuffix): AbstractConsignment
     {
-        $this->box_number = $boxNumber;
+        $this->number_suffix = $numberSuffix;
 
         return $this;
     }

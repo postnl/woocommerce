@@ -2,27 +2,28 @@
 
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter as DeliveryOptions;
 use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
-use WPO\WC\PostNL\Compatibility\WC_Core as WCX;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
 use WPO\WC\PostNL\Compatibility\Product as WCX_Product;
+use WPO\WC\PostNL\Compatibility\WC_Core as WCX;
 use WPO\WC\PostNL\Entity\SettingsFieldArguments;
 
 if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCPN_Admin')) {
-    return new WCPN_Admin();
+if (class_exists('WCPOST_Admin')) {
+    return new WCPOST_Admin();
 }
 
 /**
  * Admin options, buttons & data
  */
-class WCPN_Admin
+class WCPOST_Admin
 {
     public const META_CONSIGNMENTS           = "_postnl_consignments";
     public const META_CONSIGNMENT_ID         = "_postnl_consignment_id";
-    public const META_DELIVERY_OPTIONS       = "_myparcel_delivery_options";
+    public const META_DELIVERY_OPTIONS       = "_postnl_delivery_options";
     public const META_HIGHEST_SHIPPING_CLASS = "_postnl_highest_shipping_class";
     public const META_LAST_SHIPMENT_IDS      = "_postnl_last_shipment_ids";
     public const META_ORDER_VERSION          = "_postnl_order_version";
@@ -32,9 +33,16 @@ class WCPN_Admin
     public const META_SHIPMENT_OPTIONS_EXTRA = "_postnl_shipment_options_extra";
     public const META_TRACK_TRACE            = "_postnl_tracktrace";
     public const META_HS_CODE                = "_postnl_hs_code";
+    public const META_HS_CODE_VARIATION      = "_postnl_hs_code_variation";
     public const META_COUNTRY_OF_ORIGIN      = "_postnl_country_of_origin";
+    public const META_ORDER_TOTAL            = "_order_version";
 
-    // Id's refering to shipment statuses
+    /**
+     * Legacy meta keys.
+     */
+    public const META_SHIPMENT_OPTIONS_LT_4_0_0 = "_postnl_shipment_options";
+
+    // Ids referring to shipment statuses.
     public const ORDER_STATUS_DELIVERED_AT_RECIPIENT      = 7;
     public const ORDER_STATUS_DELIVERED_READY_FOR_PICKUP  = 8;
     public const ORDER_STATUS_DELIVERED_PACKAGE_PICKED_UP = 9;
@@ -54,6 +62,7 @@ class WCPN_Admin
         }
 
         add_action("admin_footer", [$this, "renderOffsetDialog"]);
+        add_action("admin_footer", [$this, "renderShipmentOptionsForm"]);
 
         /**
          * Orders page
@@ -74,6 +83,7 @@ class WCPN_Admin
 
         add_action("wp_ajax_wcpn_save_shipment_options", [$this, "save_shipment_options_ajax"]);
         add_action("wp_ajax_wcpn_get_shipment_summary_status", [$this, "order_list_ajax_get_shipment_summary"]);
+        add_action("wp_ajax_wcpn_get_shipment_options", [$this, "ajaxGetShipmentOptions"]);
 
         // HS code in product shipping options tab
         add_action("woocommerce_product_options_shipping", [$this, "productHsCodeField"]);
@@ -91,6 +101,79 @@ class WCPN_Admin
 
         add_action("init", [$this, "registerDeliveredPostStatus"], 10, 1);
         add_filter("wc_order_statuses", [$this, "displayDeliveredPostStatus"], 10, 2);
+
+        add_action('woocommerce_product_after_variable_attributes', array($this, 'variation_hs_code_field'), 10, 3);
+        add_action('woocommerce_save_product_variation', array($this, 'save_variation_hs_code_field'), 10, 2);
+        add_filter('woocommerce_available_variation', array($this, 'load_variation_hs_code_field'), 10, 1);
+    }
+
+    /**
+     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
+     */
+    public static function renderPickupLocation(DeliveryOptions $deliveryOptions): void
+    {
+        if (! $deliveryOptions->isPickup()) {
+            return;
+        }
+
+        $pickup = $deliveryOptions->getPickupLocation();
+
+        printf(
+            "<div class=\"pickup-location\"><strong>%s:</strong><br /> %s<br />%s %s<br />%s %s</div>",
+            __("Pickup location", "woocommerce-postnl"),
+            $pickup->getLocationName(),
+            $pickup->getStreet(),
+            $pickup->getNumber(),
+            $pickup->getPostalCode(),
+            $pickup->getCity()
+        );
+
+        echo "<hr>";
+    }
+
+    /**
+     * @param $loop
+     * @param $variationData
+     * @param $variation
+     */
+    public function variation_hs_code_field($loop, $variationData, $variation)
+    {
+        woocommerce_wp_text_input(
+            array(
+                'id'            => self::META_HS_CODE_VARIATION . "[{$loop}]",
+                'name'          => self::META_HS_CODE_VARIATION . "[{$loop}]",
+                'value'         => get_post_meta($variation->ID, self::META_HS_CODE_VARIATION, true),
+                'label'         => __('HS Code', 'woocommerce'),
+                'desc_tip'      => true,
+                'description'   => __('This HS Code overwrites the parents HS Code.', 'woocommerce'),
+                'wrapper_class' => 'form-row form-row-full',
+            )
+        );
+    }
+
+    /**
+     * @param $variationId
+     * @param $loop
+     */
+    public function save_variation_hs_code_field($variationId, $loop)
+    {
+        $hsCodeValue = $_POST[self::META_HS_CODE_VARIATION][$loop];
+
+        if (! empty($hsCodeValue)) {
+            update_post_meta($variationId, self::META_HS_CODE_VARIATION, esc_attr($hsCodeValue));
+        }
+    }
+
+    /**
+     * @param $variation
+     *
+     * @return mixed
+     */
+    public function load_variation_hs_code_field($variation)
+    {
+        $variation[self::META_HS_CODE_VARIATION] = get_post_meta($variation['variation_id'], self::META_HS_CODE_VARIATION, true);
+
+        return $variation;
     }
 
     /**
@@ -100,12 +183,12 @@ class WCPN_Admin
     {
         register_post_status('wc-custom-delivered',
             [
-                'label' => 'Delivered',
-                'public' => true,
-                'exclude_from_search' => false,
-                'show_in_admin_all_list' => true,
+                'label'                     => 'Delivered',
+                'public'                    => true,
+                'exclude_from_search'       => false,
+                'show_in_admin_all_list'    => true,
                 'show_in_admin_status_list' => true,
-                'label_count' => _n_noop('Delivered (%s)', 'Delivered (%s)'),
+                'label_count'               => _n_noop('Delivered (%s)', 'Delivered (%s)'),
             ]
         );
     }
@@ -135,7 +218,7 @@ class WCPN_Admin
      *
      * @throws ErrorException
      * @throws \MyParcelNL\Sdk\src\Exception\ApiException
-     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
+     * @throws \use MyParcelNL\Sdk\src\Exception\MissingFieldException
      */
     public function automaticExportOrder($orderId): void
     {
@@ -149,55 +232,48 @@ class WCPN_Admin
      */
     public function showPostNLSettings(WC_Order $order): void
     {
-        if (! WCPN_Country_Codes::isAllowedDestination(
-            WCX_Order::get_prop($order, 'shipping_country')
-        )) {
+        $isAllowedDestination = WCPN_Country_Codes::isAllowedDestination(WCX_Order::get_prop($order, 'shipping_country'));
+
+        if (! $isAllowedDestination) {
             return;
         }
 
-        $order_id = WCX_Order::get_id($order);
-        $consignments = WCPN_Admin::get_order_shipments($order);
+        $order_id        = WCX_Order::get_id($order);
+        $consignments    = WCPOST_Admin::get_order_shipments($order);
+        $deliveryOptions = self::getDeliveryOptionsFromOrder($order);
+        $packageType     = $deliveryOptions->getPackageType() ?? WCPOST()->export->getPackageTypeFromOrder($order);
+
+        echo '<div class="wcpn__shipment-settings-wrapper" style="display: none;">';
+
+        $this->printDeliveryDate($deliveryOptions);
 
         // if we have shipments, then we show status & link to Track & Trace, settings under i
         if (! empty($consignments)) :
             // only use last shipment
-            $last_shipment = array_pop($consignments);
-            $last_shipment_id = $last_shipment['shipment_id'];
+            $lastShipment   = array_pop($consignments);
+            $lastShipmentId = $lastShipment['shipment_id'];
 
             ?>
-            <div class="wcpn__shipment-summary">
-                <?php $this->showDeliveryOptionsForOrder($order); ?>
-                <a class="wcpn__shipment-summary__show">
-                    <span
-                            class="wcpn__encircle wcpn__shipment-summary__show">i
-                    </span>
-                </a>
-                <div
-                        class="wcpn__box wcpn__shipment-summary__list"
-                        data-loaded=""
-                        data-shipment_id="<?php echo $last_shipment_id; ?>"
-                        data-order_id="<?php echo $order_id; ?>"
-                        style="display: none;">
-                    <?php self::renderSpinner(); ?>
-                </div>
+            <a class="wcpn__shipment-summary__show">
+                <span class="wcpn__encircle wcpn__shipment-summary__show">i</span>
+            </a>
+            <div
+                class="wcpn__box wcpn__shipment-summary__list"
+                data-loaded=""
+                data-shipment_id="<?php echo $lastShipmentId; ?>"
+                data-order_id="<?php echo $order_id; ?>"
+                style="display: none;">
+                <?php self::renderSpinner(); ?>
             </div>
-        <?php else : ?>
-            <div class="wcpn__shipment-options wcpn__has-consignments" style="display: none;">
-                <?php $this->showDeliveryOptionsForOrder($order); ?>
-            </div>
-        <?php endif; ?>
-        <div class="wcpn__shipment-options" style="display: none;">
-            <?php printf(
-                '<a href="#" class="wcpn__shipment-options__show">%s &#x25BE;</a>',
-                __("Details", "woocommerce-postnl")
-            ); ?>
-            <div class="wcpn__box wcpn__shipment-options__form" style="display: none;">
-                <a class="wcpn__d--flex">
-                    <?php include('views/html-order-shipment-options.php'); ?>
-                </a>
-            </div>
-        </div>
-        <?php
+        <?php endif;
+
+        printf(
+            '<a href="#" class="wcpn__shipment-options__show" data-order-id="%d">%s &#x25BE;</a>',
+            $order->get_id(),
+            WCPN_Export::getPackageTypeHuman($packageType)
+        );
+
+        echo "</div>";
     }
 
     /**
@@ -207,7 +283,7 @@ class WCPN_Admin
      */
     public function order_list_ajax_get_shipment_summary()
     {
-        check_ajax_referer(WCPN::NONCE_ACTION, 'security');
+        check_ajax_referer(WCPOST::NONCE_ACTION, 'security');
 
         include('views/html-order-shipment-summary.php');
         die();
@@ -240,6 +316,7 @@ class WCPN_Admin
     /**
      * Add export option to bulk action drop down menu
      * Using Javascript until WordPress core fixes: http://core.trac.wordpress.org/ticket/16031
+     *
      * Used pre WordPress 4.7.0
      *
      * @access public
@@ -257,14 +334,14 @@ class WCPN_Admin
         if ('shop_order' == $post_type) {
             ?>
             <script type="text/javascript">
-                jQuery(document).ready(function () {
-                    <?php foreach ($bulk_actions as $action => $title) { ?>
-                    jQuery('<option>')
-                        .val('<?php echo $action; ?>')
-                        .html('<?php echo esc_attr($title); ?>')
-                        .appendTo('select[name=\'action\'], select[name=\'action2\']');
-                    <?php }    ?>
-                });
+              jQuery(document).ready(function () {
+                  <?php foreach ($bulk_actions as $action => $title) { ?>
+                jQuery('<option>')
+                  .val('<?php echo $action; ?>')
+                  .html('<?php echo esc_attr($title); ?>')
+                  .appendTo('select[name=\'action\'], select[name=\'action2\']');
+                  <?php }    ?>
+              });
             </script>
             <?php
             self::renderSpinner();
@@ -279,7 +356,7 @@ class WCPN_Admin
      */
     public function renderOffsetDialog(): void
     {
-        if (!WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_ASK_FOR_PRINT_POSITION)) {
+        if (! WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_ASK_FOR_PRINT_POSITION)) {
             return;
         }
 
@@ -301,18 +378,22 @@ class WCPN_Admin
         ?>
 
         <div
-                class="wcpn wcpn__box wcpn__offset-dialog" style="display: none;">
+                class="wcpn wcpn__box wcpn__offset-dialog"
+                style="display: none;">
             <div class="wcpn__offset-dialog__inner wcpn__d--flex">
                 <div>
                     <?php woocommerce_form_field($field["name"], $class->getArguments(false), ""); ?>
 
                     <img
-                            src="<?php echo WCPN()->plugin_url() . "/assets/img/print-offset-icon.png"; ?>"
+                            src="<?php echo WCPOST()->plugin_url() . "/assets/img/print-offset-icon.png"; ?>"
                             alt="<?php implode(", ", WCPN_Export::DEFAULT_POSITIONS) ?>"
                             class="wcpn__offset-dialog__icon"/>
                     <div>
-                        <a href="#" class="wcpn__action wcpn__offset-dialog__button button">
-                            <?php _e("Print", "woocommerce-postnl"); ?><?php WCPN_Admin::renderSpinner(); ?>
+                        <a
+                                href="#"
+                                class="wcpn__action wcpn__offset-dialog__button button">
+                            <?php _e("Print", "woocommerce-postnl"); ?>
+                            <?php WCPOST_Admin::renderSpinner(); ?>
                         </a>
                     </div>
                 </div>
@@ -320,6 +401,27 @@ class WCPN_Admin
             </div>
         </div>
         <?php
+    }
+
+    /**
+     * Hide an empty shipment options form in the footer.
+     */
+    public function renderShipmentOptionsForm(): void
+    {
+        echo '<div class="wcpn__box wcpn__shipment-options-dialog" style="display: none; position: absolute;"></div>';
+    }
+
+    /**
+     * Get the new html content for the shipment options form based on the passed order id.
+     */
+    public function ajaxGetShipmentOptions(): void
+    {
+        // Order is used in views/html-order-shipment-options.php
+        $order = wc_get_order((int) $_POST['orderId']);
+
+        include('views/html-order-shipment-options.php');
+
+        die();
     }
 
     /**
@@ -337,7 +439,7 @@ class WCPN_Admin
 
         $shipping_country = WCX_Order::get_prop($order, 'shipping_country');
 
-        if (!WCPN_Country_Codes::isAllowedDestination($shipping_country)) {
+        if (! WCPN_Country_Codes::isAllowedDestination($shipping_country)) {
             return;
         }
 
@@ -346,27 +448,38 @@ class WCPN_Admin
         $baseUrl      = "admin-ajax.php?action=" . WCPN_Export::EXPORT;
         $addShipments = WCPN_Export::ADD_SHIPMENTS;
         $getLabels    = WCPN_Export::GET_LABELS;
+        $addReturn    = WCPN_Export::ADD_RETURN;
 
         $listing_actions = [
             $addShipments => [
                 "url" => admin_url("$baseUrl&request=$addShipments&order_ids=$order_id"),
-                "img" => WCPN()->plugin_url() . "/assets/img/postnl-up.png",
+                "img" => WCPOST()->plugin_url() . "/assets/img/postnl-up.png",
                 "alt" => __("Export to PostNL", "woocommerce-postnl"),
             ],
-            $getLabels => [
+            $getLabels    => [
                 "url" => admin_url("$baseUrl&request=$getLabels&order_ids=$order_id"),
-                "img" => WCPN()->plugin_url() . "/assets/img/postnl-pdf.png",
+                "img" => WCPOST()->plugin_url() . "/assets/img/postnl-pdf.png",
                 "alt" => __("Print PostNL label", "woocommerce-postnl"),
+            ],
+            $addReturn    => [
+                "url" => admin_url("$baseUrl&request=$addReturn&order_ids=$order_id"),
+                "img" => WCPOST()->plugin_url() . "/assets/img/postnl-retour.png",
+                "alt" => __("Email return label", "woocommerce-postnl"),
             ],
         ];
 
-        $consignments = WCPN_Admin::get_order_shipments($order);
+        $consignments = WCPOST_Admin::get_order_shipments($order);
 
         if (empty($consignments)) {
             unset($listing_actions[$getLabels]);
         }
 
-        $display = WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_DOWNLOAD_DISPLAY) === 'display';
+        $processed_shipments = WCPOST_Admin::get_order_shipments($order);
+        if (empty($processed_shipments) || $shipping_country !== 'NL') {
+            unset($listing_actions[$addReturn]);
+        }
+
+        $display = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY) === 'display';
 
         $attributes = [];
 
@@ -386,7 +499,7 @@ class WCPN_Admin
 
     /**
      * @param WC_Order $order
-     * @param bool $exclude_concepts
+     * @param bool     $exclude_concepts
      *
      * @return array
      */
@@ -425,7 +538,7 @@ class WCPN_Admin
          */
         if ($exclude_concepts) {
             $consignments = array_filter($consignments,
-                function ($consignment) {
+                function($consignment) {
                     return isset($consignment["track_trace"]);
                 }
             );
@@ -440,16 +553,26 @@ class WCPN_Admin
      * @throws Exception
      * @see admin/views/html-order-shipment-options.php
      */
-    public function save_shipment_options_ajax()
+    public function save_shipment_options_ajax(): void
     {
         parse_str($_POST["form_data"], $form_data);
 
         foreach ($form_data[self::SHIPMENT_OPTIONS_FORM_NAME] as $order_id => $data) {
-            $order = WCX::get_order($order_id);
-            /**
-             * @var DeliveryOptions $deliveryOptions
-             */
+            $order           = WCX::get_order($order_id);
+            $shippingCountry = $order->get_shipping_country();
+            $data            = self::removeDisallowedDeliveryOptions($data, $shippingCountry);
             $deliveryOptions = self::getDeliveryOptionsFromOrder($order, $data);
+
+            error_log(
+                sprintf(
+                    "Saving delivery options for order %d\n%s",
+                    $order_id,
+                    json_encode(
+                        $deliveryOptions->toArray(),
+                        JSON_PRETTY_PRINT
+                    )
+                )
+            );
 
             WCX_Order::update_meta_data(
                 $order,
@@ -464,6 +587,8 @@ class WCPN_Admin
                 $data["extra_options"]
             );
         }
+
+        die();
     }
 
     /**
@@ -509,8 +634,8 @@ class WCPN_Admin
         $this->showOrderActions($order);
         echo '</div>';
 
-        $downloadDisplay = WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_DOWNLOAD_DISPLAY) === 'display';
-        $consignments = WCPN_Admin::get_order_shipments($order);
+        $downloadDisplay = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY) === 'display';
+        $consignments    = WCPOST_Admin::get_order_shipments($order);
 
         // show shipments if available
         if (empty($consignments)) {
@@ -537,20 +662,14 @@ class WCPN_Admin
     }
 
     /**
-     * @param WC_Order $order
+     * @param \WC_Order $order
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function showDeliveryOptionsForOrder(WC_Order $order): void
+    public function showDeliveryDateForOrder(WC_Order $order): void
     {
         $deliveryOptions = self::getDeliveryOptionsFromOrder($order);
-
-        /**
-         * Show the delivery date if it is present.
-         */
-        if ($deliveryOptions->getDate()) {
-            $this->printDeliveryDate($deliveryOptions);
-        }
+        $this->printDeliveryDate($deliveryOptions);
     }
 
     /**
@@ -566,8 +685,8 @@ class WCPN_Admin
             return;
         }
 
-        $order = WCX::get_order($order_id);
-        $country = WCX_Order::get_prop($order, 'shipping_country');
+        $order    = WCX::get_order($order_id);
+        $country  = WCX_Order::get_prop($order, 'shipping_country');
         $postcode = preg_replace('/\s+/', '', WCX_Order::get_prop($order, 'shipping_postcode'));
 
         // set url for NL or foreign orders
@@ -580,7 +699,7 @@ class WCPN_Admin
             }
 
             $trackTraceUrl = sprintf(
-                'https://jouw.postnl.nl/track-and-trace/%s/%s/%s',
+                'https://postnl.me/track-trace/%s/%s/%s',
                 $track_trace,
                 $postcode,
                 $country
@@ -602,8 +721,8 @@ class WCPN_Admin
         echo '<div class="options_group">';
         woocommerce_wp_text_input(
             [
-                'id' => self::META_HS_CODE,
-                'label' => __('HS Code', 'woocommerce-postnl'),
+                'id'          => self::META_HS_CODE,
+                'label'       => __('HS Code', 'woocommerce-postnl'),
                 'description' => sprintf(
                     __('HS Codes are used for PostNL world shipments, you can find the appropriate code on the %ssite of the Dutch Customs%s.',
                         'woocommerce-postnl'
@@ -619,10 +738,10 @@ class WCPN_Admin
     public function productHsCodeFieldSave($post_id)
     {
         // check if hs code is passed and not an array (=variation hs code)
-        if (isset($_POST[self::META_HS_CODE]) && !is_array($_POST[self::META_HS_CODE])) {
+        if (isset($_POST[self::META_HS_CODE]) && ! is_array($_POST[self::META_HS_CODE])) {
             $product = wc_get_product($post_id);
             $hs_code = $_POST[self::META_HS_CODE];
-            if (!empty($hs_code)) {
+            if (! empty($hs_code)) {
                 WCX_Product::update_meta_data($product, self::META_HS_CODE, esc_attr($hs_code));
             } else {
                 if (isset($_POST[self::META_HS_CODE]) && empty($hs_code)) {
@@ -639,6 +758,8 @@ class WCPN_Admin
             [
                 'id'          => self::META_COUNTRY_OF_ORIGIN,
                 'label'       => __('Country of Origin', 'woocommerce-postnl'),
+                'type'        => 'select',
+                'options'     => (new WC_Countries())->get_countries(),
                 'description' => sprintf(
                     __('Country of origin is required for world shipments. Defaults to shop base.')
                 ),
@@ -649,17 +770,19 @@ class WCPN_Admin
 
     public function productCountryOfOriginFieldSave($postId)
     {
-        if (isset($_POST[self::META_COUNTRY_OF_ORIGIN]) && !is_array($_POST[self::META_COUNTRY_OF_ORIGIN])) {
-            $product = wc_get_product($postId);
+        if (isset($_POST[self::META_COUNTRY_OF_ORIGIN]) && ! is_array($_POST[self::META_COUNTRY_OF_ORIGIN])) {
+            $product         = wc_get_product($postId);
             $countryOfOrigin = $_POST[self::META_COUNTRY_OF_ORIGIN];
-            if (!empty($countryOfOrigin)) {
-                WCX_Product::update_meta_data($product, self::META_HS_CODE, esc_attr($countryOfOrigin));
+            if (! empty($countryOfOrigin)) {
+                WCX_Product::update_meta_data($product, self::META_COUNTRY_OF_ORIGIN, esc_attr($countryOfOrigin));
+
                 return;
             }
             if (isset($_POST[self::META_COUNTRY_OF_ORIGIN]) && empty($countryOfOrigin)) {
                 WCX_Product::delete_meta_data($product, self::META_COUNTRY_OF_ORIGIN);
             }
         }
+
         return;
     }
 
@@ -698,7 +821,7 @@ class WCPN_Admin
      */
     public function renderBarcodes(WC_Order $order): void
     {
-        $shipments = WCPN_Admin::get_order_shipments($order, true);
+        $shipments = WCPOST_Admin::get_order_shipments($order, true);
 
         if (empty($shipments)) {
             echo __("No label has been created yet.", "woocommerce-postnl");
@@ -713,7 +836,7 @@ class WCPN_Admin
             } else {
                 printf(
                     '<a target="_blank" class="wcpn__barcode-link" title="%2$s" href="%1$s">%2$s</a><br>',
-                    WCPN_Admin::getTrackTraceUrl($order, $shipment["track_trace"]),
+                    WCPOST_Admin::getTrackTraceUrl($order, $shipment["track_trace"]),
                     $shipment["track_trace"]
                 );
             }
@@ -726,18 +849,18 @@ class WCPN_Admin
      * data is invalid it falls back to defaults.
      *
      * @param WC_Order $order
-     * @param array $inputData
+     * @param array    $inputData
      *
      * @return DeliveryOptions
      * @throws \Exception
-     * @see \wcpn_Checkout::save_delivery_options
+     * @see \WCPN_Checkout::save_delivery_options
      */
     public static function getDeliveryOptionsFromOrder(WC_Order $order, array $inputData = []): DeliveryOptions
     {
-        $meta = WCX_Order::get_meta($order, self::META_DELIVERY_OPTIONS);
+        $meta = WCX_Order::get_meta($order, self::META_DELIVERY_OPTIONS) ?: null;
 
         // $meta is a json string, create an instance
-        if (!empty($meta) && !$meta instanceof DeliveryOptions) {
+        if (! empty($meta) && ! $meta instanceof DeliveryOptions) {
             if (is_string($meta)) {
                 $meta = json_decode(stripslashes($meta), true);
             }
@@ -746,48 +869,38 @@ class WCPN_Admin
 
             try {
                 // create new instance from known json
-                $meta = DeliveryOptionsAdapterFactory::create((array)$meta);
+                $meta = DeliveryOptionsAdapterFactory::create((array) $meta);
             } catch (BadMethodCallException $e) {
                 // create new instance from unknown json data
-                $meta = new WCPN_DeliveryOptionsFromOrderAdapter(null, (array)$meta);
+                $meta = new WCPN_DeliveryOptionsFromOrderAdapter(null, (array) $meta);
             }
         }
 
-        if (empty($meta)) {
-            $meta = null;
-        }
-
         // Create or update immutable adapter from order with a instanceof DeliveryOptionsAdapter
-        $meta = new WCPN_DeliveryOptionsFromOrderAdapter($meta, $inputData);
+        if (empty($meta) || ! empty($inputData)) {
+            $meta = new WCPN_DeliveryOptionsFromOrderAdapter($meta, $inputData);
+        }
 
         return $meta;
     }
 
     /**
-     * Output the delivery date.
+     * Output the delivery date if there is a date and the show delivery day setting is enabled.
      *
-     * @param DeliveryOptions $delivery_options
+     * @param DeliveryOptions $deliveryOptions
      *
      * @throws Exception
      */
-    private function printDeliveryDate(DeliveryOptions $delivery_options): void
+    private function printDeliveryDate(DeliveryOptions $deliveryOptions): void
     {
-        $string = $delivery_options->isPickup()
-            ? __("Pickup")
-            : __("Standard delivery",
-                "woocommerce-postnl",
-                "woocommerce-postnl"
-            );
+        $showDeliveryDay = WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_SHOW_DELIVERY_DAY);
 
-        // If show delivery day is enabled
-        $showDeliveryDay = WCPN()->setting_collection->isEnabled(wcpn_Settings::SETTING_SHOW_DELIVERY_DAY);
-
-        if ($showDeliveryDay) {
+        if ($deliveryOptions->getDate() && $showDeliveryDay) {
             printf(
                 '<div class="delivery-date"><strong>%s</strong><br />%s, %s</div>',
                 __("PostNL shipment:", "woocommerce-postnl"),
-                $string,
-                wc_format_datetime(new WC_DateTime($delivery_options->getDate()), 'l d-m')
+                WCPN_Data::getDeliveryTypesHuman()[$deliveryOptions->getDeliveryType()],
+                wc_format_datetime(new WC_DateTime($deliveryOptions->getDate()), 'D d-m')
             );
         }
     }
@@ -796,7 +909,7 @@ class WCPN_Admin
      * Output a spinner.
      *
      * @param string $state
-     * @param array $args
+     * @param array  $args
      */
     public static function renderSpinner(string $state = "", array $args = []): void
     {
@@ -839,7 +952,7 @@ class WCPN_Admin
      * @param string $url
      * @param string $alt
      * @param string $icon
-     * @param array $rawAttributes
+     * @param array  $rawAttributes
      */
     public static function renderAction(string $url, string $alt, string $icon, array $rawAttributes = []): void
     {
@@ -849,7 +962,7 @@ class WCPN_Admin
                     data-tip="%2$s" 
                     %4$s>
                 <img class="wcpn__action__img" src="%3$s" alt="%2$s" />',
-            wp_nonce_url($url, WCPN::NONCE_ACTION),
+            wp_nonce_url($url, WCPOST::NONCE_ACTION),
             $alt,
             $icon,
             wc_implode_html_attributes($rawAttributes)
@@ -861,7 +974,7 @@ class WCPN_Admin
 
     /**
      * @param array $shipment
-     * @param int $order_id
+     * @param int   $order_id
      *
      * @throws Exception
      */
@@ -870,14 +983,14 @@ class WCPN_Admin
         $track_trace = $shipment["track_trace"] ?? null;
 
         if ($track_trace) {
-            $track_trace_url = WCPN_Admin::getTrackTraceUrl($order_id, $track_trace);
+            $track_trace_url  = WCPOST_Admin::getTrackTraceUrl($order_id, $track_trace);
             $track_trace_link = sprintf(
                 '<a href="%s" target="_blank">%s</a>',
                 $track_trace_url,
                 $track_trace
             );
         } elseif (isset($shipment["shipment"]) && isset($shipment["shipment"]["options"])) {
-            $package_type = WCPN()->export->getPackageType($shipment["shipment"]["options"]["package_type"]);
+            $package_type     = WCPN_Export::getPackageTypeHuman($shipment["shipment"]["options"]["package_type"]);
             $track_trace_link = "($package_type)";
         } else {
             $track_trace_link = __("(Unknown)", "woocommerce-postnl");
@@ -888,30 +1001,73 @@ class WCPN_Admin
 
     /**
      * @param array $shipment
-     * @param int $order_id
+     * @param int   $order_id
      */
     public static function renderStatus(array $shipment, int $order_id): void
     {
         echo $shipment["status"] ?? "–";
 
-        if (self::shipmentIsStatus($shipment,self::ORDER_STATUS_DELIVERED_AT_RECIPIENT)
-            || self::shipmentIsStatus($shipment,self::ORDER_STATUS_DELIVERED_READY_FOR_PICKUP)
-            || self::shipmentIsStatus($shipment,self::ORDER_STATUS_DELIVERED_PACKAGE_PICKED_UP)
+        if (self::shipmentIsStatus($shipment, self::ORDER_STATUS_DELIVERED_AT_RECIPIENT)
+            || self::shipmentIsStatus($shipment, self::ORDER_STATUS_DELIVERED_READY_FOR_PICKUP)
+            || self::shipmentIsStatus($shipment, self::ORDER_STATUS_DELIVERED_PACKAGE_PICKED_UP)
         ) {
             $order = WCX::get_order($order_id);
-            $order->update_status('wc-custom-delivered');
+//            This will be addressed in MY-24881
+//            $order->update_status('wc-custom-delivered');
         }
     }
 
     /**
      * @param array $shipment
-     * @param int $status
+     * @param int   $status
+     *
      * @return bool
      */
     public static function shipmentIsStatus(array $shipment, int $status): bool
     {
         return strstr($shipment['status'], (new WCPN_Export())->getShipmentStatusName($status));
     }
+
+    /**
+     * Remove options that aren't allowed and return the edited array.
+     *
+     * @param array  $data
+     * @param string $country
+     *
+     * @return mixed
+     */
+    private static function removeDisallowedDeliveryOptions(array $data, string $country): array
+    {
+        $data['package_type'] = $data['package_type'] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
+        $isHomeCountry        = WCPN_Data::isHomeCountry($country);
+        $isEuCountry          = WCPN_Country_Codes::isEuCountry($country);
+
+        if (! $isHomeCountry) {
+            $data['package_type'] = AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
+        }
+
+        $isPackage      = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME === $data['package_type'];
+        $isDigitalStamp = AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME === $data['package_type'];
+
+        if (! $isHomeCountry || ! $isPackage) {
+            $data['shipment_options']['age_check']       = false;
+            $data['shipment_options']['return_shipment'] = false;
+            $data['shipment_options']['insured']         = false;
+            $data['shipment_options']['insured_amount']  = 0;
+
+            $data['extra_options']['collo_amount'] = 1;
+        }
+
+        if (! $isPackage || (! $isHomeCountry && ! $isEuCountry)) {
+            $data['shipment_options']['large_format'] = false;
+        }
+
+        if (! $isDigitalStamp) {
+            unset($data['extra_options']['weight']);
+        }
+
+        return $data;
+    }
 }
 
-return new WCPN_Admin();
+return new WCPOST_Admin();

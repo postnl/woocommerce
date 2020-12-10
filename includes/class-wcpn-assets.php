@@ -54,9 +54,9 @@ class WCPN_Assets
             wp_enqueue_style("thickbox");
             wp_enqueue_script(
                 "wcpn-admin",
-                WCPN()->plugin_url() . "/assets/js/wcpn-admin.js",
+                WCPOST()->plugin_url() . "/assets/js/wcpn-admin.js",
                 ["jquery", "thickbox"],
-                WC_POST_NL_VERSION
+                WC_POSTNL_VERSION
             );
 
             wp_localize_script(
@@ -72,17 +72,17 @@ class WCPN_Assets
                         "modal_dialog"  => WCPN_Export::MODAL_DIALOG,
                     ],
                     "bulk_actions"           => [
-                        "export"       => WCPN_Admin::BULK_ACTION_EXPORT,
-                        "print"        => WCPN_Admin::BULK_ACTION_PRINT,
-                        "export_print" => WCPN_Admin::BULK_ACTION_EXPORT_PRINT,
+                        "export"       => WCPOST_Admin::BULK_ACTION_EXPORT,
+                        "print"        => WCPOST_Admin::BULK_ACTION_PRINT,
+                        "export_print" => WCPOST_Admin::BULK_ACTION_EXPORT_PRINT,
                     ],
                     "ajax_url"               => admin_url("admin-ajax.php"),
-                    "nonce"                  => wp_create_nonce(WCPN::NONCE_ACTION),
-                    "download_display"       => WCPN()->setting_collection->getByName(
-                        WCPN_Settings::SETTING_DOWNLOAD_DISPLAY
+                    "nonce"                  => wp_create_nonce(WCPOST::NONCE_ACTION),
+                    "download_display"       => WCPOST()->setting_collection->getByName(
+                        WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY
                     ),
-                    "ask_for_print_position" => WCPN()->setting_collection->isEnabled(
-                        WCPN_Settings::SETTING_ASK_FOR_PRINT_POSITION
+                    "ask_for_print_position" => WCPOST()->setting_collection->isEnabled(
+                        WCPOST_Settings::SETTING_ASK_FOR_PRINT_POSITION
                     ),
                     "strings"                => [
                         "no_orders_selected" => __("You have not selected any orders!", "woocommerce-postnl"),
@@ -92,9 +92,9 @@ class WCPN_Assets
 
             wp_enqueue_style(
                 "wcpn-admin-styles",
-                WCPN()->plugin_url() . "/assets/css/wcpn-admin-styles.css",
+                WCPOST()->plugin_url() . "/assets/css/wcpn-admin-styles.css",
                 [],
-                WC_POST_NL_VERSION,
+                WC_POSTNL_VERSION,
                 "all"
             );
 
@@ -102,9 +102,9 @@ class WCPN_Assets
             if (version_compare(WOOCOMMERCE_VERSION, "2.1", "<=")) {
                 wp_enqueue_style(
                     "wcpn-admin-styles-legacy",
-                    WCPN()->plugin_url() . "/assets/css/wcpn-admin-styles-legacy.css",
+                    WCPOST()->plugin_url() . "/assets/css/wcpn-admin-styles-legacy.css",
                     [],
-                    WC_POST_NL_VERSION,
+                    WC_POSTNL_VERSION,
                     "all"
                 );
             }

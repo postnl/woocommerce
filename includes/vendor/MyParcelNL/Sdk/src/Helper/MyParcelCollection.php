@@ -6,7 +6,7 @@
  * https://github.com/myparcelnl
  *
  * @author      Reindert Vetter <reindert@myparcel.nl>
- * @copyright   2010-2017 MyParcel
+ * @copyright   2010-2020 MyParcel
  * @license     http://creativecommons.org/licenses/by-nc-nd/3.0/nl/deed.en_US  CC BY-NC-ND 3.0 NL
  * @link        https://github.com/myparcelnl/sdk
  * @since       File available since Release v0.1.0
@@ -24,6 +24,7 @@ use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelRequest;
 use MyParcelNL\Sdk\src\Services\CollectionEncode;
+use MyParcelNL\Sdk\src\Services\ConsignmentEncode;
 use MyParcelNL\Sdk\src\Support\Arr;
 use MyParcelNL\Sdk\src\Support\Collection;
 use MyParcelNL\Sdk\src\Support\Str;
@@ -72,14 +73,14 @@ class MyParcelCollection extends Collection
     /**
      * @var string
      */
-    private $user_agent = '';
+    private static $user_agent;
 
     /**
      * @param bool $keepKeys
      *
      * @return AbstractConsignment[]
      */
-    public function getConsignments($keepKeys = true)
+    public function getConsignments($keepKeys = true): array
     {
         if ($keepKeys) {
             return $this->items;
@@ -326,7 +327,7 @@ class MyParcelCollection extends Collection
                     ->setUserAgent($this->getUserAgent())
                     ->setRequestParameters(
                         $key,
-                        $consignment->getConsignmentId(),
+                        (string) $consignment->getConsignmentId(),
                         MyParcelRequest::REQUEST_HEADER_DELETE
                     )
                     ->sendRequest('DELETE');
@@ -367,7 +368,7 @@ class MyParcelCollection extends Collection
         $result        = $request->getResult('data.shipments');
         $newCollection = $this->getNewCollectionFromResult($result);
 
-        $this->items = $newCollection->items;
+        $this->items = $newCollection->sortByCollection($this)->items;
 
         return $this;
     }
@@ -378,16 +379,16 @@ class MyParcelCollection extends Collection
      * @param     $key
      * @param int $size
      *
-     * @deprecated use MyParcelCollection::query($key, ['size' => 300]) instead
-     *
      * @return $this
      * @throws ApiException
      * @throws MissingFieldException
      * @throws Exception
+     * @deprecated use MyParcelCollection::query($key, ['size' => 300]) instead
      */
     public function setLatestDataWithoutIds($key, $size = 300)
     {
         $params = ['size' => $size];
+
         return self::query($key, $params);
     }
 
@@ -412,8 +413,7 @@ class MyParcelCollection extends Collection
             ->createConcepts()
             ->setLabelFormat($positions);
 
-        $conceptIds = $this->getConsignmentIds($key);
-
+        $conceptIds  = $this->getConsignmentIds($key);
         $requestType = MyParcelRequest::REQUEST_TYPE_RETRIEVE_LABEL;
         if ($this->useLabelPrepare(count($conceptIds))) {
             $requestType = MyParcelRequest::REQUEST_TYPE_RETRIEVE_PREPARED_LABEL;
@@ -505,16 +505,24 @@ class MyParcelCollection extends Collection
     /**
      * Send return label to customer. The customer can pay and download the label.
      *
+     * @param bool          $sendMail
+     * @param \Closure|null $modifier
+     *
      * @return $this
-     * @throws ApiException
-     * @throws MissingFieldException
+     * @throws \MyParcelNL\Sdk\src\Exception\ApiException
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      */
-    public function sendReturnLabelMails()
+    public function generateReturnConsignments(bool $sendMail, \Closure $modifier = null): self
     {
-        $parentConsignment = $this->getConsignments(false)[0];
+        // Be sure consignments are created
+        $this->createConcepts();
 
-        $apiKey = $parentConsignment->getApiKey();
-        $data   = $this->apiEncodeReturnShipment($parentConsignment);
+        $parentConsignments = $this->getConsignments(false);
+        $returnConsignments = $this->getReturnConsignments($parentConsignments, $modifier);
+
+        $data        = $this->apiEncodeReturnShipments($returnConsignments);
+        $apiKey      = $returnConsignments[0]->getApiKey();
+        $requestType = MyParcelRequest::REQUEST_TYPE_SHIPMENTS;
 
         $request = (new MyParcelRequest())
             ->setUserAgent($this->getUserAgent())
@@ -523,7 +531,8 @@ class MyParcelCollection extends Collection
                 $data,
                 MyParcelRequest::REQUEST_HEADER_RETURN
             )
-            ->sendRequest('POST');
+            ->setQuery(['send_return_mail' => (int) $sendMail])
+            ->sendRequest('POST', $requestType);
 
         $result = $request->getResult();
 
@@ -531,13 +540,31 @@ class MyParcelCollection extends Collection
             throw new ApiException('Unknown Error in MyParcel API response');
         }
 
-        if (empty($result['data']['ids'][0]['id']) ||
-            (int) $result['data']['ids'][0]['id'] < 1
-        ) {
-            throw new InvalidArgumentException('Can\'t send retour label to customer. Please create an issue on GitHub or contact MyParcel; support@myparcel.nl. Note this request body: ' . $data);
+        $returnIds = Arr::pluck(Arr::get($result, 'data.ids'), 'id');
+        if (! $returnIds || count($returnIds) < 1) {
+            throw new InvalidArgumentException('Can\'t send return label to customer. Please create an issue on GitHub or contact MyParcel; support@myparcel.nl. Note this request body: ' . $data);
         }
 
+        $returnConsignments = (new MyParcelCollection())
+            ->addConsignmentByConsignmentIds($returnIds, $apiKey)
+            ->setLatestData();
+
+        $this->items = Arr::mergeAfterEachOther($parentConsignments, $returnConsignments->toArray());
+
         return $this;
+    }
+
+    /**
+     * Send return label to customer. The customer can pay and download the label.
+     *
+     * @return $this
+     * @throws ApiException
+     * @throws MissingFieldException
+     * @deprecated Use generateReturnConsignments instead
+     */
+    public function sendReturnLabelMails(): self
+    {
+        return $this->generateReturnConsignments(true);
     }
 
     /**
@@ -578,22 +605,45 @@ class MyParcelCollection extends Collection
      */
     public function getUserAgent()
     {
-        return $this->user_agent;
+        return $this::$user_agent;
     }
 
     /**
-     * @param string $platform
-     * @param string $version
+     * @param string      $platform
+     * @param string|null $version
      *
      * @return self
      * @internal param string $user_agent
+     * @deprecated Use setCustomUserAgent instead
      */
-    public function setUserAgent($platform, $version = null)
+    public function setUserAgent(string $platform, string $version = null): self
     {
-        $this->user_agent = 'MyParcel-' . $platform;
+        $this::$user_agent = 'MyParcel-' . $platform;
         if ($version !== null) {
-            $this->user_agent .= '/' . str_replace('v', '', $version);
+            $this::$user_agent .= '/' . str_replace('v', '', $version);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param  array $userAgentMap
+     *
+     * @return self
+     */
+    public function setUserAgents(array $userAgentMap): self
+    {
+        $userAgents = [];
+
+        foreach ($userAgentMap as $key => $value) {
+            if (Str::startsWith($value, 'v')) {
+                $value = str_replace('v', '', $value);
+            }
+
+            $userAgents[] = $key . '/' . $value;
+        }
+
+        self::$user_agent = implode(' ', $userAgents);
 
         return $this;
     }
@@ -635,9 +685,10 @@ class MyParcelCollection extends Collection
         $request = (new MyParcelRequest())
             ->setRequestParameters(
                 $apiKey,
-                '?' . http_build_query($parameters),
+                null,
                 MyParcelRequest::REQUEST_HEADER_RETRIEVE_SHIPMENT
             )
+            ->setQuery($parameters)
             ->sendRequest('GET');
 
         if ($request->getResult() === null) {
@@ -725,6 +776,28 @@ class MyParcelCollection extends Collection
     }
 
     /**
+     * @param \MyParcelNL\Sdk\src\Helper\MyParcelCollection|\MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment[] $sortedCollection
+     *
+     * @return $this
+     */
+    public function sortByCollection(MyParcelCollection $sortedCollection): MyParcelCollection
+    {
+        $result = new MyParcelCollection();
+
+        foreach ($sortedCollection as $sorted) {
+            $consignment = $this->where('consignment_id', $sorted->getConsignmentId())->first();
+
+            if ($consignment) {
+                $result[] = $consignment;
+            }
+        }
+
+        $leftItems = $this->whereNotIn('consignment_id', $result->getConsignmentIds());
+
+        return $result->merge($leftItems);
+    }
+
+    /**
      * Set label format settings        The position of the label on an A4 sheet. You can specify multiple positions by
      *                                  using an array. E.g. [2,3,4]. If you do not specify an array, but specify a
      *                                  number, the following labels will fill the ascending positions. Positioning is
@@ -758,21 +831,26 @@ class MyParcelCollection extends Collection
     /**
      * Encode ReturnShipment to send to MyParcel
      *
-     * @param AbstractConsignment $consignment
+     * @param \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment[] $consignments
      *
      * @return string
      */
-    private function apiEncodeReturnShipment($consignment)
+    private function apiEncodeReturnShipments(array $consignments): string
     {
-        $data     = [];
-        $shipment = [
-            'parent'  => $consignment->getConsignmentId(),
-            'carrier' => $consignment->getCarrierId(),
-            'email'   => $consignment->getEmail(),
-            'name'    => $consignment->getPerson(),
-        ];
+        $data = [];
 
-        $data['data']['return_shipments'][] = $shipment;
+        foreach ($consignments as $consignment) {
+            $shipment = [
+                'parent'  => $consignment->getConsignmentId(),
+                'carrier' => $consignment->getCarrierId(),
+                'email'   => $consignment->getEmail(),
+                'name'    => $consignment->getPerson(),
+            ];
+
+            $shipment = ConsignmentEncode::encodeExtraOptions($shipment, $consignment);
+
+            $data['data']['return_shipments'][] = $shipment;
+        }
 
         return json_encode($data);
     }
@@ -834,5 +912,29 @@ class MyParcelCollection extends Collection
              */
             return Str::startsWith($consignment->getReferenceId(), $id);
         });
+    }
+
+    /**
+     * Let the user of the SDK adjust the return consignment by means of a callback.
+     *
+     * @param array|AbstractConsignment[] $parentConsignments
+     * @param \Closure|null               $modifier
+     *
+     * @return array|AbstractConsignment[]
+     */
+    private function getReturnConsignments(array $parentConsignments, ?\Closure $modifier): array
+    {
+        $returnConsignments = [];
+
+        foreach ($parentConsignments as $parentConsignment) {
+            $returnConsignment = clone $parentConsignment;
+            $returnConsignment->setDeliveryDate(null);
+            if ($modifier) {
+                $returnConsignment = $modifier($returnConsignment, $parentConsignment);
+            }
+            $returnConsignments[] = $returnConsignment;
+        }
+
+        return $returnConsignments;
     }
 }

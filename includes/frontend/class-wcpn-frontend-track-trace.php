@@ -37,7 +37,7 @@ class WCPN_Frontend_Track_Trace
      */
     public function addTrackTraceToEmail(WC_Order $order, bool $sentToAdmin): void
     {
-        if (! WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_TRACK_TRACE_EMAIL)) {
+        if (! WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_TRACK_TRACE_EMAIL)) {
             return;
         }
 
@@ -79,7 +79,7 @@ class WCPN_Frontend_Track_Trace
      */
     public function showTrackTraceActionInMyAccount(array $actions, WC_Order $order): array
     {
-        if (! WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_TRACK_TRACE_MY_ACCOUNT)) {
+        if (! WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_TRACK_TRACE_MY_ACCOUNT)) {
             return $actions;
         }
 
@@ -92,7 +92,7 @@ class WCPN_Frontend_Track_Trace
                 'url'  => $consignment['url'],
                 'name' => apply_filters(
                     'wcpostnl_myaccount_tracktrace_button',
-                    __('Track & Trace', 'wooocommerce-postnl')
+                    __('Track & Trace', 'woocommerce-postnl')
                 ),
             ];
         }

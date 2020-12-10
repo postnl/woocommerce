@@ -3,6 +3,7 @@
 namespace WPO\WC\PostNL\Entity;
 
 use MyParcelNL\Sdk\src\Support\Arr;
+use WCPN_Settings_Data;
 
 defined('ABSPATH') or exit;
 
@@ -12,6 +13,11 @@ if (class_exists('\\WPO\\WC\\PostNL\\Entity\\SettingsFieldArguments')) {
 
 class SettingsFieldArguments
 {
+    private const CONDITION_DEFAULTS = [
+        "type"      => "show",
+        "set_value" => null,
+    ];
+
     public const IGNORED_ARGUMENTS = [
         "callback",
         "condition",
@@ -20,7 +26,6 @@ class SettingsFieldArguments
         "label",
         "loop",
         "name",
-        "option_id",
         "type",
     ];
 
@@ -28,7 +33,6 @@ class SettingsFieldArguments
         "callback",
         "condition",
         "default",
-        "option_id",
         "type",
     ];
 
@@ -57,7 +61,12 @@ class SettingsFieldArguments
     /**
      * @var array
      */
-    private $input = [];
+    private $input;
+
+    /**
+     * @var string
+     */
+    private $prefix;
 
     /**
      * @var string
@@ -90,7 +99,7 @@ class SettingsFieldArguments
     ];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -105,35 +114,41 @@ class SettingsFieldArguments
     private $default;
 
     /**
-     * @var mixed|null
+     * @var string
      */
-    private $option_id;
+    private $suffix;
 
     /**
      * SettingsFieldArguments constructor.
      *
-     * @param array $args - The setting's arguments.
+     * @param array  $args   - The setting's arguments.
+     * @param string $prefix - Optional prefix for name and conditions.
+     * @param string $suffix - Optional suffix for name and conditions.
+     *
+     * @throws \Exception
      */
-    public function __construct(array $args)
+    public function __construct(array $args, string $prefix = '' , string $suffix = '')
     {
         $this->input     = $args;
+        $this->prefix     = $prefix;
+        $this->suffix     = $suffix;
         $this->option_id = $args["option_id"] ?? null;
 
-        $this->name        = $this->getArgument("name");
-        $this->id          = $this->getArgument("id");
-        $this->description = $this->getArgument("description");
+        $this->name        = $this->wrap($this->getInputArgument("name"));
+        $this->id          = $this->getInputArgument("id") ?? $this->name;
+        $this->description = $this->getInputArgument("description");
 
         $this->setClass();
         $this->setType();
         $this->setDefault();
-        $this->setCondition();
+        $this->setConditions();
 
         $this->setArguments($this->input);
     }
 
     private function setType(): void
     {
-        $type = $this->getArgument("type");
+        $type = $this->getInputArgument("type");
 
         switch ($type) {
             case "number":
@@ -145,9 +160,10 @@ class SettingsFieldArguments
                 $this->addArgument("step", 0.01);
                 $this->addArgument("placeholder", "0,00");
                 break;
-            case "toggle" :
+            case "toggle":
                 $type = "select";
 
+                $this->addArgument("data-type", "toggle");
                 $this->addArgument(
                     "options",
                     [
@@ -157,7 +173,7 @@ class SettingsFieldArguments
                 );
                 break;
             case "select":
-                $this->addArgument("options", $this->getArgument("options") ?? []);
+                $this->addArgument("options", $this->getInputArgument("options") ?? []);
                 break;
         }
 
@@ -167,9 +183,9 @@ class SettingsFieldArguments
     private function setClass(): void
     {
         $arr = [
-            "class"       => $this->getArgument("class"),
-            "input_class" => $this->getArgument("input_class"),
-            "label_class" => $this->getArgument("label_class"),
+            "class"       => $this->getInputArgument("class"),
+            "input_class" => $this->getInputArgument("input_class"),
+            "label_class" => $this->getInputArgument("label_class"),
         ];
 
         foreach ($arr as $class => $value) {
@@ -180,45 +196,28 @@ class SettingsFieldArguments
     }
 
     /**
-     * If the setting has a condition array set up the attributes so the JS can use them.
+     * If the setting has conditions set up the attributes so the JS can use them. Supports strings, arrays of
+     * strings and associative arrays.
      */
-    private function setCondition(): void
+    private function setConditions(): void
     {
-        $conditionArgument = $this->getArgument("condition");
+        $conditionArgument = $this->getInputArgument("condition");
+        $conditions        = [];
 
         if (! $conditionArgument) {
             return;
         }
 
-        $conditionDefaults = [
-            "type" => "show",
-        ];
-
         if (is_array($conditionArgument)) {
-            $condition = array_replace_recursive($conditionDefaults, $conditionArgument);
+            $conditions = $conditionArgument;
         } else {
-            $condition = array_merge(
-                $conditionDefaults,
-                [
-                    "name" => $conditionArgument,
-                ]
-            );
+            $conditions[] = $conditionArgument;
         }
 
-        $this->addArgument("data-parent", $condition["name"]);
-        $this->addArgument("data-parent-type", $condition["type"]);
+        $conditionData = array_map([$this, "createCondition"], $conditions);
+        $conditionData = $this->mergeConditions($conditionData);
 
-        if (isset($condition["parent_value"])) {
-            if (is_array($condition["parent_value"])) {
-                $this->addArgument("data-parent-value", implode(';', $condition["parent_value"]) . ";");
-            } else {
-                $this->addArgument("data-parent-value", $condition["parent_value"]);
-            }
-        }
-
-        if (isset($condition["set_value"])) {
-            $this->addArgument("data-parent-set", $condition["set_value"]);
-        }
+        $this->addArgument("data-conditions", $conditionData);
     }
 
     /**
@@ -226,15 +225,19 @@ class SettingsFieldArguments
      *
      * @return mixed|null
      */
-    private function getArgument(string $name)
+    public function getInputArgument(string $name)
     {
-        if (isset($this->input[$name])) {
-            return $this->input[$name];
-        } elseif (array_key_exists($name, $this->defaults)) {
-            return $this->defaults[$name];
-        } else {
-            return null;
-        }
+        return $this->input[$name] ?? $this->defaults[$name] ?? null;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getArgument(string $name)
+    {
+        return $this->arguments[$name] ?? null;
     }
 
     /**
@@ -253,9 +256,9 @@ class SettingsFieldArguments
         ];
 
         foreach ($this->arguments as $arg => $value) {
-            $array = $ignore ? self::IGNORED_ARGUMENTS : self::ALTERNATIVE_IGNORED_ARGUMENTS;
+            $ignoredArguments = $ignore ? self::IGNORED_ARGUMENTS : self::ALTERNATIVE_IGNORED_ARGUMENTS;
 
-            if (in_array($arg, $array)) {
+            if (in_array($arg, $ignoredArguments)) {
                 continue;
             }
 
@@ -273,6 +276,10 @@ class SettingsFieldArguments
                     $arguments["custom_attributes"] = [];
                 }
 
+                if (is_array($value)) {
+                    $value = htmlspecialchars(json_encode($value));
+                }
+
                 $arguments["custom_attributes"][$arg] = $value;
             }
         }
@@ -281,20 +288,28 @@ class SettingsFieldArguments
     }
 
     /**
-     * Get the custom attributes as a string.
+     * Get the custom attributes as a string for use in HTML.
      *
      * @return string
      */
-    public function getCustomAttributes(): string
+    public function getCustomAttributesAsString(): string
     {
-        $arguments  = $this->getArguments();
         $attributes = [];
 
-        foreach ($arguments["custom_attributes"] ?? [] as $att => $value) {
+        foreach ($this->getCustomAttributes() ?? [] as $att => $value) {
             $attributes[] = "$att=\"$value\"";
         }
 
         return implode(" ", $attributes);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustomAttributes(): array
+    {
+        $arguments = $this->getArguments();
+        return $arguments['custom_attributes'] ?? [];
     }
 
     /**
@@ -306,21 +321,6 @@ class SettingsFieldArguments
     private function addArgument(string $key, $value): void
     {
         $this->setArguments([$key => $value]);
-    }
-
-    /**
-     * To push one or more values to an array type argument.
-     *
-     * @param string $argument
-     * @param string ...$items
-     */
-    private function pushArgument(string $argument, string ...$items): void
-    {
-        if (! isset($this->arguments[$argument])) {
-            $this->arguments[$argument] = [];
-        }
-
-        array_push($this->arguments[$argument], ...$items);
     }
 
     /**
@@ -410,7 +410,7 @@ class SettingsFieldArguments
     /**
      * @return string
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -424,10 +424,118 @@ class SettingsFieldArguments
     }
 
     /**
+     * @param string $id
+     */
+    public function setId(string $id): void
+    {
+        $this->id = $id;
+    }
+
+    /**
      * @return mixed
      */
     public function getDefault()
     {
         return $this->default;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setValue($value): void
+    {
+        $this->value = $value;
+    }
+
+    /**
+     * @param string|array $condition
+     *
+     * @return array
+     */
+    private function createCondition($condition): array
+    {
+        if (is_array($condition)) {
+            $parentName  = $this->wrap($condition['parent_name']);
+            $parentValue = $condition['parent_value'] ?? WCPN_Settings_Data::ENABLED;
+
+            $condition['parents'] = [
+                $parentName => $parentValue,
+            ];
+
+            unset($condition['parent_name']);
+            unset($condition['parent_value']);
+
+            $newCondition = array_replace_recursive(
+                self::CONDITION_DEFAULTS,
+                $condition
+            );
+        } else {
+            $parentName   = $this->wrap($condition);
+            $newCondition = array_merge(
+                self::CONDITION_DEFAULTS,
+                [
+                    "parents" => [
+                        $parentName => WCPN_Settings_Data::ENABLED,
+                    ],
+                ]
+            );
+        }
+
+        return $newCondition;
+    }
+
+    /**
+     * @param string|null $text
+     *
+     * @return string
+     */
+    private function wrap(?string $text): ?string
+    {
+        if (! $text) {
+            return null;
+        }
+
+        return $this->prefix . $text . $this->suffix;
+    }
+
+    /**
+     * Merge multiple matching conditions (if their `type` and `set_value` are the same) into one condition, combining
+     * all `parents` properties.
+     *
+     * @param array $conditionData
+     *
+     * @return array
+     */
+    private function mergeConditions(array $conditionData): array
+    {
+        $mergedConditions = [];
+
+        foreach ($conditionData as $condition) {
+            foreach ($mergedConditions as $key => $mergedCondition) {
+                $typeMatches = $mergedCondition['type'] === $condition['type'];
+
+                if ($typeMatches) {
+                    $mergedConditions[$key]['parents'] = array_merge(
+                        $mergedCondition['parents'],
+                        $condition['parents']
+                    );
+
+                    // Continue the outer loop as well
+                    continue 2;
+                }
+            }
+
+            $mergedConditions[] = $condition;
+        }
+
+        return $mergedConditions;
     }
 }

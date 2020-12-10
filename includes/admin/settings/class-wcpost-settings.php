@@ -1,5 +1,6 @@
 <?php
 
+use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 
@@ -7,14 +8,14 @@ if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCPN_Settings')) {
-    return new WCPN_Settings();
+if (class_exists('WCPOST_Settings')) {
+    return new WCPOST_Settings();
 }
 
 /**
  * Create & render settings page
  */
-class WCPN_Settings
+class WCPOST_Settings
 {
     public const SETTINGS_MENU_SLUG = "wcpn_settings";
 
@@ -22,6 +23,7 @@ class WCPN_Settings
     public const SETTINGS_CHECKOUT        = "checkout";
     public const SETTINGS_EXPORT_DEFAULTS = "export_defaults";
     public const SETTINGS_POSTNL          = PostNLConsignment::CARRIER_NAME;
+    public const SETTINGS_DPD             = DPDConsignment::CARRIER_NAME;
 
     /**
      * General
@@ -60,7 +62,7 @@ class WCPN_Settings
     public const SETTING_DELIVERY_OPTIONS_ENABLED      = "delivery_options_enabled";
     public const SETTING_DELIVERY_OPTIONS_POSITION     = "delivery_options_position";
     public const SETTING_SHOW_DELIVERY_DAY             = "show_delivery_day";
-    public const SETTING_DELIVERY_TITLE                = "at_home_delivery";
+    public const SETTING_DELIVERY_TITLE                = "delivery_title";
     public const SETTING_HEADER_DELIVERY_OPTIONS_TITLE = "header_delivery_options_title";
     public const SETTING_PICKUP_TITLE                  = "pickup_title";
     public const SETTING_MORNING_DELIVERY_TITLE        = "morning_title";
@@ -76,12 +78,14 @@ class WCPN_Settings
      * e.g. cutoff_time => postnl_cutoff_time/dpd_cutoff_time
      */
     // Defaults
-    public const SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE      = "export_signature";
-    public const SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT = "export_only_recipient";
-    public const SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK      = "export_age_check";
-    public const SETTING_CARRIER_DEFAULT_EXPORT_RETURN         = "export_return_shipments";
-    public const SETTING_CARRIER_DEFAULT_EXPORT_INSURED        = "export_insured";
-    public const SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT = "export_insured_amount";
+    public const SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE          = "export_signature";
+    public const SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT     = "export_only_recipient";
+    public const SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT       = "export_large_format";
+    public const SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK          = "export_age_check";
+    public const SETTING_CARRIER_DEFAULT_EXPORT_RETURN             = "export_return_shipments";
+    public const SETTING_CARRIER_DEFAULT_EXPORT_INSURED            = "export_insured";
+    public const SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT     = "export_insured_amount";
+    public const SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FROM_PRICE = "export_insured_from_price";
 
 
     // Delivery options settings
@@ -102,17 +106,22 @@ class WCPN_Settings
     public const SETTING_CARRIER_DELIVERY_EVENING_ENABLED = "delivery_evening_enabled";
     public const SETTING_CARRIER_DELIVERY_EVENING_FEE     = "delivery_evening_fee";
 
-    // TODO; Currently not implemented:
+    // Saturday delivery
+    // TODO; Currently not implemented
+    public const SETTING_CARRIER_FRIDAY_CUTOFF_TIME        = "friday_cutoff_time";
     public const SETTING_CARRIER_SATURDAY_DELIVERY_ENABLED = "saturday_delivery_enabled";
     public const SETTING_CARRIER_SATURDAY_DELIVERY_FEE     = "saturday_delivery_fee";
-    public const SETTING_CARRIER_MONDAY_DELIVERY_ENABLED   = "monday_delivery_enabled";
-    public const SETTING_CARRIER_MONDAY_CUTOFF_TIME        = "monday_cutoff_time";
+
+    // Monday delivery
+    public const SETTING_CARRIER_MONDAY_DELIVERY_ENABLED = "monday_delivery_enabled";
+    public const SETTING_CARRIER_MONDAY_DELIVERY_FEE     = "monday_delivery_fee";
+    public const SETTING_CARRIER_SATURDAY_CUTOFF_TIME    = "saturday_cutoff_time";
 
     public function __construct()
     {
         add_action("admin_menu", [$this, "menu"]);
         add_filter(
-            "plugin_action_links_" . WCPN()->plugin_basename,
+            "plugin_action_links_" . WCPOST()->plugin_basename,
             [
                 $this,
                 "add_settings_link",
@@ -240,14 +249,14 @@ class WCPN_Settings
 
         // link to hide message when one of the premium extensions is installed
         if (! $hide_notice && $base_country === "BE") {
-            $post_nl_link =
+            $postnl_nl_link =
                 '<a href="https://wordpress.org/plugins/woocommerce-postnl/" target="blank">WC PostNL Netherlands</a>';
             $text             = sprintf(
                 __(
                     "It looks like your shop is based in Netherlands. This plugin is for PostNL. If you are using PostNL Netherlands, download the %s plugin instead!",
                     "woocommerce-postnl"
                 ),
-                $post_nl_link
+                $postnl_nl_link
             );
             $dismiss_button   = sprintf(
                 '<a href="%s" style="display:inline-block; margin-top: 10px;">%s</a>',
@@ -331,7 +340,7 @@ class WCPN_Settings
 
             if ($class) {
                 $class = is_array($class) ? implode(" ", $class) : $class;
-                $class = wc_implode_html_attributes(["class", esc_attr($class)]);
+                $class = wc_implode_html_attributes(["class" => esc_attr($class)]);
             }
 
             echo "<tr {$class}>";
@@ -359,4 +368,4 @@ class WCPN_Settings
     }
 }
 
-return new WCPN_Settings();
+return new WCPOST_Settings();

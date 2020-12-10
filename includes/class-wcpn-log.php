@@ -18,7 +18,7 @@ class WCPN_Log
      */
     public static function add(string ...$messages): void
     {
-        if (! WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_ERROR_LOGGING)) {
+        if (! WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_ERROR_LOGGING)) {
             return;
         }
 
