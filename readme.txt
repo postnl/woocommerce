@@ -119,7 +119,6 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Improvement: Spinner for order grid bulk actions.
 * Improvement: make default export settings show up in shipment options.
 * Improvement: show delivery date in order grid for any order that has one (only when "show delivery day" setting is enabled).
-* Fix: Calculated weight is shown for digital stamps.
 * Fix: Wrong label for "show delivery day" setting.
 * Fix: Error on sending return email.
 * Fix: Allow split address field for Belgium as well.
@@ -187,7 +186,6 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Use constants for delivery_type
 * Fix: Saturday cutoff time
 * Fix: Shipping method issue with pickup
-* Fix: Digital stamp weight issue
 
 = 3.1.5 (2019-05-14) =
 * Improvement: Add the link for the personalized Track & Trace page (portal)
@@ -197,7 +195,6 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Translation house number again button
 * Fix: Set default to 0 if there's no tax rate set up
 * Fix: fix issue with shipping class term id
-* Fix: Correct amount on the digital stamp
 * Fix: trying to get property of non-object
 * Fix: Shipment validation error (PakjeGemak)
 
@@ -230,7 +227,6 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 = 3.1.0 (2018-12-12) =
 * Hotfix: Show delivery options when checkout form already filled in.
-* Improvement: Add Digital stamp
 
 = 3.0.10 (2018-12-05) =
 * Hotfix: Flashing of the order summary.
@@ -272,7 +268,6 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Save settings with a new update
 * Improvement: PostNL delivery header titel
 * Improvement: Support WooCommerce 3.5.0
-* Improvement: add preliminary support for "digitale postzegel"
 
 = 3.0.2 (2018-10-09) =
 * Fix: Error a non-numeric value encountered in class-wcpn-frontend-settings.php

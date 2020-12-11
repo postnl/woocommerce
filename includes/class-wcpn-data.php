@@ -26,37 +26,6 @@ class WCPN_Data
         DPDConsignment::CARRIER_NAME    => 'DPD',
     ];
 
-    /**
-     * @var array
-     */
-    public const DIGITAL_STAMP_RANGES = [
-        [
-            'min'     => 0,
-            'max'     => 20,
-            'average' => 15
-        ],
-        [
-            'min'     => 20,
-            'max'     => 50,
-            'average' => 35
-        ],
-        [
-            'min'     => 50,
-            'max'     => 100,
-            'average' => 75
-        ],
-        [
-            'min'     => 100,
-            'max'     => 350,
-            'average' => 225
-        ],
-        [
-            'min'     => 350,
-            'max'     => 2000,
-            'average' => 1175
-        ],
-    ];
-
     public const DEFAULT_COUNTRY_CODE = "NL";
     public const DEFAULT_CARRIER      = PostNLConsignment::CARRIER_NAME;
 
@@ -81,14 +50,12 @@ class WCPN_Data
             AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
             AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME,
             AbstractConsignment::PACKAGE_TYPE_LETTER_NAME,
-            AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME,
         ];
 
         self::$packageTypesHuman = [
             AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME       => __("Package", "woocommerce-postnl"),
             AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME       => __("Mailbox", "woocommerce-postnl"),
             AbstractConsignment::PACKAGE_TYPE_LETTER_NAME        => __("Unpaid letter", "woocommerce-postnl"),
-            AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME => __("Digital stamp", "woocommerce-postnl"),
         ];
 
         self::$deliveryTypesHuman = [
@@ -121,14 +88,6 @@ class WCPN_Data
     public static function getDeliveryTypesHuman(): array
     {
         return self::$deliveryTypesHuman;
-    }
-
-    /**
-     * @return array
-     */
-    public static function getDigitalStampRanges(): array
-    {
-        return self::DIGITAL_STAMP_RANGES;
     }
 
     /**

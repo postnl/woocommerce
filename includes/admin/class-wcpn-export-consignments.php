@@ -438,9 +438,6 @@ class WCPN_Export_Consignments
         $totalWeight = $this->getTotalWeight($orderWeight);
         $weight      = $extraOptions['weight'] ?? $this->orderSettings->getWeight();
 
-        if ($packageType === AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP) {
-            $totalWeight = (float) $weight;
-        }
         if ((float) $orderWeight === $weight) {
             $totalWeight = (new WCPN_Export())->calculatedKiloWeight($totalWeight * 1000);
         }

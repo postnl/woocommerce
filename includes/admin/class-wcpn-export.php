@@ -1160,43 +1160,6 @@ class WCPN_Export
     }
 
     /**
-     * @return array
-     */
-    public static function getDigitalStampRangeOptions(): array
-    {
-        $options = [];
-
-        foreach (WCPN_Data::getDigitalStampRanges() as $key => $tierRange) {
-            $options[$tierRange['average']] = $tierRange['min'] . " - " . $tierRange['max'] . " gram";
-        }
-
-        return $options;
-    }
-
-    /**
-     * @param float $weight
-     *
-     * @return int
-     */
-    public static function getDigitalStampRangeFromWeight(float $weight): int
-    {
-        $intWeight = (int) ($weight * 1000);
-
-        $results = Arr::where(
-            WCPN_Data::getDigitalStampRanges(),
-            function ($range) use ($intWeight) {
-                return $intWeight > $range['min'];
-            }
-        );
-
-        if (empty($results)) {
-            return Arr::first(WCPN_Data::getDigitalStampRanges())['average'];
-        }
-
-        return Arr::last($results)['average'];
-    }
-
-    /**
      * @param $chosenMethod
      *
      * @throws \Exception

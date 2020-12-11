@@ -1036,7 +1036,6 @@ class WCPOST_Admin
         }
 
         $isPackage      = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME === $data['package_type'];
-        $isDigitalStamp = AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME === $data['package_type'];
 
         if (! $isHomeCountry || ! $isPackage) {
             $data['shipment_options']['age_check']       = false;
@@ -1045,10 +1044,6 @@ class WCPOST_Admin
             $data['shipment_options']['insured_amount']  = 0;
 
             $data['extra_options']['collo_amount'] = 1;
-        }
-
-        if (! $isDigitalStamp) {
-            unset($data['extra_options']['weight']);
         }
 
         return $data;

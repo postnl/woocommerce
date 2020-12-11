@@ -78,10 +78,6 @@ msgstr ""
 msgid "Unpaid letter"
 msgstr ""
 
-#: includes/class-wcpn-data.php:90
-msgid "Digital stamp"
-msgstr ""
-
 #: includes/class-wcpn-data.php:94
 #: includes/frontend/class-wcpn-cart-fees.php:222
 #: includes/admin/settings/class-wcpn-settings-data.php:536

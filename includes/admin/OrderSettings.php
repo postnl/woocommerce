@@ -32,12 +32,6 @@ class OrderSettings
      * @var float
      */
     private $weight;
-
-    /**
-     * @var int
-     */
-    private $digitalStampRangeWeight;
-
     /**
      * @var bool
      */
@@ -121,13 +115,6 @@ class OrderSettings
         return $this->weight;
     }
 
-    /**
-     * @return int
-     */
-    public function getDigitalStampRangeWeight(): int
-    {
-        return $this->digitalStampRangeWeight;
-    }
 
     /**
      * @return bool
@@ -226,7 +213,6 @@ class OrderSettings
         $this->setInsuranceData();
 
         $this->setWeight();
-        $this->setDigitalStampRangeWeight();
     }
 
     /**
@@ -256,17 +242,6 @@ class OrderSettings
     private function setColloAmount(): void
     {
         $this->colloAmount = (int) ($this->extraOptionsMeta['collo_amount'] ?? 1);
-    }
-
-    /**
-     * @return void
-     */
-    private function setDigitalStampRangeWeight(): void
-    {
-        $orderWeight = $this->getWeight();
-        $metaWeight  = $this->extraOptionsMeta["weight"] ?? null;
-
-        $this->digitalStampRangeWeight = (int) ($metaWeight ?? WCPN_Export::getDigitalStampRangeFromWeight($orderWeight));
     }
 
     /**

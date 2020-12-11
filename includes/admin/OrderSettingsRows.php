@@ -171,27 +171,6 @@ class OrderSettingsRows
                 ],
             ],
             [
-                "name"        => self::OPTION_EXTRA_OPTIONS_WEIGHT,
-                "type"        => "select",
-                "label"       => __("Weight", "woocommerce-postnl"),
-                "description" => $orderSettings->getWeight()
-                    ? sprintf(
-                        __("Calculated weight: %s", "woocommerce-postnl"),
-                        wc_format_weight($orderSettings->getWeight())
-                    )
-                    : null,
-                "options"     => WCPN_Export::getDigitalStampRangeOptions(),
-                "value"       => $orderSettings->getDigitalStampRangeWeight(),
-                "condition"   => [
-                    self::CONDITION_CARRIER_DEFAULT,
-                    [
-                        "parent_name"  => self::OPTION_PACKAGE_TYPE,
-                        "type"         => "show",
-                        "parent_value" => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME,
-                    ],
-                ],
-            ],
-            [
                 "name"      => self::OPTION_SHIPMENT_OPTIONS_ONLY_RECIPIENT,
                 "type"      => "toggle",
                 "label"     => __("Home address only", "woocommerce-postnl"),
