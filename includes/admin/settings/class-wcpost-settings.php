@@ -1,6 +1,5 @@
 <?php
 
-use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 
@@ -23,7 +22,6 @@ class WCPOST_Settings
     public const SETTINGS_CHECKOUT        = "checkout";
     public const SETTINGS_EXPORT_DEFAULTS = "export_defaults";
     public const SETTINGS_POSTNL          = PostNLConsignment::CARRIER_NAME;
-    public const SETTINGS_DPD             = DPDConsignment::CARRIER_NAME;
 
     /**
      * General
@@ -73,7 +71,7 @@ class WCPOST_Settings
     /*
      * Carrier settings, these will be prefixed with carrier names.
      *
-     * e.g. cutoff_time => postnl_cutoff_time/dpd_cutoff_time
+     * e.g. cutoff_time => postnl_cutoff_time
      */
     // Defaults
     public const SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE          = "export_signature";
