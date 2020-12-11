@@ -688,10 +688,10 @@ class WCPOST_Admin
             }
 
             $trackTraceUrl = sprintf(
-                'https://postnl.me/track-trace/%s/%s/%s',
+                'https://jouw.postnl.nl/track-and-trace/%s/%s/%s',
                 $track_trace,
-                $postcode,
-                $country
+                $country,
+                $postcode
             );
         } else {
             $trackTraceUrl = sprintf(
