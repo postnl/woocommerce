@@ -320,7 +320,7 @@ class WCPN_Settings_Data
                 "label"     => __("Track & Trace in email", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "Add the Track & Trace code to emails to the customer.<br/><strong>Note!</strong> When you select this option, make sure you have not enabled the Track & Trace email in your PostNL backend.",
+                    "Add the Track & Trace code to emails to the customer.<br/><strong>Note!</strong> When you select this option.",
                     "woocommerce-postnl"
                 ),
             ],
@@ -655,7 +655,7 @@ class WCPN_Settings_Data
                 "name"      => WCPOST_Settings::SETTING_LABEL_DESCRIPTION,
                 "label"     => __("Label description", "woocommerce-postnl"),
                 "help_text" => __(
-                    "With this option you can add a description to the shipment. This will be printed on the top left of the label, and you can use this to search or sort shipments in your backoffice. Because of limited space on the label which varies per package type, we recommend that you keep the label description as short as possible.",
+                    "With this option you can add a description to the shipment. This will be printed on the top left of the label. Because of limited space on the label which varies per package type, we recommend that you keep the label description as short as possible.",
                     "woocommerce-postnl"
                 ),
                 "append"  => $this->getLabelDescriptionAddition(),

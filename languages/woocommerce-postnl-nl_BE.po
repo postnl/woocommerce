@@ -613,12 +613,10 @@ msgstr "Track & Trace in e-mail"
 #: includes/admin/settings/class-wcpn-settings-data.php:319
 msgid ""
 "Add the Track & Trace code to emails to the customer.<br/><strong>Note!"
-"</strong> When you select this option, make sure you have not enabled the "
-"Track & Trace email in your PostNL backend."
+"</strong> When you select this option."
 msgstr ""
 "Voeg de Track & Trace code toe aan e-mails aan de klant.<br/> <strong>Let op!"
-"</strong> Wanneer je voor deze optie kiest, zorg er dan voor dat je niet de "
-"Track & Trace e-mail in PostNL backend hebt ingeschakeld."
+"</strong> Wanneer je voor deze optie kiest."
 
 #: includes/admin/settings/class-wcpn-settings-data.php:326
 msgid "Track & Trace in My Account"
@@ -740,6 +738,11 @@ msgstr "Dagen van de week waarop je je pakket afgeeft bij PostNL"
 msgid "Cut-off time"
 msgstr "Sluitingstijd"
 
+#: includes/admin/settings/class-wcpn-settings-data.php:596
+msgid "Cut-off time on Saturday"
+msgstr "Sluitingstijd op zaterdag"
+
+
 #: includes/admin/settings/class-wcpn-settings-data.php:507
 #: includes/admin/settings/class-wcpn-settings-data.php:605
 msgid "Time at which you stop processing orders for the day (format: hh:mm)"
@@ -828,14 +831,12 @@ msgstr "Label omschrijving"
 #: includes/admin/settings/class-wcpn-settings-data.php:672
 msgid ""
 "With this option you can add a description to the shipment. This will be "
-"printed on the top left of the label, and you can use this to search or sort "
-"shipments in your backoffice. Because of limited space on the label which varies "
+"printed on the top left of the label. Because of limited space on the label which varies "
 "per package type, we recommend that you keep the label description as short as possible."
 
 msgstr ""
 "Met deze optie kun je een beschrijving toevoegen aan de zending. Dit zal "
-"worden afgedrukt op de linkerbovenhoek van het label, en je kunt dit "
-"gebruiken om op zendingen in de PostNL backoffice te zoeken of sorteren."
+"worden afgedrukt op de linkerbovenhoek van het label."
 "Vanwege beperkte en per pakkettype variërende ruimte op het label raden we "
 "je aan om een label omschrijving zo kort mogelijk te houden."
 

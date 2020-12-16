@@ -242,6 +242,11 @@ msgid ""
 "18+ is further excluded from the delivery options morning and evening "
 "delivery."
 msgstr ""
+"De leeftijdscontrole is bedoeld voor pakketzendingen waarbij de "
+"ontvanger 18+ dient te tonen door middel van een identiteitsbewijs. "
+"Bij deze verzendoptie zijn handtekening voor ontvangst en levering alleen "
+"bij de ontvanger inbegrepen. De leeftijd van 18+ is verder uitgesloten van "
+"de bezorgopties ochtend- en avondlevering"
 
 #: includes/admin/ShipmentOptions.php:208
 #: includes/admin/settings/class-wcpn-settings-data.php:423
@@ -607,12 +612,10 @@ msgstr "Track & Trace in e-mail"
 #: includes/admin/settings/class-wcpn-settings-data.php:319
 msgid ""
 "Add the Track & Trace code to emails to the customer.<br/><strong>Note!"
-"</strong> When you select this option, make sure you have not enabled the "
-"Track & Trace email in your PostNL backend."
+"</strong> When you select this option."
 msgstr ""
 "Voeg de Track & Trace code toe aan e-mails aan de klant.<br/> <strong>Let op!"
-"</strong> Wanneer je voor deze optie kiest, zorg er dan voor dat je niet de "
-"Track & Trace e-mail in PostNL backend hebt ingeschakeld."
+"</strong> Wanneer je voor deze optie kiest."
 
 #: includes/admin/settings/class-wcpn-settings-data.php:326
 msgid "Track & Trace in My Account"
@@ -734,6 +737,11 @@ msgstr "Dagen van de week waarop je je pakket afgeeft bij PostNL"
 msgid "Cut-off time"
 msgstr "Sluitingstijd"
 
+#: includes/admin/settings/class-wcpn-settings-data.php:596
+msgid "Cut-off time on Saturday"
+msgstr "Sluitingstijd op zaterdag"
+
+
 #: includes/admin/settings/class-wcpn-settings-data.php:507
 #: includes/admin/settings/class-wcpn-settings-data.php:605
 msgid "Time at which you stop processing orders for the day (format: hh:mm)"
@@ -758,6 +766,8 @@ msgid ""
 "Amount of days a customer can postpone a shipment. Default is 0 days with a "
 "maximum value of 14 days."
 msgstr ""
+"Aantal dagen dat een klant een verzending kan uitstellen. Standaard is 0 dagen "
+"met een maximale waarde van 14 dagen."
 
 #: includes/admin/settings/class-wcpn-settings-data.php:577
 #: includes/admin/settings/class-wcpn-settings-data.php:969
@@ -822,13 +832,11 @@ msgstr "Label omschrijving"
 #: includes/admin/settings/class-wcpn-settings-data.php:672
 msgid ""
 "With this option you can add a description to the shipment. This will be "
-"printed on the top left of the label, and you can use this to search or sort "
-"shipments in your backoffice. Because of limited space on the label which varies "
+"printed on the top left of the label. Because of limited space on the label which varies "
 "per package type, we recommend that you keep the label description as short as possible."
 msgstr ""
 "Met deze optie kun je een beschrijving toevoegen aan de zending. Dit zal "
-"worden afgedrukt op de linkerbovenhoek van het label, en je kunt dit "
-"gebruiken om op zendingen in de PostNL backoffice te zoeken of sorteren."
+"worden afgedrukt op de linkerbovenhoek van het label."
 "Vanwege beperkte en per pakkettype variërende ruimte op het label raden we "
 "je aan om een label omschrijving zo kort mogelijk te houden."
 

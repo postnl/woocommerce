@@ -600,12 +600,10 @@ msgstr "Track & Trace dans l'e-mail"
 #: includes/admin/settings/class-wcpn-settings-data.php:344
 msgid ""
 "Add the Track & Trace code to emails to the customer.<br/><strong>Note!"
-"</strong> When you select this option, make sure you have not enabled the "
-"Track & Trace email in your PostNL backend."
+"</strong> When you select this option."
 msgstr ""
 "Ajouter un code Track & Trace aux e-mails envoyés au client.<br/> <strong>"
-"Attention !</strong> Lorsque vous choisissez cette option, veillez à ce que "
-"l'e-mail Track & Trace n'est pas activé dans le back-end PostNL."
+"Attention !</strong> Lorsque vous choisissez cette option."
 
 #: includes/admin/settings/class-wcpn-settings-data.php:351
 msgid "Track & Trace in My Account"
@@ -726,6 +724,10 @@ msgstr ""
 msgid "Cut-off time"
 msgstr "Heure de clôture"
 
+#: includes/admin/settings/class-wcpn-settings-data.php:596
+msgid "Cut-off time on Saturday"
+msgstr "Heure de clôture le samedi"
+
 #: includes/admin/settings/class-wcpn-settings-data.php:532
 #: includes/admin/settings/class-wcpn-settings-data.php:627
 #: includes/admin/settings/class-wcpn-settings-data.php:685
@@ -844,14 +846,12 @@ msgstr "Référence étiquette"
 #: includes/admin/settings/class-wcpn-settings-data.php:780
 msgid ""
 "With this option you can add a description to the shipment. This will be "
-"printed on the top left of the label, and you can use this to search or sort "
-"shipments in your backoffice. Because of limited space on the label which varies "
+"printed on the top left of the label. Because of limited space on the label which varies "
 "per package type, we recommend that you keep the label description as short as possible."
 msgstr ""
 "Cette option vous permet d'ajouter une référence relative à votre envoi. "
-"Celle-ci sera imprimée dans le coin supérieur gauche de l'étiquette. Vous "
-"pourrez ensuite utiliser cette référence pour retrouve ou trier vos envois "
-"dans le back-end PostNL. En raison de l'espace limité sur l'étiquette qui "
+"Celle-ci sera imprimée dans le coin supérieur gauche de l'étiquette. "
+"En raison de l'espace limité sur l'étiquette qui "
 "varie selon le type d'emballage, nous vous recommandons de garder une "
 "description d'étiquette aussi courte que possible."
 
