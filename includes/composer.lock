@@ -7,16 +7,16 @@
     "content-hash": "0450e064f5b0bcb6c5edfa4f78a0c092",
     "packages": [
         {
-            "name": "postnlnl/sdk",
+            "name": "myparcelnl/sdk",
             "version": "v5.2.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/postnlnl/sdk.git",
+                "url": "https://github.com/myparcelnl/sdk.git",
                 "reference": "fa6889d604e17121c9682ce768e9d6f68ff80d8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/postnlnl/sdk/zipball/fa6889d604e17121c9682ce768e9d6f68ff80d8d",
+                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/fa6889d604e17121c9682ce768e9d6f68ff80d8d",
                 "reference": "fa6889d604e17121c9682ce768e9d6f68ff80d8d",
                 "shasum": ""
             },
@@ -39,30 +39,30 @@
             "authors": [
                 {
                     "name": "Reindert Vetter",
-                    "email": "support@postnl.nl",
-                    "homepage": "https://www.postnl.nl",
+                    "email": "support@myparcel.nl",
+                    "homepage": "https://www.myparcel.nl",
                     "role": "Developer"
                 },
                 {
                     "name": "Richard Perdaan",
-                    "email": "support@postnl.nl",
-                    "homepage": "https://www.postnl.nl",
+                    "email": "support@myparcel.nl",
+                    "homepage": "https://www.myparcel.nl",
                     "role": "Developer"
                 },
                 {
                     "name": "Edie Lemoine",
-                    "email": "support@postnl.nl",
-                    "homepage": "https://www.postnl.nl",
+                    "email": "support@myparcel.nl",
+                    "homepage": "https://www.myparcel.nl",
                     "role": "Developer"
                 }
             ],
-            "description": "This package is designed to send and receive data from PostNL by means of an API.",
-            "homepage": "https://www.postnl.nl",
+            "description": "This package is designed to send and receive data from MyParcel by means of an API.",
+            "homepage": "https://www.myparcel.nl",
             "keywords": [
                 "Flespakket",
                 "My Parcel",
                 "Post NL",
-                "postnl",
+                "myparcel",
                 "postnl"
             ],
             "time": "2020-10-22T15:15:22+00:00"
