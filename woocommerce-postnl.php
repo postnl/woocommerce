@@ -127,28 +127,6 @@ if (! class_exists('WCPOST')) :
          */
         public function includes()
         {
-            // Use php version 5.6
-            if (! $this->phpVersionMeets(WCPOST::PHP_VERSION_7_1)) {
-                $this->includes = $this->plugin_path() . "/includes_php56";
-
-                // include compatibility classes
-                require_once($this->includes . "/compatibility/abstract-wc-data-compatibility.php");
-                require_once($this->includes . "/compatibility/class-wc-date-compatibility.php");
-                require_once($this->includes . "/compatibility/class-wc-core-compatibility.php");
-                require_once($this->includes . "/compatibility/class-wc-order-compatibility.php");
-                require_once($this->includes . "/compatibility/class-wc-product-compatibility.php");
-
-                require_once($this->includes . "/class-wcpn-assets.php");
-                $this->admin = require_once($this->includes . "/class-wcpn-admin.php");
-                require_once($this->includes . "/class-wcpn-frontend-settings.php");
-                require_once($this->includes . "/class-wcpn-frontend.php");
-                require_once($this->includes . "/class-wcpn-settings.php");
-                $this->export = require_once($this->includes . "/class-wcpn-export.php");
-                require_once($this->includes . "/class-wcpn-nl-postcode-fields.php");
-
-                return;
-            }
-
             $this->includes = $this->plugin_path() . '/includes';
             // Use minimum php version 7.1
             require_once($this->includes . "/vendor/autoload.php");
@@ -205,15 +183,10 @@ if (! class_exists('WCPOST')) :
                 return;
             }
 
-            if (! $this->phpVersionMeets(\WCPOST::PHP_VERSION_7_1)) {
-                // php 5.6
-                $this->initSettings();
-                $this->includes();
-            } else {
-                // php 7.1
-                $this->includes();
-                $this->initSettings();
-            }
+            // php 7.1
+            $this->includes();
+            $this->initSettings();
+
         }
 
         /**
@@ -365,14 +338,6 @@ if (! class_exists('WCPOST')) :
          */
         public function initSettings()
         {
-            if (! $this->phpVersionMeets(\WCPOST::PHP_VERSION_7_1)) {
-                $this->general_settings  = get_option('woocommerce_postnl_general_settings');
-                $this->export_defaults   = get_option('woocommerce_postnl_export_defaults_settings');
-                $this->checkout_settings = get_option('woocommerce_postnl_checkout_settings');
-
-                return;
-            }
-
             // Create the settings collection by importing this function, because we can't use the sdk
             // imports in the legacy version.
             require_once('includes/wcpn-initialize-settings-collection.php');
