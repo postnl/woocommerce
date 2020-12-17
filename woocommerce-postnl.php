@@ -304,9 +304,6 @@ if (! class_exists('WCPOST')) :
                 // Migrate php 7.1+ only version settings
                 if (version_compare($installed_version, '4.0.0', '<=')) {
                     require_once('migration/wcpn-upgrade-migration-v4-0-0.php');
-                }
-
-                if (version_compare($installed_version, '4.1.0', '<=')) {
                     require_once('migration/wcpn-upgrade-migration-v4-1-0.php');
                 }
             }
