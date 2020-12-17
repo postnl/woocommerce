@@ -261,7 +261,7 @@ class WCPN_Checkout
         $settings = WCPOST()->setting_collection;
         $carriers = [];
 
-        foreach ([PostNLConsignment::CARRIER_NAME, DPDConsignment::CARRIER_NAME] as $carrier) {
+        foreach ([PostNLConsignment::CARRIER_NAME] as $carrier) {
             if ($settings->getByName("{$carrier}_" . WCPOST_Settings::SETTING_CARRIER_PICKUP_ENABLED)
                 || $settings->getByName(
                     "{$carrier}_" . WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED

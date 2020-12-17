@@ -109,10 +109,6 @@ msgstr "Ramasser"
 msgid "PostNL"
 msgstr "postnl"
 
-#: includes/class-wcpn-data.php:221
-msgid "DPD"
-msgstr "DPD"
-
 #: includes/frontend/class-wcpn-frontend-track-trace.php:63
 msgid "You can track your order with the following Track & Trace link:"
 msgstr "Vous pouvez suivre votre commande via le code Track & Trace suivant :"
@@ -542,14 +538,6 @@ msgstr "Options de livraison postnl"
 msgid "PostNL pickup options"
 msgstr "Options de ramassage postnl"
 
-#: includes/admin/settings/class-wcpn-settings-data.php:275
-msgid "DPD delivery options"
-msgstr "Options de livraison DPD"
-
-#: includes/admin/settings/class-wcpn-settings-data.php:280
-msgid "DPD pickup options"
-msgstr "Options de ramassage DPD"
-
 #: includes/admin/settings/class-wcpn-settings-data.php:295
 msgid "Key"
 msgstr "Clé"
@@ -776,14 +764,6 @@ msgstr ""
 msgid "Enable PostNL pickup"
 msgstr "Activer le ramassage postnl"
 
-#: includes/admin/settings/class-wcpn-settings-data.php:667
-msgid "Enable DPD delivery"
-msgstr "Activer la distribution DPD"
-
-#: includes/admin/settings/class-wcpn-settings-data.php:677
-msgid "Days of the week on which you hand over parcels to DPD"
-msgstr "Jours de la semaine où vous remettez des colis à DPD"
-
 #: includes/admin/settings/class-wcpn-settings-data.php:701
 msgid "Delivery days window"
 msgstr "Fenêtre jours de livraison"
@@ -793,10 +773,6 @@ msgid ""
 "Amount of days a customer can postpone a shipment. Default is 0 days with a "
 "maximum value of 14 days."
 msgstr ""
-
-#: includes/admin/settings/class-wcpn-settings-data.php:720
-msgid "Enable DPD pickup"
-msgstr "Activer le ramassage DPD"
 
 #: includes/admin/settings/class-wcpn-settings-data.php:731
 #: includes/admin/settings/class-wcpn-settings-data.php:1075

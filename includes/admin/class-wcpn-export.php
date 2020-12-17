@@ -677,6 +677,7 @@ class WCPN_Export
             "city"                   => (string) WCX_Order::get_prop($order, "shipping_city"),
             "person"                 => $shipping_name,
             "company"                => (string) WCX_Order::get_prop($order, "shipping_company"),
+            "email"                  => WCX_Order::get_prop($order, "billing_email") ?? "",
             "phone"                  => $connectPhone ? WCX_Order::get_prop($order, "billing_phone") : "",
             "street_additional_info" => WCX_Order::get_prop($order, "shipping_address_2"),
         ];

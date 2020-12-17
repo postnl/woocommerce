@@ -106,10 +106,6 @@ msgstr "Afhalen"
 msgid "PostNL"
 msgstr "PostNL"
 
-#: includes/class-wcpn-data.php:221
-msgid "DPD"
-msgstr "DPD"
-
 #: includes/frontend/class-wcpn-frontend-track-trace.php:63
 msgid "You can track your order with the following Track & Trace link:"
 msgstr "Je kunt je order met de volgende Track & Trace code volgen:"

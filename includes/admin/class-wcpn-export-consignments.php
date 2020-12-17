@@ -398,7 +398,6 @@ class WCPN_Export_Consignments
         $this->consignment
             ->setAgeCheck($this->orderSettings->hasAgeCheck())
             ->setInsurance($this->orderSettings->getInsuranceAmount())
-            ->setLargeFormat($this->orderSettings->hasLargeFormat())
             ->setOnlyRecipient($this->orderSettings->hasOnlyRecipient())
             ->setReturn($this->orderSettings->hasReturnShipment())
             ->setSignature($this->orderSettings->hasSignature())
