@@ -217,14 +217,21 @@ class WCPN_Checkout
             ],
         ];
 
+        $chosenShippingMethodPrice = (float) WC()->session->get('cart_totals')['shipping_total'];
+
         foreach ($carriers as $carrier) {
             foreach (self::getDeliveryOptionsConfigMap($carrier) as $key => $setting) {
-                [$settingName, $function] = $setting;
+                [$settingName, $function, $basePrice] = $setting;
                 $value = $settings->{$function}($carrier . '_' . $settingName);
+
+                if ($basePrice) {
+                    $value = $value + $chosenShippingMethodPrice;
+                }
 
                 Arr::set($postNLConfig, 'config.' . $key, $value);
             }
         }
+        $postNLConfig['config']['priceStandardDelivery'] = $chosenShippingMethodPrice;
 
         return json_encode($postNLConfig, JSON_UNESCAPED_SLASHES);
     }
@@ -446,27 +453,27 @@ class WCPN_Checkout
     private static function getDeliveryOptionsConfigMap(string $carrier): array
     {
         return [
-            "carrierSettings.$carrier.allowDeliveryOptions"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED, 'isEnabled'],
-            "carrierSettings.$carrier.allowEveningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED, 'isEnabled'],
-            "carrierSettings.$carrier.allowMondayDelivery"   => [WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED, 'isEnabled'],
-            "carrierSettings.$carrier.allowMorningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED, 'isEnabled'],
-            "carrierSettings.$carrier.allowOnlyRecipient"    => [WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED, 'isEnabled'],
-            "carrierSettings.$carrier.allowPickupLocations"  => [WCPOST_Settings::SETTING_CARRIER_PICKUP_ENABLED, 'isEnabled'],
-            "carrierSettings.$carrier.allowSaturdayDelivery" => [WCPOST_Settings::SETTING_CARRIER_SATURDAY_DELIVERY_ENABLED, 'isEnabled'],
-            "carrierSettings.$carrier.allowSignature"        => [WCPOST_Settings::SETTING_CARRIER_SIGNATURE_ENABLED, 'isEnabled'],
-            "carrierSettings.$carrier.priceEveningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE, 'getFloatByName'],
-            "carrierSettings.$carrier.priceMondayDelivery"   => [WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_FEE, 'getFloatByName'],
-            "carrierSettings.$carrier.priceMorningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE, 'getFloatByName'],
-            "carrierSettings.$carrier.priceOnlyRecipient"    => [WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE, 'getFloatByName'],
-            "carrierSettings.$carrier.pricePickup"           => [WCPOST_Settings::SETTING_CARRIER_PICKUP_FEE, 'getFloatByName'],
-            "carrierSettings.$carrier.priceSaturdayDelivery" => [WCPOST_Settings::SETTING_CARRIER_SATURDAY_DELIVERY_FEE, 'getFloatByName'],
-            "carrierSettings.$carrier.priceSignature"        => [WCPOST_Settings::SETTING_CARRIER_SIGNATURE_FEE, 'getFloatByName'],
-            "cutoffTime"                                     => [WCPOST_Settings::SETTING_CARRIER_CUTOFF_TIME, 'getStringByName'],
-            "deliveryDaysWindow"                             => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_DAYS_WINDOW, 'getIntegerByName'],
-            "dropOffDays"                                    => [WCPOST_Settings::SETTING_CARRIER_DROP_OFF_DAYS, 'getByName'],
-            "dropOffDelay"                                   => [WCPOST_Settings::SETTING_CARRIER_DROP_OFF_DELAY, 'getIntegerByName'],
-            "fridayCutoffTime"                               => [WCPOST_Settings::SETTING_CARRIER_FRIDAY_CUTOFF_TIME, 'getStringByName'],
-            "saturdayCutoffTime"                             => [WCPOST_Settings::SETTING_CARRIER_CUTOFF_TIME, 'getStringByName'],
+            "carrierSettings.$carrier.allowDeliveryOptions"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowEveningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowMondayDelivery"   => [WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowMorningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowOnlyRecipient"    => [WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowPickupLocations"  => [WCPOST_Settings::SETTING_CARRIER_PICKUP_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowSaturdayDelivery" => [WCPOST_Settings::SETTING_CARRIER_SATURDAY_DELIVERY_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowSignature"        => [WCPOST_Settings::SETTING_CARRIER_SIGNATURE_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.priceEveningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE, 'getFloatByName', true],
+            "carrierSettings.$carrier.priceMondayDelivery"   => [WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_FEE, 'getFloatByName', true],
+            "carrierSettings.$carrier.priceMorningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE, 'getFloatByName', true],
+            "carrierSettings.$carrier.priceOnlyRecipient"    => [WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE, 'getFloatByName', false],
+            "carrierSettings.$carrier.pricePickup"           => [WCPOST_Settings::SETTING_CARRIER_PICKUP_FEE, 'getFloatByName', true],
+            "carrierSettings.$carrier.priceSaturdayDelivery" => [WCPOST_Settings::SETTING_CARRIER_SATURDAY_DELIVERY_FEE, 'getFloatByName', true],
+            "carrierSettings.$carrier.priceSignature"        => [WCPOST_Settings::SETTING_CARRIER_SIGNATURE_FEE, 'getFloatByName', false],
+            "cutoffTime"                                     => [WCPOST_Settings::SETTING_CARRIER_CUTOFF_TIME, 'getStringByName', false],
+            "deliveryDaysWindow"                             => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_DAYS_WINDOW, 'getIntegerByName', false],
+            "dropOffDays"                                    => [WCPOST_Settings::SETTING_CARRIER_DROP_OFF_DAYS, 'getByName', false],
+            "dropOffDelay"                                   => [WCPOST_Settings::SETTING_CARRIER_DROP_OFF_DELAY, 'getIntegerByName', false],
+            "fridayCutoffTime"                               => [WCPOST_Settings::SETTING_CARRIER_FRIDAY_CUTOFF_TIME, 'getStringByName', false],
+            "saturdayCutoffTime"                             => [WCPOST_Settings::SETTING_CARRIER_CUTOFF_TIME, 'getStringByName', false],
         ];
     }
 }
