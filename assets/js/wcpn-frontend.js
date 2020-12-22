@@ -568,12 +568,12 @@ jQuery(function($) {
     getHighestShippingClass: function() {
       var shippingClass = null;
 
-      jQuery.ajax({
+      $.ajax({
         type: 'POST',
         url: wcpn.ajax_url,
         async: false,
         data: {
-          action: 'nopriv_get_highest_shipping_class',
+          action: 'get_highest_shipping_class',
         },
         success: function(data) {
           shippingClass = data;
