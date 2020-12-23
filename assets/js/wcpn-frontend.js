@@ -461,7 +461,6 @@ jQuery(function($) {
     toggleDeliveryOptions: function() {
       if (PostNLFrontend.currentShippingMethodHasDeliveryOptions()) {
         PostNLFrontend.hasDeliveryOptions = true;
-        console.log(PostNLFrontend);
         PostNLFrontend.triggerEvent(PostNLFrontend.showDeliveryOptionsEvent, document);
         PostNLFrontend.updateAddress();
       } else {
