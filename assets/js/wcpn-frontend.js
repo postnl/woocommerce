@@ -122,8 +122,8 @@ jQuery(function($) {
     updatedDeliveryOptionsEvent: 'myparcel_updated_delivery_options',
     updatedAddressEvent: 'myparcel_updated_address',
 
-    showDeliveryOptionsEvent: 'postnl_show_delivery_options',
-    hideDeliveryOptionsEvent: 'postnl_hide_delivery_options',
+    showDeliveryOptionsEvent: 'myparcel_show_delivery_options',
+    hideDeliveryOptionsEvent: 'myparcel_hide_delivery_options',
 
     /**
      * WooCommerce checkout events.
