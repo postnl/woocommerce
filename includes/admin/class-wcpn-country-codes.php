@@ -10,7 +10,6 @@ if (class_exists("WCPN_Country_Codes")) {
 
 class WCPN_Country_Codes
 {
-
     private const EURO_COUNTRIES = [
         "AT",
         "NL",
@@ -45,7 +44,6 @@ class WCPN_Country_Codes
         "GL",
         "GG",
         "JE",
-        "HR",
         "LI",
         "MK",
         "MD",
@@ -55,6 +53,7 @@ class WCPN_Country_Codes
         "RS",
         "VA",
         "BY",
+        "BE",
     ];
 
     private const WORLD_COUNTRIES = [
@@ -124,6 +123,7 @@ class WCPN_Country_Codes
         "HT",
         "HN",
         "HK",
+        "HR",
         "IN",
         "ID",
         "IS",
@@ -239,37 +239,37 @@ class WCPN_Country_Codes
     ];
 
     /**
-     * @param string $country_code
+     * @param string $countryCode
      *
      * @return bool
      */
-    public static function isEuCountry(string $country_code): bool
+    public static function isEuCountry(string $countryCode): bool
     {
-        return in_array($country_code, self::EURO_COUNTRIES);
+        return in_array($countryCode, self::EURO_COUNTRIES);
     }
 
     /**
-     * @param $country_code
+     * @param $countryCode
      *
      * @return bool
      */
-    public static function isWorldShipmentCountry(string $country_code): bool
+    public static function isWorldShipmentCountry(string $countryCode): bool
     {
-        return in_array($country_code, self::WORLD_COUNTRIES);
+        return in_array($countryCode, self::WORLD_COUNTRIES);
     }
 
     /**
-     * @param $country_code
+     * @param $countryCode
      *
      * @return bool
      */
-    public static function isAllowedDestination(string $country_code): bool
+    public static function isAllowedDestination(string $countryCode): bool
     {
-        return ($country_code === WCPN_Data::DEFAULT_COUNTRY_CODE
-                || WCPN_Country_Codes::isEuCountry($country_code)
-                || WCPN_Country_Codes::isWorldShipmentCountry(
-                $country_code
-            ));
+        $isHomeCountry          = WCPN_Data::isHomeCountry($countryCode);
+        $isEuCountry            = self::isEuCountry($countryCode);
+        $isWorldShipmentCountry = self::isWorldShipmentCountry($countryCode);
+
+        return $isHomeCountry || $isEuCountry || $isWorldShipmentCountry;
     }
 }
 

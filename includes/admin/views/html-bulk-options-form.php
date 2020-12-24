@@ -11,17 +11,17 @@ include('html-start.php');
  * @var array $order_ids
  */
 
-$add_return = WCPN::ADD_RETURN;
+$add_return = WCPN_Export::ADD_RETURN;
 $export     = WCPN_Export::EXPORT;
 
 $order_ids_string = implode(';', $order_ids);
 
 $target_url = wp_nonce_url(
     admin_url("admin-ajax.php?action=$export&request=$add_return&modal=true&order_ids=$order_ids_string"),
-    WCPN::NONCE_ACTION
+    WCPOST::NONCE_ACTION
 );
 
-?>postnl
+?>
   <form
     method="post"
     class="page-form wcpn__bulk-options wcpn__return-dialog"
@@ -73,7 +73,7 @@ $target_url = wp_nonce_url(
                         <td><?php echo WCPN_Export::get_item_display_name($item, $order) ?></td>
                         <td align="right">
                             <?php echo wc_format_weight(
-                                WCPN_Export::getItemWeight_kg($item, $order)
+                                WCPN_Export::getItemWeightKg($item, $order)
                             ); ?>
                         </td>
                       </tr>
@@ -84,7 +84,7 @@ $target_url = wp_nonce_url(
                       <td>&nbsp;</td>
                       <td><?php _e("Total weight", "woocommerce-postnl"); ?></td>
                       <td align="right"><?php echo wc_format_weight(
-                              $order->get_meta(WCPN_Admin::META_ORDER_WEIGHT)
+                              $order->get_meta(WCPOST_Admin::META_ORDER_WEIGHT)
                           ); ?></td>
                     </tr>
                     </tfoot>
@@ -145,7 +145,7 @@ $target_url = wp_nonce_url(
           type="submit"
           value="<?php echo $button_text; ?>"
           class="button wcpn__return-dialog__save">
-          <?php WCPN_Admin::renderSpinner() ?>
+          <?php WCPOST_Admin::renderSpinner() ?>
       </div>
     </div>
   </form>

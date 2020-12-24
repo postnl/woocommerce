@@ -34,14 +34,18 @@ abstract class WCPN_Upgrade_Migration
 
     /**
      * @param array      $map
-     * @param array      $newSettings
+     * @param array|null $newSettings
      * @param array|null $oldSettings
      *
-     * @return array
+     * @return array|null
      */
-    protected function migrateSettings(array $map, array $newSettings, array $oldSettings = null): array
+    protected function migrateSettings(array $map, ?array $newSettings, array $oldSettings = null): ?array
     {
         $oldSettings = $oldSettings ?? $newSettings;
+
+        if (! $oldSettings) {
+            return null;
+        }
 
         foreach ($map as $oldSetting => $newSetting) {
             if (array_key_exists($oldSetting, $oldSettings)) {
@@ -81,5 +85,18 @@ abstract class WCPN_Upgrade_Migration
                 update_option($option, $settings);
             }
         }
+    }
+
+    /**
+     * Get settings array. Falls back to empty array of get_option returns a falsy value. Not compatible with
+     * non-array settings.
+     *
+     * @param string $settingName
+     *
+     * @return array
+     */
+    protected function getSettings(string $settingName): array
+    {
+        return get_option($settingName) ?: [];
     }
 }

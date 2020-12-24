@@ -32,7 +32,7 @@
 .wcpn__barcodes {
   overflow: hidden;
   -o-text-overflow: ellipsis;
-     text-overflow: ellipsis;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -40,15 +40,11 @@
   background-color: white;
   border: 1px solid #ccc;
   -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   padding: 10px;
   position: absolute;
   z-index: 999;
   border-radius: 3px;
-}
-
-.wcpn__box .form-row {
-  margin: 0.3rem 0 !important;
 }
 
 /*
@@ -70,8 +66,8 @@
 /*
  * Shipment summary (overview and single order)
  */
-.wcpn__shipment-summary, .wcpn__shipment-options {
-  display: inline;
+.wcpn__shipment-summary {
+  white-space: nowrap;
 }
 
 .wcpn__shipment-summary .delivery-date,
@@ -81,6 +77,7 @@
 
 .wcpn__shipment-summary {
   list-style: none;
+  margin-right: .3em;
 }
 
 .wcpn__shipment-summary li:before {
@@ -88,40 +85,47 @@
   margin-right: 4px;
 }
 
+.wcpn__shipment-options-dialog {
+  width: 25em;
+}
+
 /*
  * Shipment options form styling
  */
-.wcpn__shipment-options__form table {
+.wcpn__shipment-options table {
   width: 100%;
 }
 
-.wcpn__shipment-options__form input[type="checkbox"],
-.wcpn__shipment-options__form input[type="radio"] {
-  margin-right: 8px;
+.wcpn__shipment-options table,
+.wcpn__shipment-options select {
+  font-size: 90%;
 }
 
-.wcpn__shipment-options__form .wcpn_settings-table td {
-  padding-bottom: 6px;
-  vertical-align: middle;
+.wcpn__shipment-options select,
+.wcpn__shipment-options input {
+  height: auto;
+  padding: 0 8px !important;
+}
+
+.wcpn__shipment-options select,
+.wcpn__shipment-options input,
+.wcpn__shipment-options .form-row {
+  margin: 0;
 }
 
 .wcpn__shipment-summary__list {
   width: auto;
 }
 
-.wcpn__shipment-options__form td.wcpn_option_cost {
+.wcpn__shipment-options td.wcpn_option_cost {
   width: 60px;
   text-align: right;
   font-weight: bold;
 }
 
-.wcpn__shipment-options__form .calculated_weight {
-  font-size: 80%;
-  color: #999;
-}
-
-.wcpn__shipment-settings__save {
-  margin-top: 8px;
+.wcpn__shipment-options > a {
+  color: inherit;
+  text-decoration: none;
 }
 
 /*
@@ -167,7 +171,7 @@
 }
 
 .wcpn__spinner,
-.wcpn__shipment-settings__save input {
+.wcpn__shipment-options__save input {
   vertical-align: middle;
 }
 
@@ -235,7 +239,7 @@
   margin: 10px auto;
 }
 
-.wcpn__bulk-options .wcpn__shipment-settings__save {
+.wcpn__bulk-options .wcpn__shipment-options__save {
   margin-top: 8px;
   float: right;
 }
@@ -262,11 +266,6 @@
   padding: 0;
 }
 
-.wcpn__shipment-options__form > a {
-  color: inherit;
-  text-decoration: none;
-}
-
 /* fix woocommerce column float */
 @media only screen and (min-width: 1280px) {
   #order_data .order_data_column {
@@ -277,6 +276,10 @@
 /*
  * Helpers
  */
+.wcpn__d--none {
+  display: none;
+}
+
 .wcpn__d--block {
   display: block;
 }
@@ -301,10 +304,16 @@
 }
 
 /*
- * wcpn Settings page
+ * WCPN Settings page
  */
 .woocommerce_page_wcpn_settings tr.wcpn__child {
   background: #e5e5e5;
+}
+
+.woocommerce_page_wcpn_settings table.form-table select,
+.woocommerce_page_wcpn_settings table.form-table input {
+  height: auto;
+  line-height: 1.8;
 }
 
 .woocommerce_page_wcpn_settings tr.wcpn__child * {
@@ -312,7 +321,8 @@
 }
 
 .woocommerce_page_wcpn_settings tr.wcpn__child th {
-  padding: 12.5px 15px;
+  padding-left: 10px;
+  padding-left: 10px;
 }
 
 .woocommerce_page_wcpn_settings tr.wcpn__child td {
@@ -337,4 +347,60 @@
 
 .wcpn__close-button {
   cursor: pointer;
+}
+
+/* Toggle element */
+.wcpn__toggle {
+  cursor: pointer;
+}
+
+[data-disabled="true"] .wcpn__toggle,
+[data-readonly="true"] .wcpn__toggle {
+  opacity: 65%;
+  cursor: not-allowed;
+}
+/* Skeleton loader (Styles copied from Delivery Options) */
+.wcpn__skeleton-loader {
+  width: 100%;
+}
+
+.wcpn__skeleton-loader div {
+  height: 1.5em;
+  margin-top: 8px;
+  -webkit-animation: shimmer 2s infinite linear;
+  animation: shimmer 2s infinite linear;
+  background: rgba(0, 0, 0, .05) -o-linear-gradient(left, transparent 25%, rgba(0, 0, 0, .05) 50%, transparent 75%);
+  background: rgba(0, 0, 0, .05) -webkit-gradient(linear, left top, right top, color-stop(25%, transparent), color-stop(50%, rgba(0, 0, 0, .05)), color-stop(75%, transparent));
+  background: rgba(0, 0, 0, .05) linear-gradient(to right, transparent 25%, rgba(0, 0, 0, .05) 50%, transparent 75%);
+  background-size: 400% 400%;
+}
+
+.wcpn__skeleton-loader tr:nth-child(1) td:first-child div { width: 60%; }
+.wcpn__skeleton-loader tr:nth-child(2) td:first-child div { width: 80%; }
+.wcpn__skeleton-loader tr:nth-child(3) td:first-child div { width: 75%; }
+.wcpn__skeleton-loader tr:nth-child(4) td:first-child div { width: 77%; }
+.wcpn__skeleton-loader tr:nth-child(5) td:first-child div { width: 64%; }
+
+@-webkit-keyframes shimmer {
+  0% {
+    background-position: 0 50%
+  }
+  50% {
+    background-position: 100% 50%
+  }
+  100% {
+    background-position: 0 50%
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0 50%
+  }
+  50% {
+    background-position: 100% 50%
+  }
+  100% {
+    background-position: 0 50%
+  }
 }

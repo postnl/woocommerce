@@ -12,27 +12,27 @@
     <?php
     wp_enqueue_script(
         'wcpn-admin',
-        WCPN()->plugin_url() . '/assets/js/wcpn-admin.js',
+        WCPOST()->plugin_url() . '/assets/js/wcpn-admin.js',
         ['jquery', 'thickbox'],
-        WC_POST_NL_VERSION
+        WC_POSTNL_VERSION
     );
     wp_localize_script(
         'wcpn-admin',
         'wc_postnl',
         [
-            'ajax_url'                              => admin_url('admin-ajax.php'),
-            'nonce'                                 => wp_create_nonce(WCPN::NONCE_ACTION),
-            WCPN_Settings::SETTING_DOWNLOAD_DISPLAY => WCPN()->setting_collection->getByName(
-                WCPN_Settings::SETTING_DOWNLOAD_DISPLAY
-            ) ? WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_DOWNLOAD_DISPLAY) : '',
+            'ajax_url'                                => admin_url('admin-ajax.php'),
+            'nonce'                                   => wp_create_nonce(WCPOST::NONCE_ACTION),
+            WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY => WCPOST()->setting_collection->getByName(
+                WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY
+            ) ? WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY) : '',
         ]
     );
 
     wp_enqueue_style(
         'wcpn-admin-styles',
-        WCPN()->plugin_url() . '/assets/css/wcpn-admin-styles.css',
+        WCPOST()->plugin_url() . '/assets/css/wcpn-admin-styles.css',
         [],
-        WC_POST_NL_VERSION,
+        WC_POSTNL_VERSION,
         'all'
     );
 
@@ -40,9 +40,9 @@
     if (version_compare(WOOCOMMERCE_VERSION, '2.1', '<=')) {
         wp_enqueue_style(
             'wcpn-admin-styles-legacy',
-            WCPN()->plugin_url() . '/assets/css/wcpn-admin-styles-legacy.css',
+            WCPOST()->plugin_url() . '/assets/css/wcpn-admin-styles-legacy.css',
             [],
-            WC_POST_NL_VERSION,
+            WC_POSTNL_VERSION,
             'all'
         );
     }

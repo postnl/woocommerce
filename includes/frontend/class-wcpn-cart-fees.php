@@ -54,11 +54,11 @@ class WCPN_Cart_Fees
         }
 
         /*  check for delivery options & add fees*/
-        if (empty($post_data[WCPN_Admin::META_DELIVERY_OPTIONS])) {
+        if (empty($post_data[WCPOST_Admin::META_DELIVERY_OPTIONS])) {
             return;
         }
 
-        $delivery_options_data = $post_data[WCPN_Admin::META_DELIVERY_OPTIONS];
+        $delivery_options_data = $post_data[WCPOST_Admin::META_DELIVERY_OPTIONS];
         $delivery_options_data = json_decode(stripslashes($delivery_options_data), true);
         $this->deliveryOptions = DeliveryOptionsAdapterFactory::create($delivery_options_data);
 
@@ -196,15 +196,15 @@ class WCPN_Cart_Fees
         $carrier = $this->deliveryOptions->getCarrier();
 
         $getCarrierFee = function(string $setting) use ($carrier): float {
-            return WCPN()->setting_collection->getFloatByName("{$carrier}_{$setting}");
+            return WCPOST()->setting_collection->getFloatByName("{$carrier}_{$setting}");
         };
 
         return [
-            "delivery_evening" => $getCarrierFee(WCPN_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE),
-            "delivery_morning" => $getCarrierFee(WCPN_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE),
-            "delivery_pickup"  => $getCarrierFee(WCPN_Settings::SETTING_CARRIER_PICKUP_FEE),
-            "only_recipient"   => $getCarrierFee(WCPN_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE),
-            "signature"        => $getCarrierFee(WCPN_Settings::SETTING_CARRIER_SIGNATURE_FEE),
+            "delivery_evening" => $getCarrierFee(WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE),
+            "delivery_morning" => $getCarrierFee(WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE),
+            "delivery_pickup"  => $getCarrierFee(WCPOST_Settings::SETTING_CARRIER_PICKUP_FEE),
+            "only_recipient"   => $getCarrierFee(WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE),
+            "signature"        => $getCarrierFee(WCPOST_Settings::SETTING_CARRIER_SIGNATURE_FEE),
         ];
     }
 

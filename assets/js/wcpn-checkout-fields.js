@@ -61,7 +61,7 @@ window.addEventListener('load', function() {
 
     /* Update settings after filling if the frontend script is loaded and initialized and address is not empty */
     if (address.length && window.hasOwnProperty('PostNL_Frontend')) {
-      window.PostNL_Frontend.updateAddress();
+      window.MyParcel_Frontend.updateAddress();
     }
   }
 });

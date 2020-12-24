@@ -29,60 +29,81 @@ class WCPN_Frontend
         // pickup address on thank you page
         add_action("woocommerce_thankyou", [$this, "thankyou_pickup_html"], 10, 1);
 
-        add_filter(
-            "wpo_wcpdf_templates_replace_myparcel_delivery_options",
-            [$this, "wpo_wcpdf_delivery_options"],
-            10,
-            2
-        );
+        // WooCommerce PDF Invoices & Packing Slips Premium Templates compatibility
+        add_filter("wpo_wcpdf_templates_replace_postnl_delivery_options", [$this, "wpo_wcpdf_delivery_options"], 10, 2);
+        add_filter("wpo_wcpdf_templates_replace_postnl_delivery_date", [$this, "wpo_wcpdf_delivery_date"], 10, 2);
 
         // Initialize delivery options fees
         new WCPN_Cart_Fees();
 
         // Output most expensive shipping class in frontend data
-        add_action("woocommerce_checkout_after_order_review", [$this, "injectShippingClassInput"], 100);
+        add_action("woocommerce_checkout_before_order_review", [$this, "injectShippingClassInput"], 100);
         add_action("woocommerce_update_order_review_fragments", [$this, "order_review_fragments"]);
+
+        // Ajax
+        add_action('wp_ajax_get_highest_shipping_class', [$this, 'ajaxGetHighestShippingClass']);
+        add_action('wp_ajax_nopriv_get_highest_shipping_class', [$this, 'ajaxGetHighestShippingClass']);
     }
 
     /**
-     * @param      $order
-     * @param bool $sent_to_admin
-     * @param bool $plain_text
+     * @param \WC_Order $order
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function email_pickup_html($order, $sent_to_admin = false, $plain_text = false)
+    public function email_pickup_html(WC_Order $order): void
     {
-        WCPN()->admin->showDeliveryOptionsForOrder($order);
+        WCPOST()->admin->showDeliveryDateForOrder($order);
     }
 
     /**
-     * @param $order_id
+     * @param int $order_id
      *
      * @throws Exception
      */
-    public function thankyou_pickup_html(int $order_id)
+    public function thankyou_pickup_html(int $order_id): void
     {
         $order = wc_get_order($order_id);
-        WCPN()->admin->showDeliveryOptionsForOrder($order);
+        WCPOST()->admin->showDeliveryDateForOrder($order);
     }
 
     /**
-     * @param $replacement
-     * @param $order
+     * @param string   $replacement
+     * @param WC_Order $order
      *
-     * @return false|string
+     * @return string
      * @throws Exception
      */
-    public function wpo_wcpdf_delivery_options($replacement, WC_Order $order)
+    public function wpo_wcpdf_delivery_options(string $replacement, WC_Order $order): string
     {
         ob_start();
-        WCPN()->admin->showDeliveryOptionsForOrder($order);
+        WCPOST()->admin->showDeliveryDateForOrder($order);
+
         return ob_get_clean();
     }
 
     /**
+     * @param string   $replacement
+     * @param WC_Order $order
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function wpo_wcpdf_delivery_date(string $replacement, WC_Order $order): string
+    {
+        $deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
+        $deliveryDate    = $deliveryOptions->getDate();
+
+        if ($deliveryDate) {
+            return wc_format_datetime(new WC_DateTime($deliveryDate), 'l d-m');
+        }
+
+        return $replacement;
+    }
+
+    /**
      * Output the highest shipping class input
+     *
+     * @throws Exception
      */
     public function injectShippingClassInput(): void
     {
@@ -112,33 +133,36 @@ class WCPN_Frontend
      * Requires WC2.4+
      * Only supports 1 package, takes the first
      *
-     * @return bool|int
+     * @return null|int
      * @throws \Exception
      */
-    public static function get_cart_shipping_class()
+    public static function get_cart_shipping_class(): ?int
     {
         if (version_compare(WOOCOMMERCE_VERSION, '2.4', '<')) {
-            return false;
+            return null;
         }
 
-        $chosen_method = WC()->session->get('chosen_shipping_methods')[0] ?? '';
+        $shippingMethodString = WC()->session->get('chosen_shipping_methods')[0] ?? '';
+        $shippingMethod       = WCPN_Export::getShippingMethod($shippingMethodString);
 
-        // get package
-        $packages = WC()->cart->get_shipping_packages();
-        $package  = current($packages);
-
-        $shipping_method = WCPN_Export::getShippingMethod($chosen_method);
-
-        if (empty($shipping_method)) {
-            return false;
+        if (empty($shippingMethod)) {
+            return null;
         }
 
-        // get shipping classes from package
-        $found_shipping_classes = $shipping_method->find_shipping_classes($package);
+        if (method_exists($shippingMethod, 'find_shipping_classes')) {
+            // get package
+            $packages = WC()->cart->get_shipping_packages();
+            $package  = current($packages);
 
-        return WCPN()->export->getShippingClass(
-            $shipping_method,
-            $found_shipping_classes
+            // get shipping classes from package
+            $shippingClasses = $shippingMethod->find_shipping_classes($package);
+        } else {
+            $shippingClasses = [];
+        }
+
+        return WCPOST()->export->getShippingClass(
+            $shippingMethod,
+            $shippingClasses
         );
     }
 
@@ -146,11 +170,10 @@ class WCPN_Frontend
      * @param $fragments
      *
      * @return mixed
-     * @throws Exception
      */
     public function order_review_fragments($fragments)
     {
-        $postnl_shipping_data          = $this->renderHighestShippingClassInput();
+        $postnl_shipping_data            = $this->renderHighestShippingClassInput();
         $fragments['.wcpn__shipping-data'] = $postnl_shipping_data;
 
         return $fragments;
@@ -165,7 +188,7 @@ class WCPN_Frontend
     public static function getTrackTraceShipments($order_id): array
     {
         $order     = WCX::get_order($order_id);
-        $shipments = WCPN_Admin::get_order_shipments($order);
+        $shipments = WCPOST_Admin::get_order_shipments($order);
 
         if (empty($shipments)) {
             return [];
@@ -180,7 +203,7 @@ class WCPN_Frontend
                 continue;
             }
 
-            $track_trace_url = WCPN_Admin::getTrackTraceUrl(
+            $track_trace_url = WCPOST_Admin::getTrackTraceUrl(
                 $order_id,
                 $trackTrace
             );
@@ -221,6 +244,16 @@ class WCPN_Frontend
         }
 
         return $track_trace_links;
+    }
+
+    /**
+     * @return int|null
+     * @throws Exception
+     */
+    public function ajaxGetHighestShippingClass(): ?int
+    {
+        echo WCPN_Frontend::get_cart_shipping_class();
+        die();
     }
 }
 

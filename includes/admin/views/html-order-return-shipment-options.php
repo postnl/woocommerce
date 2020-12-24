@@ -5,7 +5,7 @@ if (! defined('ABSPATH')) {
 } // Exit if accessed directly
 
 /** @noinspection PhpUnhandledExceptionInspection */
-$deliveryOptions = WCPN_Admin::getDeliveryOptionsFromOrder($order);
+$deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
 
 ?>
 <table class="wcpn__settings-table" style="width: auto">
@@ -14,7 +14,7 @@ $deliveryOptions = WCPN_Admin::getDeliveryOptionsFromOrder($order);
             <?php _e("Shipment type", "woocommerce-postnl") ?>:<br/> <small class="calculated_weight">
                 <?php printf(
                     __("Calculated weight: %s", "woocommerce-postnl"),
-                    wc_format_weight($order->get_meta(WCPN_Admin::META_ORDER_WEIGHT))
+                    wc_format_weight($order->get_meta(WCPOST_Admin::META_ORDER_WEIGHT))
                 ) ?>
             </small>
         </td>
@@ -37,7 +37,7 @@ $deliveryOptions = WCPN_Admin::getDeliveryOptionsFromOrder($order);
 <?php if (! isset($skip_save)): ?>
     <div class="wcpn__d--flex">
         <a class="button save" data-order="<?php echo $order_id; ?>"><?php _e("Save", "woocommerce-postnl") ?>
-            <?php WCPN_Admin::renderSpinner() ?>
+            <?php WCPOST_Admin::renderSpinner() ?>
         </a>
     </div>
 <?php endif ?>

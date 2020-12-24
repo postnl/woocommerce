@@ -1,6 +1,5 @@
 <?php
 
-use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use WPO\WC\PostNL\Entity\SettingsFieldArguments;
 
@@ -39,40 +38,45 @@ class WCPN_Settings_Data
 
     /**
      * Create all settings sections.
+     *
+     * @throws \Exception
      */
     public function create_all_settings(): void
     {
         $this->generate_settings(
             $this->get_sections_general(),
-            WCPN_Settings::SETTINGS_GENERAL
+            WCPOST_Settings::SETTINGS_GENERAL
         );
 
         $this->generate_settings(
             $this->get_sections_export_defaults(),
-            WCPN_Settings::SETTINGS_EXPORT_DEFAULTS
+            WCPOST_Settings::SETTINGS_EXPORT_DEFAULTS
         );
 
         $this->generate_settings(
             $this->get_sections_checkout(),
-            WCPN_Settings::SETTINGS_CHECKOUT
+            WCPOST_Settings::SETTINGS_CHECKOUT
         );
 
         $this->generate_settings(
             $this->get_sections_carrier_postnl(),
-            WCPN_Settings::SETTINGS_POSTNL,
+            WCPOST_Settings::SETTINGS_POSTNL,
             true
         );
     }
 
-    public static function getTabs()
+    /**
+     * @return array
+     */
+    public static function getTabs(): array
     {
         $array = [
-            WCPN_Settings::SETTINGS_GENERAL         => __("General", "woocommerce-postnl"),
-            WCPN_Settings::SETTINGS_EXPORT_DEFAULTS => __("Default export settings", "woocommerce-postnl"),
-            WCPN_Settings::SETTINGS_CHECKOUT        => __("Checkout settings", "woocommerce-postnl"),
+            WCPOST_Settings::SETTINGS_GENERAL         => __("General", "woocommerce-postnl"),
+            WCPOST_Settings::SETTINGS_EXPORT_DEFAULTS => __("Default export settings", "woocommerce-postnl"),
+            WCPOST_Settings::SETTINGS_CHECKOUT        => __("Checkout settings", "woocommerce-postnl"),
         ];
 
-        $array[WCPN_Settings::SETTINGS_POSTNL] = __("PostNL", "woocommerce-postnl");
+        $array[WCPOST_Settings::SETTINGS_POSTNL] = __("PostNL", "woocommerce-postnl");
 
         return $array;
     }
@@ -81,12 +85,14 @@ class WCPN_Settings_Data
      * Generate settings sections and fields by the given $settingsArray.
      *
      * @param array  $settingsArray - Array of settings to loop through.
-     * @param string $optionName - Name to use in the identifier.
-     * @param bool   $prefix - Add the key of the top level settings as prefix before every setting or not.
+     * @param string $optionName    - Name to use in the identifier.
+     * @param bool   $prefix        - Add the key of the top level settings as prefix before every setting or not.
+     *
+     * @throws \Exception
      */
     private function generate_settings(array $settingsArray, string $optionName, bool $prefix = false): void
     {
-        $optionIdentifier = WCPN_Settings::getOptionId($optionName);
+        $optionIdentifier = WCPOST_Settings::getOptionId($optionName);
         $defaults         = [];
 
         // Register settings.
@@ -99,40 +105,40 @@ class WCPN_Settings_Data
                 add_settings_section(
                     $sectionName,
                     $section["label"],
-                    function() use ($section) {
-                        // Allows a description to be shown with a section title.
-                        /** @noinspection PhpVoidFunctionResultUsedInspection */
-                        return $this->callbacks->renderSection($section);
+                    /**
+                     * Allows a description to be shown with a section title.
+                     */
+                    static function() use ($section) {
+                        WCPN_Settings_Callbacks::renderSection($section);
                     },
                     $optionIdentifier
                 );
 
                 foreach ($section["settings"] as $setting) {
-                    $setting["id"] = $prefix ? "{$name}_{$setting["name"]}" : $setting["name"];
+                    $namePrefix            = $prefix ? "{$name}_" : '';
+                    $setting["id"]        = $prefix ? "{$name}_{$setting["name"]}" : $setting["name"];
+                    $setting["option_id"] = $optionIdentifier;
 
-                    // Add the prefix to the name in the condition array
-                    if (isset($setting["condition"])) {
-                        if (is_array($setting["condition"])) {
-                            $related                      = $setting["condition"]["name"];
-                            $related                      = $prefix ? "{$name}_{$related}" : $related;
-                            $setting["condition"]["name"] = "{$optionIdentifier}[$related]";
-                        } else {
-                            $related              = $setting["condition"];
-                            $related              = $prefix ? "{$name}_{$related}" : $related;
-                            $setting["condition"] = "{$optionIdentifier}[$related]";
-                        }
-                    }
-
-                    $class = new SettingsFieldArguments($setting);
+                    $class = new SettingsFieldArguments($setting, "{$optionIdentifier}[{$namePrefix}", ']');
 
                     // Add the setting's default value to the defaults array.
                     $defaults[$setting["id"]] = $class->getDefault();
 
-                    $defaultCallback = function() use ($class, $optionIdentifier) {
-                        $this->callbacks->renderField($class, $optionIdentifier);
+                    if (isset(get_option($optionIdentifier)[$class->getId()])) {
+                        $class->setValue(get_option($optionIdentifier)[$class->getId()]);
+                    }
+
+                    // Default callback
+                    $callback = static function() use ($class) {
+                        WCPN_Settings_Callbacks::renderField($class);
                     };
 
-                    $callback = $setting["callback"] ?? $defaultCallback;
+                    // Pass the class to custom callbacks as well.
+                    if (isset($setting['callback'])) {
+                        $callback = static function () use ($setting, $class) {
+                            call_user_func($setting["callback"], $class);
+                        };
+                    }
 
                     add_settings_field(
                         $setting["id"],
@@ -169,7 +175,7 @@ class WCPN_Settings_Data
     private function get_sections_general()
     {
         return [
-            WCPN_Settings::SETTINGS_GENERAL => [
+            WCPOST_Settings::SETTINGS_GENERAL => [
                 [
                     "name"     => "api",
                     "label"    => __("API settings", "woocommerce-postnl"),
@@ -195,7 +201,7 @@ class WCPN_Settings_Data
     private function get_sections_export_defaults()
     {
         return [
-            WCPN_Settings::SETTINGS_EXPORT_DEFAULTS => [
+            WCPOST_Settings::SETTINGS_EXPORT_DEFAULTS => [
                 [
                     "name"     => "main",
                     "label"    => __("Default export settings", "woocommerce-postnl"),
@@ -208,7 +214,7 @@ class WCPN_Settings_Data
     private function get_sections_checkout()
     {
         return [
-            WCPN_Settings::SETTINGS_CHECKOUT => [
+            WCPOST_Settings::SETTINGS_CHECKOUT => [
                 [
                     "name"     => "main",
                     "label"    => __("Checkout settings", "woocommerce-postnl"),
@@ -217,7 +223,7 @@ class WCPN_Settings_Data
                 [
                     "name"      => "strings",
                     "label"     => __("Titles", "woocommerce-postnl"),
-                    "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                    "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                     "settings"  => $this->get_section_checkout_strings(),
                 ],
             ],
@@ -235,7 +241,7 @@ class WCPN_Settings_Data
             PostNLConsignment::CARRIER_NAME => [
                 [
                     "name"        => "export_defaults",
-                    "label"       => __("Default export settings", "woocommerce-postnl"),
+                    "label"       => __("PostNL export settings", "woocommerce-postnl"),
                     "description" => __(
                         "These settings will be applied to PostNL shipments you create in the backend.",
                         "woocommerce-postnl"
@@ -256,7 +262,6 @@ class WCPN_Settings_Data
         ];
     }
 
-
     /**
      * @return array
      */
@@ -264,7 +269,7 @@ class WCPN_Settings_Data
     {
         return [
             [
-                "name"      => WCPN_Settings::SETTING_API_KEY,
+                "name"      => WCPOST_Settings::SETTING_API_KEY,
                 "label"     => __("Key", "woocommerce-postnl"),
                 "help_text" => __("api key", "woocommerce-postnl"),
             ],
@@ -278,7 +283,7 @@ class WCPN_Settings_Data
     {
         return [
             [
-                "name"    => WCPN_Settings::SETTING_DOWNLOAD_DISPLAY,
+                "name"    => WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY,
                 "label"   => __("Label display", "woocommerce-postnl"),
                 "type"    => "select",
                 "options" => [
@@ -287,7 +292,7 @@ class WCPN_Settings_Data
                 ],
             ],
             [
-                "name"    => WCPN_Settings::SETTING_LABEL_FORMAT,
+                "name"    => WCPOST_Settings::SETTING_LABEL_FORMAT,
                 "label"   => __("Label format", "woocommerce-postnl"),
                 "type"    => "select",
                 "options" => [
@@ -296,36 +301,37 @@ class WCPN_Settings_Data
                 ],
             ],
             [
-                "name"      => WCPN_Settings::SETTING_ASK_FOR_PRINT_POSITION,
-                "label"     => __("Ask for print start position", "woocommerce-postnl"),
+                "name"       => WCPOST_Settings::SETTING_ASK_FOR_PRINT_POSITION,
+                "label"      => __("Ask for print start position", "woocommerce-postnl"),
                 "condition" => [
-                    "name"         => WCPN_Settings::SETTING_LABEL_FORMAT,
+                    "parent_name"  => WCPOST_Settings::SETTING_LABEL_FORMAT,
                     "type"         => "disable",
                     "parent_value" => "A4",
                     "set_value"    => self::DISABLED,
                 ],
-                "type"      => "toggle",
-                "help_text" => __(
+                "type"       => "toggle",
+                "help_text"  => __(
                     "This option enables you to continue printing where you left off last time",
                     "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_TRACK_TRACE_EMAIL,
+                "name"      => WCPOST_Settings::SETTING_TRACK_TRACE_EMAIL,
                 "label"     => __("Track & Trace in email", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "Add the Track & Trace code to emails to the customer.", "woocommerce-postnl"
+                    "Add the Track & Trace code to emails to the customer.<br/><strong>Note!</strong> When you select this option.",
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_TRACK_TRACE_MY_ACCOUNT,
+                "name"      => WCPOST_Settings::SETTING_TRACK_TRACE_MY_ACCOUNT,
                 "label"     => __("Track & Trace in My Account", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __("Show Track & Trace trace code and link in My Account.", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_PROCESS_DIRECTLY,
+                "name"      => WCPOST_Settings::SETTING_PROCESS_DIRECTLY,
                 "label"     => __("Process shipments directly", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -334,7 +340,7 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_ORDER_STATUS_AUTOMATION,
+                "name"      => WCPOST_Settings::SETTING_ORDER_STATUS_AUTOMATION,
                 "label"     => __("Order status automation", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -343,22 +349,22 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_AUTOMATIC_ORDER_STATUS,
-                "condition" => WCPN_Settings::SETTING_ORDER_STATUS_AUTOMATION,
+                "name"      => WCPOST_Settings::SETTING_AUTOMATIC_ORDER_STATUS,
+                "condition" => WCPOST_Settings::SETTING_ORDER_STATUS_AUTOMATION,
                 "class"     => ["wcpn__child"],
                 "label"     => __("Automatic order status", "woocommerce-postnl"),
                 "type"      => "select",
-                "options"   => $this->callbacks->get_order_status_options(),
+                "options"   => WCPN_Settings_Callbacks::get_order_status_options(),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_BARCODE_IN_NOTE,
+                "name"      => WCPOST_Settings::SETTING_BARCODE_IN_NOTE,
                 "label"     => __("Place barcode inside note", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __("Place the barcode inside a note of the order", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_BARCODE_IN_NOTE_TITLE,
-                "condition" => WCPN_Settings::SETTING_BARCODE_IN_NOTE,
+                "name"      => WCPOST_Settings::SETTING_BARCODE_IN_NOTE_TITLE,
+                "condition" => WCPOST_Settings::SETTING_BARCODE_IN_NOTE,
                 "class"     => ["wcpn__child"],
                 "label"     => __("Title before the barcode", "woocommerce-postnl"),
                 "default"   => __("Track & trace code:", "woocommerce-postnl"),
@@ -377,7 +383,7 @@ class WCPN_Settings_Data
     {
         return [
             [
-                "name"        => WCPN_Settings::SETTING_ERROR_LOGGING,
+                "name"        => WCPOST_Settings::SETTING_ERROR_LOGGING,
                 "label"       => __("Log API communication", "woocommerce-postnl"),
                 "type"        => "toggle",
                 "description" => '<a href="' . esc_url_raw(
@@ -396,7 +402,7 @@ class WCPN_Settings_Data
     {
         return [
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT,
                 "label"     => __("Home address only", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -405,7 +411,7 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE,
                 "label"     => __("Signature on delivery", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -414,7 +420,7 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK,
                 "label"     => __("Age check 18+", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -423,7 +429,7 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN,
                 "label"     => __("Return if no answer", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -432,7 +438,7 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
                 "label"     => __("Insured shipment", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -441,11 +447,25 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
-                "label"     => __("Insured amount", "woocommerce-postnl"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FROM_PRICE,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
+                "label"     => __("Insure from price", "woocommerce-postnl"),
+                "type"      => "number",
+                "help_text" => __(
+                    "Insure all orders that exceed this price point.",
+                    "woocommerce-postnl"
+                ),
+            ],
+            [
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
+                "label"     => __("Max insured amount", "woocommerce-postnl"),
                 "type"      => "select",
-                "options"   => WCPN_Data::getInsuranceAmount(),
+                "options"   => WCPN_Data::getInsuranceAmounts(),
+                "help_text" => __(
+                    "Insure all parcels up to the selected amount.",
+                    "woocommerce-postnl"
+                ),
             ],
         ];
     }
@@ -453,7 +473,7 @@ class WCPN_Settings_Data
     /**
      * These are the unprefixed settings for postnl.
      * After the settings are generated every name will be prefixed with "postnl_"
-     * Example: delivery_enabled => myparcel_delivery_enabled
+     * Example: delivery_enabled => postnl_delivery_enabled
      *
      * @return array
      */
@@ -461,22 +481,22 @@ class WCPN_Settings_Data
     {
         return [
             [
-                "name"  => WCPN_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "name"  => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
                 "label" => __("Enable PostNL delivery", "woocommerce-postnl"),
                 "type"  => "toggle",
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DROP_OFF_DAYS,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DROP_OFF_DAYS,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
                 "label"     => __("Drop-off days", "woocommerce-postnl"),
-                "callback"  => [$this->callbacks, "enhanced_select"],
-                "options"   => $this->getWeekdays(),
-                "default"   => [1, 2, 3, 4, 5],
+                "callback"  => [WCPN_Settings_Callbacks::class, "enhanced_select"],
+                "options"   => $this->getWeekdays(null),
+                "default"   => [2],
                 "help_text" => __("Days of the week on which you hand over parcels to PostNL", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_CUTOFF_TIME,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_CUTOFF_TIME,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
                 "label"     => __("Cut-off time", "woocommerce-postnl"),
                 "help_text" => __(
                     "Time at which you stop processing orders for the day (format: hh:mm)",
@@ -485,76 +505,67 @@ class WCPN_Settings_Data
                 "default"   => "17:00",
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DROP_OFF_DELAY,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DROP_OFF_DELAY,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
                 "label"     => __("Drop-off delay", "woocommerce-postnl"),
                 "type"      => "number",
                 "max"       => 14,
                 "help_text" => __("Number of days you need to process an order.", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DELIVERY_DAYS_WINDOW,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Show delivery date", "woocommerce-postnl"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DELIVERY_DAYS_WINDOW,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label"     => __("Delivery days window", "woocommerce-postnl"),
                 "type"      => "number",
                 "max"       => 14,
                 "default"   => self::ENABLED,
-                "help_text" => __("Show the delivery date inside the delivery options.", "woocommerce-postnl"),
+                "help_text" => __(
+                    "Amount of days a customer can postpone a shipment. Default is 0 days with a maximum value of 14 days.",
+                    "woocommerce-postnl"
+                ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
                 "label"     => __("Morning delivery", "woocommerce-postnl"),
                 "type"      => "toggle",
             ],
+            self::getFeeField(
+                WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE,
+                [
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED,
+                ]
+            ),
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED,
-                "class"     => ["wcpn__child"],
-                "label"     => __("Fee (optional)", "woocommerce-postnl"),
-                "type"      => "currency",
-                "help_text" => __(
-                    "Enter an amount that is either positive or negative. For example, do you want to give a discount for using this function or do you want to charge extra for this delivery option.",
-                    "woocommerce-postnl"
-                ),
-            ],
-            [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
                 "label"     => __("Evening delivery", "woocommerce-postnl"),
                 "type"      => "toggle",
             ],
+            self::getFeeField(
+                WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE,
+                [
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED,
+                ]
+            ),
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED,
-                "class"     => ["wcpn__child"],
-                "label"     => __("Fee (optional)", "woocommerce-postnl"),
-                "type"      => "currency",
-                "help_text" => __(
-                    "Enter an amount that is either positive or negative. For example, do you want to give a discount for using this function or do you want to charge extra for this delivery option.",
-                    "woocommerce-postnl"
-                ),
-            ],
-            [
-                "name"      => WCPN_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
                 "label"     => __("Home address only", "woocommerce-postnl"),
                 "type"      => "toggle",
             ],
+            self::getFeeField(
+                WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE,
+                [
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
+                ]
+            ),
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE,
-                "condition" => WCPN_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
-                "class"     => ["wcpn__child"],
-                "label"     => __("Fee (optional)", "woocommerce-postnl"),
-                "type"      => "currency",
-                "help_text" => __(
-                    "Enter an amount that is either positive or negative. For example, do you want to give a discount for using this function or do you want to charge extra for this delivery option.",
-                    "woocommerce-postnl"
-                ),
-            ],
-            [
-                "name"      => WCPN_Settings::SETTING_CARRIER_SIGNATURE_ENABLED,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_SIGNATURE_ENABLED,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
                 "label"     => __("Signature on delivery", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -562,32 +573,31 @@ class WCPN_Settings_Data
                     "woocommerce-postnl"
                 ),
             ],
+            self::getFeeField(
+                WCPOST_Settings::SETTING_CARRIER_SIGNATURE_FEE,
+                [
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_SIGNATURE_ENABLED,
+                ]
+            ),
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_SIGNATURE_FEE,
-                "condition" => WCPN_Settings::SETTING_CARRIER_SIGNATURE_ENABLED,
-                "class"     => ["wcpn__child"],
-                "label"     => __("Fee (optional)", "woocommerce-postnl"),
-                "type"      => "currency",
-                "help_text" => __(
-                    "Enter an amount that is either positive or negative. For example, do you want to give a discount for using this function or do you want to charge extra for this delivery option.",
-                    "woocommerce-postnl"
-                ),
-            ],
-            [
-                "name"      => WCPN_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED,
-                "condition" => WCPN_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
                 "label"     => __("Monday delivery", "woocommerce-postnl"),
                 "type"      => "toggle",
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CARRIER_MONDAY_CUTOFF_TIME,
-                "condition" => WCPN_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED,
-                "class"     => ["wcpn__child"],
-                "label"     => __("Fee (optional)", "woocommerce-postnl"),
+                "name"        => WCPOST_Settings::SETTING_CARRIER_SATURDAY_CUTOFF_TIME,
+                "condition"   => [
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED,
+                ],
+                "class"       => ["wcpn__child"],
+                "label"       => __("Cut-off time on Saturday", "woocommerce-postnl"),
                 "placeholder" => "14:30",
                 "default"     => "15:00",
-                "help_text" => __(
-                    "Your drop-off days must include Saturday and cut-off time on Saturday must be before 15:00 (14:30 recommended).",
+                "help_text"   => __(
+                    "Time at which you stop processing orders for the day (format: hh:mm)",
                     "woocommerce-postnl"
                 ),
             ],
@@ -601,21 +611,16 @@ class WCPN_Settings_Data
     {
         return [
             [
-                "name"  => WCPN_Settings::SETTING_CARRIER_PICKUP_ENABLED,
+                "name"  => WCPOST_Settings::SETTING_CARRIER_PICKUP_ENABLED,
                 "label" => __("Enable PostNL pickup", "woocommerce-postnl"),
                 "type"  => "toggle",
             ],
-            [
-                "name"      => WCPN_Settings::SETTING_CARRIER_PICKUP_FEE,
-                "condition" => WCPN_Settings::SETTING_CARRIER_PICKUP_ENABLED,
-                "class"     => ["wcpn__child"],
-                "label"     => __("Fee (optional)", "woocommerce-postnl"),
-                "type"      => "currency",
-                "help_text" => __(
-                    "Enter an amount that is either positive or negative. For example, do you want to give a discount for using this function or do you want to charge extra for this delivery option.",
-                    "woocommerce-postnl"
-                ),
-            ],
+            self::getFeeField(
+                WCPOST_Settings::SETTING_CARRIER_PICKUP_FEE,
+                [
+                    WCPOST_Settings::SETTING_CARRIER_PICKUP_ENABLED,
+                ]
+            ),
         ];
     }
 
@@ -626,11 +631,11 @@ class WCPN_Settings_Data
     {
         return [
             [
-                "name"      => WCPN_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES,
+                "name"      => WCPOST_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES,
                 "label"     => __("Package types", "woocommerce-postnl"),
-                "callback"  => [$this->callbacks, "enhanced_select"],
+                "callback"  => [WCPN_Settings_Callbacks::class, "enhanced_select"],
                 "loop"      => WCPN_Data::getPackageTypesHuman(),
-                "options"   => WCPN_Settings_Callbacks::getShippingMethods(),
+                "options"   => (new WCPN_Shipping_Methods())->getShippingMethods(),
                 "default"   => [],
                 "help_text" => __(
                     "Select one or more shipping methods for each PostNL package type",
@@ -638,16 +643,7 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_CONNECT_EMAIL,
-                "label"     => __("Connect customer email", "woocommerce-postnl"),
-                "type"      => "toggle",
-                "help_text" => __(
-                    "When you connect the customer email, PostNL can send a Track & Trace email to this address.",
-                    "woocommerce-postnl"
-                ),
-            ],
-            [
-                "name"      => WCPN_Settings::SETTING_CONNECT_PHONE,
+                "name"      => WCPOST_Settings::SETTING_CONNECT_PHONE,
                 "label"     => __("Connect customer phone", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -656,15 +652,16 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_LABEL_DESCRIPTION,
+                "name"      => WCPOST_Settings::SETTING_LABEL_DESCRIPTION,
                 "label"     => __("Label description", "woocommerce-postnl"),
                 "help_text" => __(
-                    "With this option, you can add a description to the shipment. This will be printed on the top left of the label, and you can use this to search or sort shipments in your backoffice. Use [ORDER_NR] to include the order number, [DELIVERY_DATE] to include the delivery date.",
+                    "With this option you can add a description to the shipment. This will be printed on the top left of the label. Because of limited space on the label which varies per package type, we recommend that you keep the label description as short as possible.",
                     "woocommerce-postnl"
                 ),
+                "append"  => $this->getLabelDescriptionAddition(),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_EMPTY_PARCEL_WEIGHT,
+                "name"      => WCPOST_Settings::SETTING_EMPTY_PARCEL_WEIGHT,
                 "label"     => __("Empty parcel weight (grams)", "woocommerce-postnl"),
                 "help_text" => __(
                     "Default weight of your empty parcel, rounded to grams.",
@@ -672,7 +669,7 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_HS_CODE,
+                "name"      => WCPOST_Settings::SETTING_HS_CODE,
                 "label"     => __("Default HS Code", "woocommerce-postnl"),
                 "help_text" => __(
                     "HS Codes are used for PostNL world shipments, you can find the appropriate code on the site of the Dutch Customs.",
@@ -680,7 +677,7 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"    => WCPN_Settings::SETTING_PACKAGE_CONTENT,
+                "name"    => WCPOST_Settings::SETTING_PACKAGE_CONTENT,
                 "label"   => __("Customs shipment type", "woocommerce-postnl"),
                 "type"    => "select",
                 "options" => [
@@ -692,20 +689,13 @@ class WCPN_Settings_Data
                 ],
             ],
             [
-              "name"      => WCPN_Settings::SETTING_COUNTRY_OF_ORIGIN,
-              "label"     => __("Default country of origin", "woocommerce-postnl"),
-              "help-text" => __(
+                "name"      => WCPOST_Settings::SETTING_COUNTRY_OF_ORIGIN,
+                "label"     => __("Default country of origin", "woocommerce-postnl"),
+                "type"      => "select",
+                "options"   => (new WC_Countries())->get_countries(),
+                "help-text" => __(
                   "Country of origin is required for world shipments. Defaults to shop base or NL. Example: 'NL', 'BE', 'DE'", "woocommerce-postnl"
               ),
-            ],
-            [
-                "name"      => WCPN_Settings::SETTING_AUTOMATIC_EXPORT,
-                "label"     => __("Automatic export", "woocommerce-postnl"),
-                "type"      => "toggle",
-                "help_text" => __(
-                    "With this setting enabled, orders are exported to PostNL automatically after payment.",
-                    "woocommerce-postnl"
-                ),
             ],
         ];
     }
@@ -717,16 +707,16 @@ class WCPN_Settings_Data
     {
         return [
             [
-                "name"      => WCPN_Settings::SETTING_USE_SPLIT_ADDRESS_FIELDS,
+                "name"      => WCPOST_Settings::SETTING_USE_SPLIT_ADDRESS_FIELDS,
                 "label"     => __("PostNL address fields", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "When enabled the checkout will use the PostNLPostNL address fields. This means there will be three separate fields for street name, number and suffix. Want to use the WooCommerce default fields? Leave this option unchecked.",
+                    "When enabled the checkout will use the PostNL address fields. This means there will be three separate fields for street name, number and suffix. Want to use the WooCommerce default fields? Leave this option unchecked.",
                     "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_SHOW_DELIVERY_DAY,
+                "name"      => WCPOST_Settings::SETTING_SHOW_DELIVERY_DAY,
                 "label"     => __("Show delivery day", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -735,7 +725,7 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Enable PostNL delivery options", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
@@ -744,8 +734,8 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_DELIVERY_OPTIONS_DISPLAY,
-                "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_DISPLAY,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Display for", "woocommerce-postnl"),
                 "type"      => "select",
                 "help_text" => __(
@@ -761,8 +751,8 @@ class WCPN_Settings_Data
                 ],
             ],
             [
-                "name"      => WCPN_Settings::SETTING_DELIVERY_OPTIONS_POSITION,
-                "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_POSITION,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Checkout position", "woocommerce-postnl"),
                 "type"      => "select",
                 "default"   => "woocommerce_after_checkout_billing_form",
@@ -783,6 +773,10 @@ class WCPN_Settings_Data
                         "Show after notes",
                         "woocommerce-postnl"
                     ),
+                    "woocommerce_review_order_before_payment"     => __(
+                        "Show after subtotal",
+                        "woocommerce-postnl"
+                    ),
                 ],
                 "help_text" => __(
                     "You can change the place of the delivery options on the checkout page. By default it will be placed after shipping details.",
@@ -790,8 +784,8 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"              => WCPN_Settings::SETTING_DELIVERY_OPTIONS_CUSTOM_CSS,
-                "condition"         => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"              => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_CUSTOM_CSS,
+                "condition"         => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"             => __("Custom styles", "woocommerce-postnl"),
                 "type"              => "textarea",
                 "append"            => $this->getCustomCssAddition(),
@@ -829,8 +823,8 @@ class WCPN_Settings_Data
     {
         return [
             [
-                "name"      => WCPN_Settings::SETTING_HEADER_DELIVERY_OPTIONS_TITLE,
-                "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_HEADER_DELIVERY_OPTIONS_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Delivery options title", "woocommerce-postnl"),
                 "title"     => "Delivery options title",
                 "help_text" => __(
@@ -839,20 +833,20 @@ class WCPN_Settings_Data
                 ),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_DELIVERY_TITLE,
-                "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_DELIVERY_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Delivery title", "woocommerce-postnl"),
                 "default"   => __("Delivered at home or at work", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_MORNING_DELIVERY_TITLE,
-                "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_MORNING_DELIVERY_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Morning delivery title", "woocommerce-postnl"),
                 "default"   => __("Morning delivery", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_STANDARD_TITLE,
-                "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_STANDARD_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Standard delivery title", "woocommerce-postnl"),
                 "help_text" => __(
                     "When there is no title, the delivery time will automatically be visible.",
@@ -861,26 +855,26 @@ class WCPN_Settings_Data
                 "default"   => __("Standard delivery", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_EVENING_DELIVERY_TITLE,
-                "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_EVENING_DELIVERY_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Evening delivery title", "woocommerce-postnl"),
                 "default"   => __("Evening delivery", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_ONLY_RECIPIENT_TITLE,
-                "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_ONLY_RECIPIENT_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Home address only title", "woocommerce-postnl"),
                 "default"   => __("Home address only", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_SIGNATURE_TITLE,
-                "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_SIGNATURE_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Signature on delivery title", "woocommerce-postnl"),
                 "default"   => __("Signature on delivery", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCPN_Settings::SETTING_PICKUP_TITLE,
-                "condition" => WCPN_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "name"      => WCPOST_Settings::SETTING_PICKUP_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Pickup title", "woocommerce-postnl"),
                 "default"   => __("Pickup", "woocommerce-postnl"),
             ],
@@ -897,7 +891,7 @@ class WCPN_Settings_Data
         $currentTheme = wp_get_theme();
 
         $preset  = sanitize_title($currentTheme);
-        $cssPath = WCPN()->plugin_path() . "/assets/css/delivery-options/delivery-options-preset-$preset.css";
+        $cssPath = WCPOST()->plugin_path() . "/assets/css/delivery-options/delivery-options-preset-$preset.css";
 
         if (! file_exists($cssPath)) {
             return "";
@@ -909,6 +903,52 @@ class WCPN_Settings_Data
             file_get_contents($cssPath),
             __("Apply preset.", "woocommerce-postnl")
         );
+    }
+
+    /**
+     * Created html for clickable hints for the variables that can be used in the label description.
+     *
+     * @return string
+     */
+    private function getLabelDescriptionAddition(): string
+    {
+        $output = '';
+        $variables = [
+            '[DELIVERY_DATE]' => __('Delivery date', 'woocommerce-postnl'),
+            '[ORDER_NR]'      => __('Order number', 'woocommerce-postnl'),
+            '[PRODUCT_ID]'    => __('Product id', 'woocommerce-postnl'),
+            '[PRODUCT_NAME]'  => __('Product name', 'woocommerce-postnl'),
+            '[PRODUCT_QTY]'   => __('Product quantity', 'woocommerce-postnl'),
+            '[PRODUCT_SKU]'   => __('Product SKU', 'woocommerce-postnl'),
+            '[CUSTOMER_NOTE]' => __('Customer note', 'woocommerce-postnl'),
+        ];
+
+        foreach ($variables as $variable => $description) {
+            $output .= "<br><a onclick=\"var el = document.querySelector('#label_description_field input');el.value += '$variable';el.focus();\">$variable</a>: $description";
+        }
+
+        return sprintf("<div class=\"label-description-variables\"><p>Available variables: %s</p>", $output);
+    }
+
+    /**
+     * @param string $name
+     * @param string|array  $conditions
+     *
+     * @return array
+     */
+    private static function getFeeField(string $name, array $conditions): array
+    {
+        return [
+            "name"       => $name,
+            "condition" => $conditions,
+            "class"      => ["wcpn__child"],
+            "label"      => __("Fee (optional)", "woocommerce-postnl"),
+            "type"       => "currency",
+            "help_text"  => __(
+                "Enter an amount that is either positive or negative. For example, do you want to give a discount for using this function or do you want to charge extra for this delivery option.",
+                "woocommerce-postnl"
+            ),
+        ];
     }
 }
 

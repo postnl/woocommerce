@@ -1,11 +1,9 @@
 <?php
 
-use MyParcelNL\Sdk\src\Exception\MissingFieldException;
-use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
-use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
-use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter as DeliveryOptions;
+use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
+use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
 use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
 use WPO\WC\PostNL\Compatibility\Product as WCX_Product;
@@ -50,7 +48,14 @@ class WCPN_Export_Consignments
      */
     private $carrier;
 
-    private $referenceId;
+    /**
+     * @var PostNLCollection
+     */
+    public $postNLCollection;
+    /**
+     * @var \OrderSettings
+     */
+    private $orderSettings;
 
     /**
      * WCPN_Export_Consignments constructor.
@@ -65,8 +70,18 @@ class WCPN_Export_Consignments
         $this->getApiKey();
 
         $this->order           = $order;
-        $this->deliveryOptions = WCPN_Admin::getDeliveryOptionsFromOrder($order);
+        $this->deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
+        $this->orderSettings   = new OrderSettings($this->deliveryOptions, $order);
+
         $this->carrier         = $this->deliveryOptions->getCarrier() ?? WCPN_Data::DEFAULT_CARRIER;
+
+        $this->postNLCollection = (new MyParcelCollection())->setUserAgents(
+            [
+                'Wordpress'              => get_bloginfo('version'),
+                'WooCommerce'            => WOOCOMMERCE_VERSION,
+                'PostNL-WooCommerce' => WC_POSTNL_VERSION,
+            ]
+        );
 
         $this->createConsignment();
         $this->setConsignmentData();
@@ -105,17 +120,45 @@ class WCPN_Export_Consignments
      */
     private function getSetting(string $name)
     {
-        return WCPN()->setting_collection->getByName($name);
+        return WCPOST()->setting_collection->getByName($name);
     }
 
     /**
-     * @param DeliveryOptions $delivery_options
-     *
      * @return int
      */
-    private function getPickupTypeByDeliveryOptions(DeliveryOptions $delivery_options): int
+    private function getPackageType(): int
     {
-        return AbstractConsignment::DELIVERY_TYPES_NAMES_IDS_MAP[$delivery_options->getDeliveryType() ?? AbstractConsignment::DELIVERY_TYPE_STANDARD_NAME];
+        return WCPN_Data::getPackageTypeId($this->orderSettings->getPackageType());
+    }
+
+    /**
+     * @return int
+     */
+    private function getDeliveryType(): int
+    {
+        $deliveryTypeId = WCPN_Data::getDeliveryTypeId($this->deliveryOptions->getDeliveryType());
+
+        return $deliveryTypeId ?? AbstractConsignment::DELIVERY_TYPE_STANDARD;
+    }
+
+    /**
+     * Get date in YYYY-MM-DD HH:MM:SS format
+     *
+     * @return string
+     */
+    public function getDeliveryDate(): string
+    {
+        $date             = strtotime($this->deliveryOptions->getDate());
+        $deliveryDateTime = date('Y-m-d H:i:s', $date);
+        $deliveryDate     = date("Y-m-d", $date);
+        $dateOfToday      = date("Y-m-d", strtotime('now'));
+        $dateOfTomorrow   = date('Y-m-d H:i:s', strtotime('now +1 day'));
+
+        if ($deliveryDate <= $dateOfToday) {
+            return $dateOfTomorrow;
+        }
+
+        return $deliveryDateTime;
     }
 
     /**
@@ -128,31 +171,44 @@ class WCPN_Export_Consignments
         foreach ($this->order->get_items() as $item_id => $item) {
             $product = $item->get_product();
             $country = $this->getCountryOfOrigin($product);
-
             if (! empty($product)) {
                 // Description
                 $description = $item["name"];
 
                 // GitHub issue https://github.com/postnlnl/woocommerce/issues/190
-                if (strlen($description) >= WCPN_Export::DESCRIPTION_MAX_LENGTH) {
+                if (strlen($description) >= WCPN_Export::ITEM_DESCRIPTION_MAX_LENGTH) {
                     $description = substr($item["name"], 0, 47) . "...";
                 }
                 // Amount
                 $amount = (int) (isset($item["qty"]) ? $item["qty"] : 1);
 
                 // Weight (total item weight in grams)
-                $weight       = (int) round(WCPN_Export::getItemWeight_kg($item, $this->order) * 1000);
-                $myParcelItem = (new MyParcelCustomsItem())
+                $weight      = (int) round(WCPN_Export::getItemWeightKg($item, $this->order) * 1000);
+                $totalWeight = $this->getTotalWeight($weight);
+
+                $postNLItem = (new MyParcelCustomsItem())
                     ->setDescription($description)
                     ->setAmount($amount)
-                    ->setWeight($weight)
+                    ->setWeight($totalWeight)
                     ->setItemValue((int) round(($item["line_total"] + $item["line_tax"]) * 100))
                     ->setCountry($country)
                     ->setClassification($this->getHsCode($product));
 
-                $this->consignment->addItem($myParcelItem);
+                $this->consignment->addItem($postNLItem);
             }
         }
+    }
+
+    /**
+     * @param int $weight
+     *
+     * @return int
+     */
+    private function getTotalWeight(int $weight): int
+    {
+        $parcelWeight = (int) $this->getSetting(WCPOST_Settings::SETTING_EMPTY_PARCEL_WEIGHT);
+
+        return $parcelWeight + $weight;
     }
 
     /**
@@ -163,14 +219,14 @@ class WCPN_Export_Consignments
      */
     public function getHsCode(WC_Product $product): int
     {
-        $defaultHsCode = $this->getSetting(WCPN_Settings::SETTING_HS_CODE);
-        $productHsCode = WCX_Product::get_meta($product, WCPN_Admin::META_HS_CODE, true);
+        $defaultHsCode   = $this->getSetting(WCPOST_Settings::SETTING_HS_CODE);
+        $productHsCode   = WCX_Product::get_meta($product, WCPOST_Admin::META_HS_CODE, true);
+        $variationHsCode = WCX_Product::get_meta($product, WCPOST_Admin::META_HS_CODE_VARIATION, true);
 
         $hsCode = $productHsCode ? $productHsCode : $defaultHsCode;
 
-        if (! $productHsCode) {
-            $variableProductParent = WCX_Product::get_parent($product);
-            $hsCode = WCX_Product::get_meta($variableProductParent, WCPN_Admin::META_HS_CODE, true);
+        if ($variationHsCode) {
+            $hsCode = $variationHsCode;
         }
 
         if (! $hsCode) {
@@ -187,8 +243,8 @@ class WCPN_Export_Consignments
      */
     public function getCountryOfOrigin(WC_Product $product): string
     {
-        $defaultCountryOfOrigin = $this->getSetting(WCPN_Settings::SETTING_COUNTRY_OF_ORIGIN);
-        $productCountryOfOrigin = WCX_Product::get_meta($product, WCPN_Admin::META_COUNTRY_OF_ORIGIN, true);
+        $defaultCountryOfOrigin = $this->getSetting(WCPOST_Settings::SETTING_COUNTRY_OF_ORIGIN);
+        $productCountryOfOrigin = WCX_Product::get_meta($product, WCPOST_Admin::META_COUNTRY_OF_ORIGIN, true);
 
         $countryOfOrigin = $this->getPriorityOrigin($defaultCountryOfOrigin, $productCountryOfOrigin);
 
@@ -196,57 +252,30 @@ class WCPN_Export_Consignments
     }
 
     /**
-     * @param $defaultCountryOfOrigin
-     * @param $productCountryOfOrigin
+     * @param string|null $defaultCountryOfOrigin
+     * @param string|null  $productCountryOfOrigin
      *
      * @return string
      */
-    public function getPriorityOrigin($defaultCountryOfOrigin, $productCountryOfOrigin): string
+    public function getPriorityOrigin(?string $defaultCountryOfOrigin, ?string $productCountryOfOrigin): string
     {
+        if ($productCountryOfOrigin) {
+            return $productCountryOfOrigin;
+        }
+
         if ($defaultCountryOfOrigin) {
             return $defaultCountryOfOrigin;
         }
 
-        if (! $defaultCountryOfOrigin) {
-            if (! $productCountryOfOrigin) {
-                return WC()->countries->get_base_country() ?? 'NL';
-            }
-        }
-
-        return $productCountryOfOrigin;
+        return WC()->countries->get_base_country() ?? AbstractConsignment::CC_NL;
     }
 
     /**
-     * @return bool
+     * @return AbstractConsignment
      */
-    private function getSignature(): bool
+    public function getConsignment(): AbstractConsignment
     {
-        return WCPN_Export::getChosenOrDefaultShipmentOption(
-            $this->deliveryOptions->getShipmentOptions()->hasSignature(),
-            "{$this->carrier}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE
-        );
-    }
-
-    /**
-     * @return bool
-     */
-    private function getOnlyRecipient(): bool
-    {
-        return WCPN_Export::getChosenOrDefaultShipmentOption(
-            $this->deliveryOptions->getShipmentOptions()->hasOnlyRecipient(),
-            "{$this->carrier}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT
-        );
-    }
-
-    /**
-     * @return bool
-     */
-    private function getAgeCheck(): bool
-    {
-        return WCPN_Export::getChosenOrDefaultShipmentOption(
-            $this->deliveryOptions->getShipmentOptions()->hasAgeCheck(),
-            "{$this->carrier}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK
-        );
+        return $this->consignment;
     }
 
     /**
@@ -258,64 +287,13 @@ class WCPN_Export_Consignments
     }
 
     /**
-     * @return bool
-     */
-    private function getReturnShipment(): bool
-    {
-        return WCPN_Export::getChosenOrDefaultShipmentOption(
-            $this->deliveryOptions->getShipmentOptions()->isReturn(),
-            "{$this->carrier}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN
-        );
-    }
-
-    /**
-     * Get the value of the insurance setting. Changes true/false to either 500 or 0 because the API expects an amount.
-     *
-     * @return int
-     */
-    private function getInsurance(): int
-    {
-        $isInsuranceActive = WCPN_Export::getChosenOrDefaultShipmentOption(
-            $this->deliveryOptions->getShipmentOptions()->getInsurance(),
-            "{$this->carrier}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED
-        );
-
-        $insuranceAmount = $this->getInsuranceAmount($isInsuranceActive);
-
-        return $insuranceAmount;
-    }
-
-    /**
-     * @param $isInsuranceActive
-     *
-     * @return int|mixed
-     */
-    private function getInsuranceAmount($isInsuranceActive)
-    {
-        if ($isInsuranceActive) {
-            return $this->getSetting("{$this->carrier}_" . WCPN_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT);
-        }
-
-        return 0;
-    }
-
-    /**
-     * @return int
-     */
-    private function getTotalPackageWeight(): int
-    {
-        return $this->order->get_meta(WCPN_Admin::META_ORDER_WEIGHT);
-    }
-
-    /**
      * Gets the recipient and puts its data in the consignment.
      *
      * @throws Exception
      */
     private function setRecipient(): void
     {
-        $connectEmail    = $this->carrier === PostNLConsignment::CARRIER_NAME;
-        $this->recipient = WCPN_Export::getRecipientFromOrder($this->order, $connectEmail);
+        $this->recipient = WCPN_Export::getRecipientFromOrder($this->order);
 
         $this->consignment
             ->setCountry($this->recipient['cc'])
@@ -336,7 +314,7 @@ class WCPN_Export_Consignments
      */
     private function getApiKey(): void
     {
-        $this->apiKey = $this->getSetting(WCPN_Settings::SETTING_API_KEY);
+        $this->apiKey = $this->getSetting(WCPOST_Settings::SETTING_API_KEY);
 
         if (! $this->apiKey) {
             throw new ErrorException(__("No API key found in PostNL settings", "woocommerce-postnl"));
@@ -344,23 +322,48 @@ class WCPN_Export_Consignments
     }
 
     /**
-     * @return mixed|string
+     * Get the label description from OrderSettings and replace any variables in it.
+     *
+     * @return string
      */
-    private function getLabelDescription()
+    private function getFormattedLabelDescription(): string
     {
-        $default = "Order: " . $this->order->get_id();
-        $setting = $this->getSetting(WCPN_Settings::SETTING_LABEL_DESCRIPTION);
+        $productIds   = [];
+        $productNames = [];
+        $productSkus  = [];
 
-        if ($setting) {
-            $replacements = [
-                "[ORDER_NR]"      => $this->order->get_order_number(),
-                "[DELIVERY_DATE]" => $this->deliveryOptions->getDate(),
-            ];
+        foreach ($this->order->get_items() as $item) {
+            if (! method_exists($item, 'get_product')) {
+                continue;
+            }
 
-            $description = str_replace(array_keys($replacements), array_values($replacements), $setting);
+            /** @var WC_Product $product */
+            $product = $item->get_product();
+            $sku     = $product->get_sku();
+
+            $productIds[]   = $product->get_id();
+            $productNames[] = $product->get_name();
+            $productSkus[]  = empty($sku) ? '–' : $sku;
         }
 
-        return $description ?? $default;
+        $formattedLabelDescription = strtr(
+            $this->orderSettings->getLabelDescription(),
+            [
+                '[DELIVERY_DATE]' => date('d-m-Y', strtotime($this->deliveryOptions->getDate())),
+                '[ORDER_NR]'      => $this->order->get_order_number(),
+                '[PRODUCT_ID]'    => implode(', ', $productIds),
+                '[PRODUCT_NAME]'  => implode(', ', $productNames),
+                '[PRODUCT_QTY]'   => count($this->order->get_items()),
+                '[PRODUCT_SKU]'   => implode(', ', $productSkus),
+                '[CUSTOMER_NOTE]' => $this->order->get_customer_note(),
+            ]
+        );
+
+        if (strlen($formattedLabelDescription) > WCPN_Export::ORDER_DESCRIPTION_MAX_LENGTH) {
+            return substr($formattedLabelDescription, 0, 42) . "...";
+        }
+
+        return $formattedLabelDescription;
     }
 
     /**
@@ -381,6 +384,7 @@ class WCPN_Export_Consignments
             ->setPickupStreet($pickupLocation->getStreet())
             ->setPickupNumber($pickupLocation->getNumber())
             ->setPickupPostalCode($pickupLocation->getPostalCode())
+            ->setRetailNetworkId($pickupLocation->getRetailNetworkId())
             ->setPickupLocationCode($pickupLocation->getLocationCode());
     }
 
@@ -389,16 +393,16 @@ class WCPN_Export_Consignments
      *
      * @throws Exception
      */
-    private function setShipmentOptions()
+    private function setShipmentOptions(): void
     {
         $this->consignment
-            ->setSignature($this->getSignature())
-            ->setOnlyRecipient($this->getOnlyRecipient())
-            ->setInsurance($this->getInsurance())
-            ->setAgeCheck($this->getAgeCheck())
+            ->setAgeCheck($this->orderSettings->hasAgeCheck())
+            ->setInsurance($this->orderSettings->getInsuranceAmount())
+            ->setOnlyRecipient($this->orderSettings->hasOnlyRecipient())
+            ->setReturn($this->orderSettings->hasReturnShipment())
+            ->setSignature($this->orderSettings->hasSignature())
             ->setContents($this->getContents())
-            ->setInvoice($this->order->get_id())
-            ->setReturn($this->getReturnShipment());
+            ->setInvoice($this->order->get_id());
     }
 
     /**
@@ -406,7 +410,7 @@ class WCPN_Export_Consignments
      *
      * @throws \Exception
      */
-    private function setCustomsDeclaration()
+    private function setCustomsDeclaration(): void
     {
         $shippingCountry = WCX_Order::get_prop($this->order, "shipping_country");
 
@@ -420,27 +424,40 @@ class WCPN_Export_Consignments
      *
      * @throws \Exception
      */
-    private function setPhysicalProperties()
+    private function setPhysicalProperties(): void
     {
-        $this->consignment
-            ->setPhysicalProperties(["weight" => $this->getTotalPackageWeight()]);
+        $extraOptions = WCX_Order::get_meta($this->order, WCPOST_Admin::META_SHIPMENT_OPTIONS_EXTRA);
+        $packageType  = $this->getPackageType();
+
+        if (! $extraOptions) {
+            return;
+        }
+
+        $orderWeight = (int) $this->order->get_meta(WCPOST_Admin::META_ORDER_WEIGHT);
+        $totalWeight = $this->getTotalWeight($orderWeight);
+        $weight      = $extraOptions['weight'] ?? $this->orderSettings->getWeight();
+
+        if ((float) $orderWeight === $weight) {
+            $totalWeight = (new WCPN_Export())->calculatedKiloWeight($totalWeight * 1000);
+        }
+        $this->consignment->setPhysicalProperties(
+            [
+                "weight" => round($totalWeight)
+            ]
+        );
     }
 
+    /**
+     * @throws Exception
+     */
     private function setBaseData(): void
     {
         $this->consignment
             ->setApiKey($this->apiKey)
             ->setReferenceId((string) $this->order->get_id())
-            ->setDeliveryType($this->getPickupTypeByDeliveryOptions($this->deliveryOptions))
-            ->setLabelDescription($this->getLabelDescription())
-            ->setPackageType(WCPN()->export->getPackageTypeForOrder($this->order->get_id()));
-    }
-
-    /**
-     * @return AbstractConsignment
-     */
-    public function getConsignment(): AbstractConsignment
-    {
-        return $this->consignment;
+            ->setPackageType($this->getPackageType())
+            ->setDeliveryDate($this->getDeliveryDate())
+            ->setDeliveryType($this->getDeliveryType())
+            ->setLabelDescription($this->getFormattedLabelDescription());
     }
 }

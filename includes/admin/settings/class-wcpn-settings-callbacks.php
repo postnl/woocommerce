@@ -13,113 +13,6 @@ if (class_exists('WCPN_Settings_Callbacks')) {
 class WCPN_Settings_Callbacks
 {
     /**
-     * @return array
-     */
-    public static function getShippingMethods(): array
-    {
-        $shippingMethods     = [];
-        $wc_shipping_methods = WC()->shipping()->load_shipping_methods();
-
-        if ($wc_shipping_methods) {
-            foreach ($wc_shipping_methods as $key => $shipping_method) {
-                // Automattic / WooCommerce Table Rate Shipping
-                if ($key === 'table_rate' && class_exists('WC_Table_Rate_Shipping')
-                    && class_exists('WC_Shipping_Zones')) {
-                    $zones = WC_Shipping_Zones::get_zones();
-                    foreach ($zones as $zone_data) {
-                        if (isset($zone_data['id'])) {
-                            $zone_id = $zone_data['id'];
-                        } elseif (isset($zone_data['zone_id'])) {
-                            $zone_id = $zone_data['zone_id'];
-                        } else {
-                            continue;
-                        }
-                        $zone         = WC_Shipping_Zones::get_zone($zone_id);
-                        $zone_methods = $zone->get_shipping_methods(false);
-                        foreach ($zone_methods as $key => $shipping_method) {
-                            if ($shipping_method->id === 'table_rate'
-                                && method_exists(
-                                    $shipping_method,
-                                    'get_shipping_rates'
-                                )) {
-                                $zone_table_rates = $shipping_method->get_shipping_rates();
-                                foreach ($zone_table_rates as $zone_table_rate) {
-                                    $rate_label =
-                                        ! empty($zone_table_rate->rate_label) ? $zone_table_rate->rate_label
-                                            : "{$shipping_method->title} ({$zone_table_rate->rate_id})";
-
-                                    $shippingMethods["table_rate:{$shipping_method->instance_id}:{$zone_table_rate->rate_id}"] =
-                                        "{$zone->get_zone_name()} - {$rate_label}";
-                                }
-                            }
-                        }
-                    }
-                    continue;
-                }
-
-                // Bolder Elements Table Rate Shipping
-                if ($key === 'betrs_shipping' && is_a($shipping_method, 'NL_Table_Rate_Method')
-                    && class_exists('WC_Shipping_Zones')) {
-                    $zones = WC_Shipping_Zones::get_zones();
-
-                    foreach ($zones as $zone_data) {
-                        if (isset($zone_data['id'])) {
-                            $zone_id = $zone_data['id'];
-                        } elseif (isset($zone_data['zone_id'])) {
-                            $zone_id = $zone_data['zone_id'];
-                        } else {
-                            continue;
-                        }
-                        $zone         = WC_Shipping_Zones::get_zone($zone_id);
-                        $zone_methods = $zone->get_shipping_methods(false);
-                        foreach ($zone_methods as $key => $shipping_method) {
-                            if ($shipping_method->id === 'betrs_shipping') {
-                                $shipping_method_options = get_option(
-                                    $shipping_method->id . '_options-' . $shipping_method->instance_id
-                                );
-                                if (isset($shipping_method_options['settings'])) {
-                                    foreach ($shipping_method_options['settings'] as $zone_table_rate) {
-                                        $rate_label =
-                                            ! empty($zone_table_rate['title']) ? $zone_table_rate['title']
-                                                : "{$shipping_method->title} ({$zone_table_rate['option_id']})";
-
-                                        $shippingMethods["betrs_shipping_{$shipping_method->instance_id}-{$zone_table_rate['option_id']}"] =
-                                            "{$zone->get_zone_name()} - {$rate_label}";
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    continue;
-                }
-                $method_title          =
-                    ! empty($wc_shipping_methods[$key]->method_title) ? $wc_shipping_methods[$key]->method_title
-                        : $wc_shipping_methods[$key]->title;
-                $shippingMethods[$key] = $method_title;
-
-                // split flat rate by shipping class
-                if (($key === 'flat_rate' || $key === 'legacy_flat_rate')
-                    && version_compare(WOOCOMMERCE_VERSION, '2.4', '>=')) {
-                    $shipping_classes = WC()->shipping()->get_shipping_classes();
-
-                    foreach ($shipping_classes as $shipping_class) {
-                        if (! isset($shipping_class->term_id)) {
-                            continue;
-                        }
-                        $id   = $shipping_class->term_id;
-                        $name = esc_html("{$method_title} - {$shipping_class->name}");
-
-                        $method_class                   = esc_attr($key) . ":" . $id;
-                        $shippingMethods[$method_class] = $name;
-                    }
-                }
-            }
-        }
-
-        return $shippingMethods;
-    }
-
-    /**
      * Validate options.
      *
      * @param array $input options to valid.
@@ -154,29 +47,24 @@ class WCPN_Settings_Callbacks
     }
 
     /**
-     * @param array $args
+     * @param \WPO\WC\PostNL\Entity\SettingsFieldArguments|array $args
+     *
+     * @throws \Exception
      */
-    public function enhanced_select(array $args): void
+    public static function enhanced_select($args): void
     {
-        include("class-wcpn-settings-callbacks-enhanced-select.php");
+        if (is_array($args)) {
+            $args = new SettingsFieldArguments($args);
+        }
 
+        include("class-wcpn-settings-callbacks-enhanced-select.php");
         new WCPN_Settings_Callbacks_Enhanced_Select($args);
     }
 
     /**
-     * Echoes a woocommerce help tip.
-     *
-     * @param string $content - Can contain HTML.
-     */
-    private function renderTooltip(string $content): void
-    {
-        echo wc_help_tip($content, true);
-    }
-
-    /**
      * @param array $args
      */
-    public function renderSection(array $args): void
+    public static function renderSection(array $args): void
     {
         if (isset($args["description"])) {
             echo "<p>{$args["description"]}</p>";
@@ -187,22 +75,26 @@ class WCPN_Settings_Callbacks
      * Output a WooCommerce style form field.
      *
      * @param SettingsFieldArguments $class
-     * @param string                 $optionId
      */
-    public function renderField(SettingsFieldArguments $class, string $optionId): void
+    public static function renderField(SettingsFieldArguments $class): void
     {
-        $arguments = $class->getArguments();
+        $arguments  = $class->getArguments();
+        $attributes = $class->getCustomAttributes();
 
         if (isset($arguments["description"])) {
             $description = $arguments["description"];
             unset ($arguments["description"]);
         }
 
-        woocommerce_form_field(
-            "{$optionId}[{$class->getId()}]",
-            $arguments,
-            get_option($optionId)[$class->getId()]
-        );
+        if (isset($attributes['data-type']) && $attributes['data-type'] === 'toggle') {
+            self::renderToggle($class);
+        } else {
+            woocommerce_form_field(
+                $class->getName(),
+                $arguments,
+                $class->getValue()
+            );
+        }
 
         if (isset($arguments["append"])) {
             echo $arguments["append"];
@@ -210,7 +102,7 @@ class WCPN_Settings_Callbacks
 
         // Render the description here instead of inside the above function.
         if (isset($description)) {
-            $this->renderDescription($description);
+            WCPN_Settings_Callbacks::renderDescription($description);
         }
     }
 
@@ -219,7 +111,7 @@ class WCPN_Settings_Callbacks
      *
      * @return array
      */
-    public function get_order_status_options(): array
+    public static function get_order_status_options(): array
     {
         $order_statuses = [];
 
@@ -243,9 +135,45 @@ class WCPN_Settings_Callbacks
     /**
      * @param $description
      */
-    private function renderDescription($description)
+    private static function renderDescription($description): void
     {
-        echo "<p>$description</p>";
+        echo "<p class=\"description\">$description</p>";
+    }
+
+    /**
+     * Render a custom toggle element. Uses classes from WooCommerce but has a custom JS implementation.
+     *
+     * @param \WPO\WC\PostNL\Entity\SettingsFieldArguments $class
+     */
+    private static function renderToggle(SettingsFieldArguments $class): void
+    {
+        $arguments                = $class->getArguments();
+        $arguments['type']        = ['hidden'];
+        $arguments['input_class'] = ['wcpn__input--toggle'];
+        unset($arguments['description']);
+
+        echo '<a class="wcpn__toggle wcpn__d--inline-block">';
+
+        printf(
+            '<input type="hidden" name="%s" value="%s" %s>',
+            $class->getName(),
+            $class->getValue(),
+            $class->getCustomAttributesAsString()
+        );
+
+        if (wc_string_to_bool($class->getValue())) {
+            printf(
+                "<span class=\"woocommerce-input-toggle woocommerce-input-toggle--enabled\">%s</span>",
+                esc_attr__('Yes', 'woocommerce')
+            );
+        } else {
+            printf(
+                "<span class=\"woocommerce-input-toggle woocommerce-input-toggle--disabled\">%s</span>",
+                esc_attr__('No', 'woocommerce')
+            );
+        }
+
+        echo "</a>";
     }
 }
 

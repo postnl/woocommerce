@@ -1,13 +1,15 @@
 <?php
 
+use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\ApiException;
 use MyParcelNL\Sdk\src\Exception\MissingFieldException;
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
-use WPO\WC\PostNL\Compatibility\WC_Core as WCX;
+use MyParcelNL\Sdk\src\Support\Str;
 use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
+use WPO\WC\PostNL\Compatibility\WC_Core as WCX;
 use WPO\WC\PostNL\Compatibility\WCPN_ChannelEngine_Compatibility as ChannelEngine;
 
 if (! defined("ABSPATH")) {
@@ -20,30 +22,68 @@ if (class_exists("WCPN_Export")) {
 
 class WCPN_Export
 {
-    // Package types
-    public const PACKAGE       = 1;
-    public const MAILBOX       = 2;
-    public const LETTER        = 3;
+    /**
+     * @param WC_Order $order
+     * @param string   $shippingMethodId
+     *
+     * @return int|null
+     * @throws Exception
+     */
+    public function getOrderShippingClass(WC_Order $order, string $shippingMethodId = ''): ?int
+    {
+        if (empty($shippingMethodId)) {
+            $orderShippingMethods = $order->get_items('shipping');
+
+            if (! empty($orderShippingMethods)) {
+                // we're taking the first (we're not handling multiple shipping methods as of yet)
+                $orderShippingMethod = array_shift($orderShippingMethods);
+                $shippingMethodId    = $orderShippingMethod['method_id'];
+            } else {
+                return null;
+            }
+        }
+
+        $shippingMethod = $this->getShippingMethod($shippingMethodId);
+
+        if (empty($shippingMethod)) {
+            return null;
+        }
+
+        // get shipping classes from order
+        $foundShippingClasses = $this->find_order_shipping_classes($order);
+
+        $highest_class = $this->getShippingClass($shippingMethod, $foundShippingClasses);
+
+        return $highest_class;
+    }
 
     public const EXPORT = "wcpn_export";
-
     public const ADD_SHIPMENTS = "add_shipments";
     public const ADD_RETURN    = "add_return";
     public const GET_LABELS    = "get_labels";
-    public const MODAL_DIALOG  = "modal_dialog";
 
+    public const MODAL_DIALOG  = "modal_dialog";
     /**
      * Maximum characters length of item description.
      */
-    public const DESCRIPTION_MAX_LENGTH = 50;
+    public const ITEM_DESCRIPTION_MAX_LENGTH = 50;
 
+    public const ORDER_DESCRIPTION_MAX_LENGTH = 45;
     public const DEFAULT_POSITIONS = [2, 4, 1, 3];
-    public const SUFFIX_CHECK_REG = "~^([a-z]{1}\d{1,3}|-\d{1,4}\d{2}\w{1,2}|[a-z]{1}[a-z\s]{0,3})(?:\W|$)~i";
 
+    public const SUFFIX_CHECK_REG  = "~^([a-z]{1}\d{1,3}|-\d{1,4}\d{2}\w{1,2}|[a-z]{1}[a-z\s]{0,3})(?:\W|$)~i";
+
+    /**
+     * Shipping methods that can never have delivery options.
+     */
+    public const DISALLOWED_SHIPPING_METHODS = [
+        WCPN_Shipping_Methods::LOCAL_PICKUP,
+    ];
     public $order_id;
     public $success;
     public $errors;
-    public $myParcelCollection;
+
+    public $postNLCollection;
 
     private $prefix_message;
 
@@ -62,15 +102,14 @@ class WCPN_Export
 
     /**
      * @param int $orderId
+     *
      * @throws ApiException
      * @throws ErrorException
      * @throws MissingFieldException
      */
     public function exportByOrderId(int $orderId): void
     {
-        $automaticExport = WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_AUTOMATIC_EXPORT);
-
-        if ($orderId && $automaticExport) {
+        if ($orderId) {
             $export = new self();
             $export->addShipments([(string) $orderId], 0, false);
         }
@@ -80,18 +119,14 @@ class WCPN_Export
      * Get the value of a shipment option. Check if it was set manually, through the delivery options for example,
      *  if not get the value of the default export setting for given settingName.
      *
-     * @param bool|null $option Condition to check.
-     * @param string    $settingName Name of the setting to fall back to.
+     * @param mixed  $option      Chosen value.
+     * @param string $settingName Name of the setting to fall back to if there is no chosen value.
      *
      * @return mixed
      */
     public static function getChosenOrDefaultShipmentOption($option, string $settingName)
     {
-        if ($valueFromSetting = WCPN()->setting_collection->getByName($settingName)) {
-            return $valueFromSetting;
-        }
-
-        return $option;
+        return $option ?? WCPOST()->setting_collection->getByName($settingName);
     }
 
     /**
@@ -120,6 +155,7 @@ class WCPN_Export
         if (isset($_GET["postnl_done"])) {
             $action_return = get_option("wcpostnl_admin_notices");
             $print_queue   = get_option("wcpostnl_print_queue", []);
+            $error_notice = get_option("wcpostnl_admin_error_notices");
 
             if (! empty($action_return)) {
                 foreach ($action_return as $type => $message) {
@@ -132,9 +168,9 @@ class WCPN_Export
                             '<input type="hidden" value=\'%s\' class="wcpn__print-queue">',
                             json_encode(
                                 [
-	                                "shipment_ids" => $print_queue["shipment_ids"],
-	                                "order_ids"    => $print_queue["order_ids"],
-	                                "offset"       => $print_queue["offset"],
+                                    "shipment_ids" => $print_queue["shipment_ids"],
+                                    "order_ids"    => $print_queue["order_ids"],
+                                    "offset"       => $print_queue["offset"],
                                 ]
                             )
                         );
@@ -144,7 +180,7 @@ class WCPN_Export
                     }
 
                     printf(
-                        '<div class="wcpn__notice notice notice-%s"><p>%s</p>%s</div>',
+                        '<div class="wcpn__notice is-dismissible notice notice-%s"><p>%s</p>%s</div>',
                         $type,
                         $message,
                         $print_queue_store ?? ""
@@ -156,6 +192,17 @@ class WCPN_Export
             }
         }
 
+        if (! empty($error_notice)) {
+            printf(
+                '<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p>%s</div>',
+                $error_notice,
+                $print_queue_store ?? ""
+            );
+            // destroy after reading
+            delete_option("wcpostnl_admin_error_notices");
+            wp_cache_delete("wcpostnl_admin_error_notices", "options");
+        }
+
         if (isset($_GET["postnl"])) {
             switch ($_GET["postnl"]) {
                 case "no_consignments":
@@ -163,7 +210,7 @@ class WCPN_Export
                         "You have to export the orders to PostNL before you can print the labels!",
                         "woocommerce-postnl"
                     );
-                    printf('<div class="wcpn__notice notice notice-error"><p>%s</p></div>', $message);
+                    printf('<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p></div>', $message);
                     break;
                 default:
                     break;
@@ -183,7 +230,7 @@ class WCPN_Export
     public function export()
     {
         // Check the nonce
-        if (! check_ajax_referer(WCPN::NONCE_ACTION, "_wpnonce", false)) {
+        if (! check_ajax_referer(WCPOST::NONCE_ACTION, "_wpnonce", false)) {
             die("Ajax security check failed. Did you pass a valid nonce in \$_REQUEST['_wpnonce']?");
         }
 
@@ -248,7 +295,9 @@ class WCPN_Export
                         break;
                 }
             } catch (Exception $e) {
-                $this->errors[] = "$request: {$e->getMessage()}";
+                $errorMessage = $e->getMessage();
+                $this->errors[] = "$request: {$errorMessage}";
+                add_option("wcpostnl_admin_error_notices", $errorMessage);
             }
         }
 
@@ -304,10 +353,9 @@ class WCPN_Export
      */
     public function add_shipments(array $order_ids, bool $process)
     {
-        $return                   = [];
-        $orderIdsWithNewShipments = [];
-        $collection               = new MyParcelCollection();
-        $processDirectly          = WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_PROCESS_DIRECTLY) || $process === true;
+        $return          = [];
+        $collection      = new MyParcelCollection();
+        $processDirectly = WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_PROCESS_DIRECTLY) || $process === true;
 
         WCPN_Log::add("*** Creating shipments started ***");
 
@@ -315,26 +363,16 @@ class WCPN_Export
          * Loop over the order ids and create consignments for each order.
          */
         foreach ($order_ids as $order_id) {
-            $order                      = WCX::get_order($order_id);
-            $orderIdsWithNewShipments[] = $order_id;
+            $order        = WCX::get_order($order_id);
+            $consignment  = (new WCPN_Export_Consignments($order))->getConsignment();
 
-            $extra_params = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENT_OPTIONS_EXTRA);
-            $collo_amount = isset($extra_params["collo_amount"]) ? $extra_params["collo_amount"] : 1;
+            $extraOptions = WCX_Order::get_meta($order, WCPOST_Admin::META_SHIPMENT_OPTIONS_EXTRA);
+            $colloAmount  = $extraOptions["collo_amount"] ?? 1;
 
-            /**
-             * Create a real multi collo shipment if available, otherwise loop over the collo_amount and add separate
-             * consignments to the collection.
-             */
-            if ($collo_amount > 1) {
-                $consignment = (new WCPN_Export_Consignments($order))->getConsignment();
-
-                $collection->addMultiCollo($consignment, $collo_amount);
+            if ($colloAmount > 1) {
+                $collection->addMultiCollo($consignment, $colloAmount);
             } else {
-                for ($i = 0; $i < $collo_amount; $i++) {
-                    $consignment = (new WCPN_Export_Consignments($order))->getConsignment();
-
-                    $collection->addConsignment($consignment);
-                }
+                $collection->addConsignment($consignment);
             }
 
             WCPN_Log::add("Shipment data for order {$order_id}.");
@@ -346,7 +384,7 @@ class WCPN_Export
             $collection->setLinkOfLabels();
         }
 
-        foreach ($orderIdsWithNewShipments as $order_id) {
+        foreach ($order_ids as $order_id) {
             $order          = WCX::get_order($order_id);
             $consignmentIds = ($collection->getConsignmentsByReferenceIdGroup($order_id))->getConsignmentIds();
 
@@ -365,14 +403,14 @@ class WCPN_Export
 
             WCX_Order::update_meta_data(
                 $order,
-                WCPN_Admin::META_LAST_SHIPMENT_IDS,
+                WCPOST_Admin::META_LAST_SHIPMENT_IDS,
                 $consignmentIds
             );
         }
 
         if (! empty($this->success)) {
             $return["success"]     = sprintf(
-                __("%s shipments successfully exported to PostNL", "woocommerce-postnl"),
+                __("%s shipments successfully prepare for PostNL", "woocommerce-postnl"),
                 count($collection->getConsignmentIds())
             );
             $return["success_ids"] = $collection->getConsignmentIds();
@@ -425,7 +463,9 @@ class WCPN_Export
                     throw new Exception("\$response\[\"body.data.ids\"] empty or not found.");
                 }
             } catch (Exception $e) {
-                $this->errors[$order_id] = $e->getMessage();
+                $errorMessage = $e->getMessage();
+                $this->errors[$order_id] = $errorMessage;
+                add_option('wcpostnl_admin_error_notices', $errorMessage);
             }
         }
 
@@ -458,11 +498,12 @@ class WCPN_Export
             // positions are defined on landscape, but paper is filled portrait-wise
             $positions = array_slice(self::DEFAULT_POSITIONS, $offset % 4);
 
-            $displaySetting = WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_DOWNLOAD_DISPLAY);
+            $displaySetting = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY);
             $display        = ($displayOverride ?? $displaySetting) === "display";
             $api->getShipmentLabels($shipment_ids, $order_ids, $positions, $display);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
+            add_option('wcpostnl_admin_error_notice', $e->getMessage());
         }
 
         return $return;
@@ -529,7 +570,7 @@ class WCPN_Export
      */
     public function init_api()
     {
-        $key = $this->getSetting(WCPN_Settings::SETTING_API_KEY);
+        $key = $this->getSetting(WCPOST_Settings::SETTING_API_KEY);
 
         if (! ($key)) {
             throw new ErrorException(__("No API key found in PostNL settings", "woocommerce-postnl"));
@@ -622,22 +663,21 @@ class WCPN_Export
     public static function getRecipientFromOrder(WC_Order $order)
     {
         $isUsingPostNLFields = WCX_Order::has_meta($order, "_billing_street_name")
-                               || WCX_Order::has_meta($order, "_billing_house_number");
+                                 && WCX_Order::has_meta($order, "_billing_house_number");
 
         $shipping_name =
             method_exists($order, "get_formatted_shipping_full_name") ? $order->get_formatted_shipping_full_name()
                 : trim($order->get_shipping_first_name() . " " . $order->get_shipping_last_name());
 
 
-        $connectEmail = WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_CONNECT_EMAIL);
-        $connectPhone = WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_CONNECT_PHONE);
+        $connectPhone = WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_CONNECT_PHONE);
 
         $address = [
             "cc"                     => (string) WCX_Order::get_prop($order, "shipping_country"),
             "city"                   => (string) WCX_Order::get_prop($order, "shipping_city"),
             "person"                 => $shipping_name,
             "company"                => (string) WCX_Order::get_prop($order, "shipping_company"),
-            "email"                  => $connectEmail ? WCX_Order::get_prop($order, "billing_email") : "",
+            "email"                  => WCX_Order::get_prop($order, "billing_email") ?? "",
             "phone"                  => $connectPhone ? WCX_Order::get_prop($order, "billing_phone") : "",
             "street_additional_info" => WCX_Order::get_prop($order, "shipping_address_2"),
         ];
@@ -645,7 +685,7 @@ class WCPN_Export
         $shipping_country = WCX_Order::get_prop($order, "shipping_country");
         if ($shipping_country === "NL") {
             // use billing address if old "pakjegemak" (1.5.6 and older)
-            $pgAddress = WCX_Order::get_meta($order, WCPN_Admin::META_PGADDRESS);
+            $pgAddress = WCX_Order::get_meta($order, WCPOST_Admin::META_PGADDRESS);
 
             if ($pgAddress) {
                 $billing_name = method_exists($order, "get_formatted_billing_full_name")
@@ -701,11 +741,11 @@ class WCPN_Export
                     $address_intl["number"]        = (string) $address_parts["number"];
                     $address_intl["number_suffix"] = (string) $address_parts["extension"] ?: "";
 
-                    if (!$address_intl["number_suffix"]) {
-                       if (preg_match(self::SUFFIX_CHECK_REG, $address["street_additional_info"])) {
-                           $address_intl["number_suffix"] = $address["street_additional_info"];
-                           $address["street_additional_info"] = "";
-                       }
+                    if (! $address_intl["number_suffix"]) {
+                        if (preg_match(self::SUFFIX_CHECK_REG, $address["street_additional_info"])) {
+                            $address_intl["number_suffix"]     = $address["street_additional_info"];
+                            $address["street_additional_info"] = "";
+                        }
                     }
                 }
             }
@@ -724,18 +764,18 @@ class WCPN_Export
     }
 
     /**
-     * @param array $order_id
+     * @param int $order_id
      * @param array $track_traces
      *
      * @internal param $shipment_ids
      */
     public static function addTrackTraceNoteToOrder(int $order_id, array $track_traces): void
     {
-        if (! WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_BARCODE_IN_NOTE)) {
+        if (! WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_BARCODE_IN_NOTE)) {
             return;
         }
 
-        $prefix_message = WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_BARCODE_IN_NOTE_TITLE);
+        $prefix_message = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_BARCODE_IN_NOTE_TITLE);
 
         // Select the barcode text of the PostNL settings
         $prefix_message = $prefix_message ? $prefix_message . " " : "";
@@ -751,7 +791,7 @@ class WCPN_Export
      */
     private function getSetting(string $name)
     {
-        return WCPN()->setting_collection->getByName($name);
+        return WCPOST()->setting_collection->getByName($name);
     }
 
     /**
@@ -766,7 +806,7 @@ class WCPN_Export
 
         foreach ($order_ids as $order_id) {
             $order           = WCX::get_order($order_id);
-            $order_shipments = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENTS);
+            $order_shipments = WCX_Order::get_meta($order, WCPOST_Admin::META_SHIPMENTS);
 
             if (empty($order_shipments)) {
                 continue;
@@ -786,7 +826,7 @@ class WCPN_Export
             }
 
             if (isset($args["only_last"])) {
-                $last_shipment_ids = WCX_Order::get_meta($order, WCPN_Admin::META_LAST_SHIPMENT_IDS);
+                $last_shipment_ids = WCX_Order::get_meta($order, WCPOST_Admin::META_LAST_SHIPMENT_IDS);
 
                 if (! empty($last_shipment_ids) && is_array($last_shipment_ids)) {
                     foreach ($order_shipment_ids as $order_shipment_id) {
@@ -822,63 +862,43 @@ class WCPN_Export
         $new_shipments                           = [];
         $new_shipments[$shipment["shipment_id"]] = $shipment;
 
-        if (WCX_Order::has_meta($order, WCPN_Admin::META_SHIPMENTS)) {
-            $old_shipments = WCX_Order::get_meta($order, WCPN_Admin::META_SHIPMENTS);
+        if (WCX_Order::has_meta($order, WCPOST_Admin::META_SHIPMENTS)) {
+            $old_shipments = WCX_Order::get_meta($order, WCPOST_Admin::META_SHIPMENTS);
         }
 
         $new_shipments = array_replace_recursive($old_shipments, $new_shipments);
 
-        WCX_Order::update_meta_data($order, WCPN_Admin::META_SHIPMENTS, $new_shipments);
+        WCX_Order::update_meta_data($order, WCPOST_Admin::META_SHIPMENTS, $new_shipments);
     }
 
     /**
-     * @param array  $order
-     * @param string $shippingMethodId
+     * Determine appropriate package type for this order.
      *
-     * @return int|null
-     * @throws \Exception
+     * @param WC_Order                            $order
+     * @param AbstractDeliveryOptionsAdapter|null $deliveryOptions
+     *
+     * @return string
+     * @throws Exception
      */
-    public function getOrderShippingClass($order, $shippingMethodId = ''): ?int
-    {
-        if (empty($shippingMethodId)) {
-            $orderShippingMethods = $order->get_items('shipping');
+    public function getPackageTypeFromOrder(
+        WC_Order $order,
+        AbstractDeliveryOptionsAdapter $deliveryOptions = null
+    ): string {
+        $packageTypeFromDeliveryOptions = $deliveryOptions
+            ? $deliveryOptions->getPackageType()
+            : null;
 
-            if (! empty($orderShippingMethods)) {
-                // we're taking the first (we're not handling multiple shipping methods as of yet)
-                $orderShippingMethod = array_shift($orderShippingMethods);
-                $shippingMethodId    = $orderShippingMethod['method_id'];
-            } else {
-                return null;
-            }
+        if ($packageTypeFromDeliveryOptions) {
+            return $packageTypeFromDeliveryOptions;
         }
 
-        $shippingMethod = $this->getShippingMethod($shippingMethodId);
-
-        if (empty($shippingMethod)) {
-            return null;
+        // Get pre 4.0.0 package type if it exists.
+        if (WCX_Order::has_meta($order, WCPOST_Admin::META_SHIPMENT_OPTIONS_LT_4_0_0)) {
+            $shipmentOptions = WCX_Order::get_meta($order, WCPOST_Admin::META_SHIPMENT_OPTIONS_LT_4_0_0);
+            return self::getPackageTypeAsString($shipmentOptions['package_type']);
         }
 
-        // get shipping classes from order
-        $foundShippingClasses = $this->find_order_shipping_classes($order);
-
-        $highest_class = $this->getShippingClass($shippingMethod, $foundShippingClasses);
-
-        return $highest_class;
-    }
-
-    /**
-     * determine appropriate package type for this order
-     *
-     * @param $order
-     *
-     * @return int|string
-     * @throws \Exception
-     */
-    public function getPackageTypeForOrder($order)
-    {
-        $order            = wc_get_order($order);
-        $shipping_country = $order->get_shipping_country();
-        $packageType      = self::PACKAGE;
+        $packageType = AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
 
         // get shipping methods from order
         $orderShippingMethods = $order->get_items('shipping');
@@ -888,12 +908,12 @@ class WCPN_Export
             $orderShippingMethod = array_shift($orderShippingMethods);
             $orderShippingMethod = $orderShippingMethod['method_id'];
 
-            $orderShippingClass = WCX_Order::get_meta($order, WCPN_Admin::META_HIGHEST_SHIPPING_CLASS);
+            $orderShippingClass = WCX_Order::get_meta($order, WCPOST_Admin::META_HIGHEST_SHIPPING_CLASS);
             if (empty($orderShippingClass)) {
                 $orderShippingClass = $this->getOrderShippingClass($order, $orderShippingMethod);
             }
 
-            $packageType = WCPN_Export::getPackageTypeFromShippingMethod(
+            $packageType = self::getPackageTypeFromShippingMethod(
                 $orderShippingMethod,
                 $orderShippingClass
             );
@@ -903,62 +923,88 @@ class WCPN_Export
     }
 
     /**
-     * @param $shipping_method
-     * @param $shipping_class
+     * @param $shippingMethod
+     * @param $shippingClass
      *
-     * @return int|string
+     * @return string
      */
-    public function getPackageTypeFromShippingMethod($shipping_method, $shipping_class)
+    public static function getPackageTypeFromShippingMethod($shippingMethod, $shippingClass): string
     {
-        $package_type             = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME;
-        $shipping_method_id_class = "";
+        $packageType           = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME;
+        $shippingMethodIdClass = "";
 
-        if (strpos($shipping_method, "table_rate:") === 0 && class_exists('WC_Table_Rate_Shipping')) {
+        if (Str::startsWith($shippingMethod, 'table_rate:') && class_exists('WC_Table_Rate_Shipping')) {
             // Automattic / WooCommerce table rate
             // use full method = method_id:instance_id:rate_id
-            $shipping_method_id = $shipping_method;
-        } else { // non table rates
-
-            if (strpos($shipping_method, ':') !== false) {
+            $shippingMethodId = $shippingMethod;
+        } else {
+            // non table rates
+            if (Str::contains($shippingMethodIdClass, ':')) {
                 // means we have method_id:instance_id
-                $shipping_method          = explode(':', $shipping_method);
-                $shipping_method_id       = $shipping_method[0];
-                $shipping_method_instance = $shipping_method[1];
+                $shippingMethod   = explode(':', $shippingMethod);
+                $shippingMethodId = $shippingMethod[0];
             } else {
-                $shipping_method_id = $shipping_method;
+                $shippingMethodId = $shippingMethod;
             }
 
             // add class if we have one
-            if (! empty($shipping_class)) {
-                $shipping_method_id_class = "{$shipping_method_id}:{$shipping_class}";
+            if (! empty($shippingClass)) {
+                $shippingMethodIdClass = "{$shippingMethodId}:{$shippingClass}";
             }
         }
-        foreach (WCPN()->setting_collection->getByName(WCPN_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES) as $package_type_key => $package_type_shipping_methods) {
 
-            if (WCPN_Export::isActiveMethod(
-                $shipping_method_id,
-                $package_type_shipping_methods,
-                $shipping_method_id_class,
-                $shipping_class)) {
-
-                $package_type = $package_type_key;
+        $packageTypes = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES);
+        foreach ($packageTypes as $packageTypeKey => $packageTypeShippingMethods) {
+            if (self::isActiveMethod(
+                $shippingMethodId,
+                $packageTypeShippingMethods,
+                $shippingMethodIdClass,
+                $shippingClass
+            )) {
+                $packageType = $packageTypeKey;
                 break;
             }
         }
 
-        $package_type = WCPN_Data::getPackageTypeId($package_type);
-
-        return $package_type;
+        return self::getPackageTypeAsString($packageType);
     }
 
     /**
-     * @param string $package_type
+     * @param string|null $packageType
      *
      * @return string
      */
-    public function getPackageType(string $package_type): string
+    public static function getPackageTypeHuman(?string $packageType): string
     {
-        return WCPN_Data::getPackageTypeHuman($package_type) ?? __("Unknown", "woocommerce-postnl");
+        if ($packageType) {
+            $packageType = WCPN_Data::getPackageTypeHuman($packageType);
+        }
+
+        return $packageType ?? __("Unknown", "woocommerce-postnl");
+    }
+
+    /**
+     * Will convert any package type to a valid string package type.
+     *
+     * @param mixed $packageType
+     *
+     * @return string
+     */
+    public static function getPackageTypeAsString($packageType): string
+    {
+        if (is_numeric($packageType)) {
+            $packageType = WCPN_Data::getPackageTypeName($packageType);
+        }
+
+        if (! is_string($packageType) || ! in_array($packageType, WCPN_Data::getPackageTypes())) {
+            // Log data when this occurs but don't actually throw an exception.
+            $type = gettype($packageType);
+            WCPN_Log::add(new Exception("Tried to convert invalid value to package type: $packageType ($type)"));
+
+            $packageType = null;
+        }
+
+        return $packageType ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
     }
 
     /**
@@ -1074,7 +1120,7 @@ class WCPN_Export
      *
      * @return float
      */
-    public static function getItemWeight_kg($item, WC_Order $order): float
+    public static function getItemWeightKg($item, WC_Order $order): float
     {
         $product = $order->get_product_from_item($item);
 
@@ -1082,63 +1128,87 @@ class WCPN_Export
             return 0;
         }
 
-        $weight      = (int) $product->get_weight();
-        $weight_unit = get_option("woocommerce_weight_unit");
-        switch ($weight_unit) {
-            case "g":
-                $product_weight = $weight / 1000;
-                break;
-            case "lbs":
-                $product_weight = $weight * 0.45359237;
-                break;
-            case "oz":
-                $product_weight = $weight * 0.0283495231;
-                break;
-            default:
-                $product_weight = $weight;
-                break;
-        }
+        $weight        = (float) $product->get_weight();
+        $productWeight = WCPN_Export::calculatedKiloWeight($weight);
 
-        $item_weight = (float) $product_weight * (int) $item["qty"];
-
-        return (float) $item_weight;
+        return  $productWeight * (int) $item["qty"];
     }
 
     /**
-     * @param $chosen_method
+     * @param float $weight
      *
-     * @return bool|WC_Shipping_Method
-     * @throws \Exception
+     * @return float
      */
-    public static function getShippingMethod($chosen_method)
+    public static function calculatedKiloWeight(float $weight): float
     {
-        if (version_compare(WOOCOMMERCE_VERSION, "2.6", ">=") && $chosen_method !== "legacy_flat_rate") {
-            $chosen_method = explode(":", $chosen_method); // slug:instance
-            // only for flat rate
-            if ($chosen_method[0] !== "flat_rate") {
-                return false;
-            }
-            if (empty($chosen_method[1])) {
-                return false; // no instance known (=probably manual order)
-            }
-
-            $method_slug     = $chosen_method[0];
-            $method_instance = $chosen_method[1];
-            $shipping_method = WC_Shipping_Zones::get_shipping_method($method_instance);
-        } else {
-            // only for flat rate or legacy flat rate
-            if (! in_array($chosen_method, ["flat_rate", "legacy_flat_rate"])) {
-                return false;
-            }
-            $shipping_methods = WC()->shipping()->load_shipping_methods();
-
-            if (! isset($shipping_methods[$chosen_method])) {
-                return false;
-            }
-            $shipping_method = $shipping_methods[$chosen_method];
+        $weightUnit = get_option("woocommerce_weight_unit");
+        switch ($weightUnit) {
+            case "g":
+                $calculatedWeight = $weight / 1000;
+                break;
+            case "lbs":
+                $calculatedWeight = $weight * 0.45359237;
+                break;
+            case "oz":
+                $calculatedWeight = $weight * 0.0283495231;
+                break;
+            default:
+                $calculatedWeight = $weight;
+                break;
         }
 
-        return $shipping_method;
+        return $calculatedWeight;
+    }
+
+    /**
+     * @param $chosenMethod
+     *
+     * @throws \Exception
+     */
+    public static function getShippingMethod(string $chosenMethod)
+    {
+        if (version_compare(WOOCOMMERCE_VERSION, "2.6", "<") || $chosenMethod ===
+            WCPN_Shipping_Methods::LEGACY_FLAT_RATE) {
+            return self::getLegacyShippingMethod($chosenMethod);
+        }
+
+        [$methodSlug, $methodInstance] = WCPN_Checkout::splitShippingMethodString($chosenMethod);
+
+        $isDisallowedShippingMethod = in_array($methodSlug, self::DISALLOWED_SHIPPING_METHODS);
+        $isManualOrder              = empty($methodInstance);
+
+        if ($isDisallowedShippingMethod || $isManualOrder) {
+            return null;
+        }
+
+        return WC_Shipping_Zones::get_shipping_method($methodInstance) ?? null;
+    }
+
+    /**
+     * @param string $chosen_method
+     *
+     * @return null|WC_Shipping_Method
+     */
+    private static function getLegacyShippingMethod(string $chosen_method): ?WC_Shipping_Method
+    {
+        // only for flat rate or legacy flat rate
+        if (! in_array(
+            $chosen_method,
+            [
+                WCPN_Shipping_Methods::FLAT_RATE,
+                WCPN_Shipping_Methods::LEGACY_FLAT_RATE,
+            ]
+        )) {
+            return null;
+        }
+
+        $shipping_methods = WC()->shipping()->load_shipping_methods();
+
+        if (! isset($shipping_methods[$chosen_method])) {
+            return null;
+        }
+
+        return $shipping_methods[$chosen_method];
     }
 
     /**
@@ -1328,7 +1398,7 @@ class WCPN_Export
      *
      * @return bool
      */
-    private function isActiveMethod(
+    private static function isActiveMethod(
         $shipping_method_id,
         $package_type_shipping_methods,
         $shipping_method_id_class,
@@ -1374,9 +1444,9 @@ class WCPN_Export
      */
     private function updateOrderStatus(WC_Order $order): void
     {
-        if (WCPN()->setting_collection->isEnabled(WCPN_Settings::SETTING_ORDER_STATUS_AUTOMATION)) {
+        if (WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_ORDER_STATUS_AUTOMATION)) {
             $order->update_status(
-                $this->getSetting(WCPN_Settings::SETTING_AUTOMATIC_ORDER_STATUS),
+                $this->getSetting(WCPOST_Settings::SETTING_AUTOMATIC_ORDER_STATUS),
                 __("PostNL shipment created:", "woocommerce-postnl")
             );
         }
@@ -1432,7 +1502,7 @@ class WCPN_Export
         }
 
         // if we're going to print directly, we need to process the orders first, regardless of the settings
-        $process = $print === "yes" ? true : false;
+        $process = $print === "yes";
         $return  = $this->add_shipments($order_ids, $process);
 
         // When adding shipments, store $return for use in admin_notice
@@ -1440,11 +1510,11 @@ class WCPN_Export
         if ($print === "no" || $print === "after_reload") {
             update_option("wcpostnl_admin_notices", $return);
             if ($print === "after_reload") {
-	            $print_queue = [
-		            "order_ids"    => $order_ids,
-		            "shipment_ids" => $return["success_ids"],
-		            "offset"       => isset( $offset ) && is_numeric( $offset ) ? $offset % 4 : 0,
-	            ];
+                $print_queue = [
+                    "order_ids"    => $order_ids,
+                    "shipment_ids" => $return["success_ids"],
+                    "offset"       => isset($offset) && is_numeric($offset) ? $offset % 4 : 0,
+                ];
                 update_option("wcpostnl_print_queue", $print_queue);
             }
         }

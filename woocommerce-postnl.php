@@ -3,7 +3,8 @@
 Plugin Name: WooCommerce PostNL
 Plugin URI: https://postnl.nl/
 Description: Export your WooCommerce orders to PostNL (https://postnl.nl/) and print labels directly from the WooCommerce admin
-Author: Richard Perdaan
+Author: PostNL
+Author URI: https://postnl.nl
 Version: 4.0.0
 Text Domain: woocommerce-postnl
 
@@ -15,9 +16,9 @@ if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (! class_exists('WCPN')) :
+if (! class_exists('WCPOST')) :
 
-    class WCPN
+    class WCPOST
     {
         /**
          * Translations domain
@@ -49,7 +50,7 @@ if (! class_exists('WCPN')) :
         public $export;
 
         /**
-         * @var WCPN_Admin
+         * @var WCPOST_Admin
          */
         public $admin;
 
@@ -71,7 +72,7 @@ if (! class_exists('WCPN')) :
          */
         public function __construct()
         {
-            $this->define('WC_POST_NL_VERSION', $this->version);
+            $this->define('WC_POSTNL_VERSION', $this->version);
             $this->plugin_basename = plugin_basename(__FILE__);
 
             // load the localisation & classes
@@ -130,6 +131,9 @@ if (! class_exists('WCPN')) :
             // Use minimum php version 7.1
             require_once($this->includes . "/vendor/autoload.php");
 
+            require_once($this->includes . "/admin/OrderSettings.php");
+            require_once($this->includes . "/admin/OrderSettingsRows.php");
+
             // include compatibility classes
             require_once($this->includes . "/compatibility/abstract-wc-data-compatibility.php");
             require_once($this->includes . "/compatibility/class-wc-date-compatibility.php");
@@ -149,13 +153,15 @@ if (! class_exists('WCPN')) :
             require_once($this->includes . "/frontend/class-wcpn-frontend-track-trace.php");
             require_once($this->includes . "/frontend/class-wcpn-checkout.php");
             require_once($this->includes . "/frontend/class-wcpn-frontend.php");
-            $this->admin = require_once($this->includes . "/admin/class-wcpn-admin.php");
-            require_once($this->includes . "/admin/settings/class-wcpn-settings.php");
+            $this->admin = require_once($this->includes . "/admin/class-wcpost-admin.php");
+            require_once($this->includes . "/admin/settings/class-wcpost-settings.php");
             require_once($this->includes . "/class-wcpn-log.php");
             require_once($this->includes . "/admin/class-wcpn-country-codes.php");
+            require_once($this->includes . '/admin/settings/class-wcpn-shipping-methods.php');
             $this->export = require_once($this->includes . "/admin/class-wcpn-export.php");
             require_once($this->includes . "/class-wcpn-postcode-fields.php");
             require_once($this->includes . "/adapter/delivery-options-from-order-adapter.php");
+            require_once($this->includes . "/adapter/pickup-location-from-order-adapter.php");
             require_once($this->includes . "/adapter/shipment-options-from-order-adapter.php");
             require_once($this->includes . "/admin/class-wcpn-export-consignments.php");
         }
@@ -177,15 +183,10 @@ if (! class_exists('WCPN')) :
                 return;
             }
 
-            if (! $this->phpVersionMeets(\WCPN::PHP_VERSION_7_1)) {
-                // php 5.6
-                $this->initSettings();
-                $this->includes();
-            } else {
-                // php 7.1
-                $this->includes();
-                $this->initSettings();
-            }
+            // php 7.1
+            $this->includes();
+            $this->initSettings();
+
         }
 
         /**
@@ -296,13 +297,14 @@ if (! class_exists('WCPN')) :
                 require_once('migration/wcpn-upgrade-migration-v3-0-4.php');
             }
 
-            if ($this->phpVersionMeets(\WCPN::PHP_VERSION_7_1)) {
+            if ($this->phpVersionMeets(\WCPOST::PHP_VERSION_7_1)) {
                 // Import the migration class base
                 require_once('migration/wcpn-upgrade-migration.php');
 
                 // Migrate php 7.1+ only version settings
                 if (version_compare($installed_version, '4.0.0', '<=')) {
                     require_once('migration/wcpn-upgrade-migration-v4-0-0.php');
+                    require_once('migration/wcpn-upgrade-migration-v4-1-0.php');
                 }
             }
         }
@@ -333,14 +335,6 @@ if (! class_exists('WCPN')) :
          */
         public function initSettings()
         {
-            if (! $this->phpVersionMeets(\WCPN::PHP_VERSION_7_1)) {
-                $this->general_settings  = get_option('woocommerce_postnl_general_settings');
-                $this->export_defaults   = get_option('woocommerce_postnl_export_defaults_settings');
-                $this->checkout_settings = get_option('woocommerce_postnl_checkout_settings');
-
-                return;
-            }
-
             // Create the settings collection by importing this function, because we can't use the sdk
             // imports in the legacy version.
             require_once('includes/wcpn-initialize-settings-collection.php');
@@ -365,22 +359,22 @@ endif;
 /**
  * Returns the main instance of the plugin class to prevent the need to use globals.
  *
- * @return WCPN
+ * @return WCPOST
  * @since  2.0
  */
-function WCPN()
+function WCPOST()
 {
-    return WCPN::instance();
+    return WCPOST::instance();
 }
 
 /**
  * For PHP < 7.1 support.
  *
- * @return WCPN
+ * @return WCPOST
  */
 function WooCommerce_PostNL()
 {
-    return WCPN();
+    return WCPOST();
 }
 
-WCPN(); // load plugin
+WCPOST(); // load plugin
