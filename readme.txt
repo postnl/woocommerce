@@ -90,7 +90,7 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 == Changelog ==
 
-= 4.1.4 (2020-11-24) =
+= 4.0.0 (2021-01-04) =
 * Fix: Shipping classes not saving
 * Fix: Drop off days
 * Fix: WooCommerce PDF Invoices & Packing Slips placeholders compatibility
@@ -98,20 +98,38 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Error delivery_date is too early
 * Fix: Multiple barcode in order note
 * Fix: Maximum label description lenght of 45 characters
-* Improvement: support WP-Multilang
-
-
-= 4.1.3 (2020-11-13) =
 * Fix: Error on checkout when using custom address fields
-
-= 4.1.2 (2020-11-12) =
 * Fix: Crack down on invalid package types
-
-= 4.1.1 (2020-11-11) =
 * Fix: 4.1.0 migration fatal errors
 * Fix: PHP Fatal error: Uncaught TypeError: Return value of WCPN_Export::getPackageTypeFromOrder()
-
-= 4.1.0 (2020-11-11) =
+* Fix: Wrong label for "show delivery day" setting.
+* Fix: Error on sending return email.
+* Fix: Allow split address field for Belgium as well.
+* Fix: Add options that were missing in 4.0.0
+* Fix: Rename at_home_delivery to delivery_title
+* Fix: Monday delivery
+* Fix: Free_shipping linked to package then you should also see the delivery options
+* Fix: If you have a shipping method with flatrate: 181 and the method gives flatrate: 18 then you should not see the delivery options
+* Fix: Error CRITICAL Uncaught TypeError: Return value of WCPN_Export::getShippingMethod()
+* Fix: Disable order status delivered
+* Fix: Package type not being recognized
+* Fix: migrate all package types in export defaults settings
+* Fix: Failed opening class-wcpost-settings.php
+* Fix: Old settings non existent error
+* Fix: Class naming for theme compatibility
+* Fix:  Show delivery options with a shipping class and with tablerates
+* Fix: Wrong meta variable country of origin
+* Fix: Html layout of shipment summary settings and searching in WooCommerce orders overview
+* Fix: Translations
+* Fix: Export pickup locations
+* Fix: When deliveryType is empty use default package
+* Fix: Html layout of shipment summary and searching in WooCommerce orders overview
+* Fix: HS code
+* Fix: Delete options keep old shipments
+* Fix: Insurance possibilities
+* Fix: Barcode in orderview
+* Fix: Housenumber and suffix
+* Improvement: support WP-Multilang
 * Improvement: All enabled/disabled dropdowns replaced with clickable toggles.
 * Improvement: Show package type and delivery date instead of "details".
 * Improvement: Add label description for individual shipments.
@@ -119,50 +137,9 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Improvement: Spinner for order grid bulk actions.
 * Improvement: make default export settings show up in shipment options.
 * Improvement: show delivery date in order grid for any order that has one (only when "show delivery day" setting is enabled).
-* Fix: Wrong label for "show delivery day" setting.
-* Fix: Error on sending return email.
-* Fix: Allow split address field for Belgium as well.
-* Fix: Add options that were missing in 4.0.0
-* Fix: Rename at_home_delivery to delivery_title
-* Fix: Monday delivery
-
-= 4.0.6 (2020-10-14) =
-* Fix: Free_shipping linked to package then you should also see the delivery options
-* Fix: If you have a shipping method with flatrate: 181 and the method gives flatrate: 18 then you should not see the delivery options
-* Fix: Error CRITICAL Uncaught TypeError: Return value of WCPN_Export::getShippingMethod()
-
-= 4.0.5 (2020-10-05) =
-* Fix: Disable order status delivered
-* Fix: Package type not being recognized
-* Fix: migrate all package types in export defaults settings
-
-= 4.0.4 (2020-10-01) =
-* Fix: Failed opening class-wcpost-settings.php
-
-= 4.0.3 (2020-10-01) =
-* Fix: Old settings non existent error
-* Fix: Class naming for theme compatibility
-
-= 4.0.2 (2020-08-21) =
-* Fix:  Show delivery options with a shipping class and with tablerates
 * Improvement: Automatic insurance
-
-= 4.0.1 (2020-07-29) =
-* Fix: Wrong meta variable country of origin
-* Fix: Html layout of shipment summary settings and searching in WooCommerce orders overview
-* Fix: Translations
-* Fix: Export pickup locations
-* Fix: When deliveryType is empty use default package
-* Fix: Html layout of shipment summary and searching in WooCommerce orders overview
 * Improvement: Add empty parcel weight option
 * Improvement: Add multicollo option
-
-= 4.0.0 (2020-06-24) =
-* Fix: HS code
-* Fix: Delete options keep old shipments
-* Fix: Insurance possibilities
-* Fix: Barcode in orderview
-* Fix: Housenumber and suffix
 * Improvement: Country of origin
 * Improvement: New checkout and SDK
 * Improvement: V2 shipment endpoint
