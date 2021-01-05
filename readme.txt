@@ -8,13 +8,13 @@ Requires PHP: 7.1
 License: GPLv3 or later
 License URI: http://www.opensource.org/licenses/gpl-license.php
 
-Export your WooCommerce orders to PostNL (www.postnl.nl) or to Flespakket (www.flespakket.nl) and print labels directly from the WooCommerce admin
+EExport your WooCommerce orders to PostNL (www.postnl.nl) and print labels directly from the WooCommerce admin
 
 == Description ==
-[vimeo https://vimeo.com/241571840]
-This WooCommerce extension allows you to export your orders to the PostNL service (www.postnl.nl) & Flespakket service (www.flespakket.nl). The products are delivered by PostNL.
 
-**Online Manual (in Dutch):** [https://postnlnl.github.io/woocommerce/](https://postnlnl.github.io/woocommerce/)
+This WooCommerce extension allows you to export your orders to the PostNL service (www.postnl.nl).
+
+**Online Manual (in Dutch):** https://postnl.github.io/woocommerce/
 
 = Main features =
 - Delivery options integrated in your checkout
@@ -26,9 +26,9 @@ This WooCommerce extension allows you to export your orders to the PostNL servic
 - Modify the PostNL shipping options per order before exporting
 - Extra checkout fields to separate street name, house number and house number suffix for more precise address data
 - View the status of the shipment in the order details page
-- Add Track & Trace link to the order confirmation email
+- Add track&trace link to the order confirmation email
 
-An API-key is required for this plugin! You can create this in your backoffice account.
+A PostNL API account is required for this plugin! Contact your PostNL account manager for the API key.
 
 == Installation ==
 
