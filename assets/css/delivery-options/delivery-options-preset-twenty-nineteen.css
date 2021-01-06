@@ -1,0 +1,6 @@
+/* Twenty Nineteen preset */
+.woocommerce-postnl__delivery-options > .myparcel-delivery-options {
+  padding: 1rem;
+  clear: both;
+  background: #eee;
+}
