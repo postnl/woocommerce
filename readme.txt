@@ -90,6 +90,9 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 == Changelog ==
 
+= 4.0.1 (2021-01-06) =
+* Fix: Auto export when order is paid
+
 = 4.0.0 (2021-01-04) =
 * Fix: Shipping classes not saving
 * Fix: Drop off days
