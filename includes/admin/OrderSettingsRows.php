@@ -106,9 +106,7 @@ class OrderSettingsRows
                 "type"              => "select",
                 "options"           => array_combine(WCPN_Data::getPackageTypes(), WCPN_Data::getPackageTypesHuman()),
                 "value"             => WCPOST()->export->getPackageTypeFromOrder($order, $deliveryOptions),
-                "custom_attributes" => $isPackageTypeDisabled
-                    ? ["disabled" => "disabled"]
-                    : [],
+                "custom_attributes" => [],
             ],
         ];
 
