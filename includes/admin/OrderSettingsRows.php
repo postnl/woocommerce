@@ -79,11 +79,11 @@ class OrderSettingsRows
     ): array {
         $orderSettings = new OrderSettings($deliveryOptions, $order);
         $isHomeCountry = WCPN_Data::isHomeCountry($order->get_shipping_country());
-        $packageType   = array_combine(WCPN_Data::getPackageTypes(), WCPN_Data::getPackageTypesHuman());
+        $packageTypeOptions   = array_combine(WCPN_Data::getPackageTypes(), WCPN_Data::getPackageTypesHuman());
 
         // Remove mailbox because this is not possible for international shipments
         if (! $isHomeCountry){
-            unset($packageType['mailbox']);
+            unset($packageTypeOptions['mailbox']);
         }
 
         $rows = [
@@ -107,7 +107,7 @@ class OrderSettingsRows
                 "name"              => self::OPTION_PACKAGE_TYPE,
                 "label"             => __("Shipment type", "woocommerce-postnl"),
                 "type"              => "select",
-                "options"           => $packageType,
+                "options"           => $packageTypeOptions,
                 "value"             => WCPOST()->export->getPackageTypeFromOrder($order, $deliveryOptions),
             ],
         ];

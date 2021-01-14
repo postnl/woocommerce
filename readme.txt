@@ -1,6 +1,6 @@
 === Plugin Name ===
 Contributors: richardperdaan, ademdemir, edielemoine
-Tags: woocommerce, export, delivery, packages, Postnl, postnl
+Tags: woocommerce, export, delivery, packages, postnl
 Requires at least: 3.5.1 & WooCommerce 2.0+
 Tested up to: 5.6.0
 Stable tag: trunk
