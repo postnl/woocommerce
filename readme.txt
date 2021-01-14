@@ -1,8 +1,8 @@
 === Plugin Name ===
 Contributors: richardperdaan, ademdemir, edielemoine
-Tags: woocommerce, export, delivery, packages, postnl, flespakket, postnl
+Tags: woocommerce, export, delivery, packages, Postnl, postnl
 Requires at least: 3.5.1 & WooCommerce 2.0+
-Tested up to: 5.5.1
+Tested up to: 5.6.0
 Stable tag: trunk
 Requires PHP: 7.1
 License: GPLv3 or later
@@ -89,6 +89,9 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 5. PostNL information on the order details page
 
 == Changelog ==
+
+= 4.0.2 (--) =
+* Fix: Export letter for international shipments
 
 = 4.0.1 (2021-01-06) =
 * Fix: Auto export when order is paid
