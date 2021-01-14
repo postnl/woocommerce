@@ -77,9 +77,9 @@ class OrderSettingsRows
         AbstractDeliveryOptionsAdapter $deliveryOptions,
         WC_Order $order
     ): array {
-        $orderSettings = new OrderSettings($deliveryOptions, $order);
-        $isHomeCountry = WCPN_Data::isHomeCountry($order->get_shipping_country());
-        $packageTypeOptions   = array_combine(WCPN_Data::getPackageTypes(), WCPN_Data::getPackageTypesHuman());
+        $orderSettings      = new OrderSettings($deliveryOptions, $order);
+        $isHomeCountry      = WCPN_Data::isHomeCountry($order->get_shipping_country());
+        $packageTypeOptions = array_combine(WCPN_Data::getPackageTypes(), WCPN_Data::getPackageTypesHuman());
 
         // Remove mailbox because this is not possible for international shipments
         if (! $isHomeCountry){
