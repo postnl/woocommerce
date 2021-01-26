@@ -2,11 +2,11 @@
 
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter as DeliveryOptions;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
-use MyParcelNL\Sdk\src\Helper\PostNLCollection;
+use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use MyParcelNL\Sdk\src\Model\PostNLCustomsItem;
-use WPO\WC\WC\PostNL\Compatibility\Order as WCX_Order;
-use WPO\WC\WC\PostNL\Compatibility\Product as WCX_Product;
+use MyParcelNL\Sdk\src\Model\MyParcelCustomsItem;
+use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
+use WPO\WC\PostNL\Compatibility\Product as WCX_Product;
 
 if (! defined("ABSPATH")) {
     exit;
@@ -49,7 +49,7 @@ class WCPN_Export_Consignments
     private $carrier;
 
     /**
-     * @var PostNLCollection
+     * @var myParcelCollection
      */
     public $myParcelCollection;
     /**
@@ -75,11 +75,11 @@ class WCPN_Export_Consignments
 
         $this->carrier         = $this->deliveryOptions->getCarrier() ?? WCPN_Data::DEFAULT_CARRIER;
 
-        $this->myParcelCollection = (new PostNLCollection())->setUserAgents(
+        $this->myParcelCollection = (new MyParcelCollection())->setUserAgents(
             [
-                'Wordpress'              => get_bloginfo('version'),
-                'WooCommerce'            => WOOCOMMERCE_VERSION,
-                'MyParcelNL-WooCommerce' => WC_POSTNL_VERSION,
+                'Wordpress'          => get_bloginfo('version'),
+                'WooCommerce'        => WOOCOMMERCE_VERSION,
+                'PostNL-WooCommerce' => WC_POSTNL_VERSION,
             ]
         );
 
@@ -191,7 +191,7 @@ class WCPN_Export_Consignments
                 $value = round(($total + $tax) * 100);
 
                 $this->consignment->addItem(
-                    (new PostNLCustomsItem())
+                    (new MyParcelCustomsItem())
                         ->setDescription($description)
                         ->setAmount($amount)
                         ->setWeight($weight)

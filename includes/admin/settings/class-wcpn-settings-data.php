@@ -80,7 +80,6 @@ class WCPN_Settings_Data
         ];
 
         $array[WCPOST_Settings::SETTINGS_POSTNL] = __("PostNL", "woocommerce-postnl");
-//        $array[WCPOST_Settings::SETTINGS_DPD]    = __("DPD", "woocommerce-postnl");
 
         return $array;
     }

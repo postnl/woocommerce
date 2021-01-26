@@ -1,7 +1,6 @@
 <?php
 
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
@@ -198,7 +197,7 @@ class WCPN_Checkout
         $settings = WCPOST()->setting_collection;
         $carriers = $this->get_carriers();
 
-        $myParcelConfig = [
+        $postNLConfigConfig = [
             "config"  => [
                 "currency" => get_woocommerce_currency(),
                 "locale"   => "nl-NL",
@@ -235,12 +234,12 @@ class WCPN_Checkout
                     $value = $value + $chosenShippingMethodPrice;
                 }
 
-                Arr::set($myParcelConfig, 'config.' . $key, $value);
+                Arr::set($postNLConfigConfig, 'config.' . $key, $value);
             }
         }
-        $myParcelConfig['config']['priceStandardDelivery'] = $chosenShippingMethodPrice;
+        $postNLConfigConfig['config']['priceStandardDelivery'] = $chosenShippingMethodPrice;
 
-        return json_encode($myParcelConfig, JSON_UNESCAPED_SLASHES);
+        return json_encode($postNLConfigConfig, JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -275,7 +274,7 @@ class WCPN_Checkout
         $settings = WCPOST()->setting_collection;
         $carriers = [];
 
-        foreach ([PostNLConsignment::CARRIER_NAME, DPDConsignment::CARRIER_NAME] as $carrier) {
+        foreach ([PostNLConsignment::CARRIER_NAME] as $carrier) {
             if ($settings->getByName("{$carrier}_" . WCPOST_Settings::SETTING_CARRIER_PICKUP_ENABLED)
                 || $settings->getByName(
                     "{$carrier}_" . WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED
@@ -301,7 +300,7 @@ class WCPN_Checkout
         $order = WCX::get_order($order_id);
 
         $shippingMethod       = Arr::get($_POST, "shipping_method");
-        $highestShippingClass = Arr::get($_POST, "myparcel_highest_shipping_class") ?? $shippingMethod[0];
+        $highestShippingClass = Arr::get($_POST, "postnl_highest_shipping_class") ?? $shippingMethod[0];
 
         /**
          * Save the current version of our plugin to the order.

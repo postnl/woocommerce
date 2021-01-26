@@ -21,28 +21,28 @@ if (class_exists('WCPOST_Admin')) {
  */
 class WCPOST_Admin
 {
-    public const META_CONSIGNMENTS           = "_myparcel_consignments";
-    public const META_CONSIGNMENT_ID         = "_myparcel_consignment_id";
-    public const META_DELIVERY_OPTIONS       = "_myparcel_delivery_options";
-    public const META_HIGHEST_SHIPPING_CLASS = "_myparcel_highest_shipping_class";
-    public const META_LAST_SHIPMENT_IDS      = "_myparcel_last_shipment_ids";
-    public const META_RETURN_SHIPMENT_IDS    = "_myparcel_return_shipment_ids";
-    public const META_ORDER_VERSION          = "_myparcel_order_version";
-    public const META_ORDER_WEIGHT           = "_myparcel_order_weight";
-    public const META_PGADDRESS              = "_myparcel_pgaddress";
-    public const META_SHIPMENTS              = "_myparcel_shipments";
-    public const META_SHIPMENT_OPTIONS_EXTRA = "_myparcel_shipment_options_extra";
-    public const META_TRACK_TRACE            = "_myparcel_tracktrace";
-    public const META_HS_CODE                = "_myparcel_hs_code";
-    public const META_HS_CODE_VARIATION      = "_myparcel_hs_code_variation";
-    public const META_COUNTRY_OF_ORIGIN      = "_myparcel_country_of_origin";
-    public const META_AGE_CHECK              = "_myparcel_age_check";
+    public const META_CONSIGNMENTS           = "_postnl_consignments";
+    public const META_CONSIGNMENT_ID         = "_postnl_consignment_id";
+    public const META_DELIVERY_OPTIONS       = "_postnl_delivery_options";
+    public const META_HIGHEST_SHIPPING_CLASS = "_postnl_highest_shipping_class";
+    public const META_LAST_SHIPMENT_IDS      = "_postnl_last_shipment_ids";
+    public const META_RETURN_SHIPMENT_IDS    = "_postnl_return_shipment_ids";
+    public const META_ORDER_VERSION          = "_postnl_order_version";
+    public const META_ORDER_WEIGHT           = "_postnl_order_weight";
+    public const META_PGADDRESS              = "_postnl_pgaddress";
+    public const META_SHIPMENTS              = "_postnl_shipments";
+    public const META_SHIPMENT_OPTIONS_EXTRA = "_postnl_shipment_options_extra";
+    public const META_TRACK_TRACE            = "_postnl_tracktrace";
+    public const META_HS_CODE                = "_postnl_hs_code";
+    public const META_HS_CODE_VARIATION      = "_postnl_hs_code_variation";
+    public const META_COUNTRY_OF_ORIGIN      = "_postnl_country_of_origin";
+    public const META_AGE_CHECK              = "_postnl_age_check";
     public const META_ORDER_TOTAL            = "_order_version";
 
     /**
      * Legacy meta keys.
      */
-    public const META_SHIPMENT_OPTIONS_LT_4_0_0 = "_myparcel_shipment_options";
+    public const META_SHIPMENT_OPTIONS_LT_4_0_0 = "_postnl_shipment_options";
 
     // Ids referring to shipment statuses.
     public const ORDER_STATUS_DELIVERED_AT_RECIPIENT      = 7;
@@ -51,7 +51,7 @@ class WCPOST_Admin
     public const ORDER_STATUS_PRINTED_LETTER              = 12;
     public const ORDER_STATUS_PRINTED_DIGITAL_STAMP       = 14;
 
-    public const SHIPMENT_OPTIONS_FORM_NAME = "myparcel_options";
+    public const SHIPMENT_OPTIONS_FORM_NAME = "postnl_options";
 
     public const BULK_ACTION_EXPORT       = "wcpn_export";
     public const BULK_ACTION_PRINT        = "wcpn_print";
@@ -93,7 +93,7 @@ class WCPOST_Admin
         add_filter("manage_edit-shop_order_columns", [$this, "barcode_add_new_order_admin_list_column"], 10, 1);
         add_action("manage_shop_order_posts_custom_column", [$this, "addBarcodeToOrderColumn"], 10, 2);
 
-        add_action('woocommerce_payment_complete', [$this, 'automaticExportOrder'], 1000);
+//        add_action('woocommerce_payment_complete', [$this, 'automaticExportOrder'], 1000);
 
         add_action("init", [$this, "registerDeliveredPostStatus"], 10, 1);
         add_filter("wc_order_statuses", [$this, "displayDeliveredPostStatus"], 10, 2);
@@ -299,9 +299,9 @@ class WCPOST_Admin
         $actions = array_merge(
             $actions,
             [
-                self::BULK_ACTION_EXPORT       => __("PostNL: Export", "woocommerce-postnl"),
+                self::BULK_ACTION_EXPORT       => __("PostNL: Prepare shipment", "woocommerce-postnl"),
                 self::BULK_ACTION_PRINT        => __("PostNL: Print", "woocommerce-postnl"),
-                self::BULK_ACTION_EXPORT_PRINT => __("PostNL: Export & Print", "woocommerce-postnl"),
+                self::BULK_ACTION_EXPORT_PRINT => __("PostNL: Prepare & print shipment", "woocommerce-postnl"),
             ]
         );
 
@@ -323,9 +323,9 @@ class WCPOST_Admin
     {
         global $post_type;
         $bulk_actions = [
-            self::BULK_ACTION_EXPORT       => __("PostNL: Export", "woocommerce-postnl"),
+            self::BULK_ACTION_EXPORT       => __("PostNL: Prepare shipment", "woocommerce-postnl"),
             self::BULK_ACTION_PRINT        => __("PostNL: Print", "woocommerce-postnl"),
-            self::BULK_ACTION_EXPORT_PRINT => __("PostNL: Export & Print", "woocommerce-postnl"),
+            self::BULK_ACTION_EXPORT_PRINT => __("PostNL: Prepare & print shipment", "woocommerce-postnl"),
         ];
 
         if ('shop_order' == $post_type) {
@@ -388,7 +388,7 @@ class WCPOST_Admin
                     <div class="wcpn__d--flex wcpn__pb--2">
                         <?php woocommerce_form_field($field["name"], $class->getArguments(false), ""); ?>
                         <img
-                          src="<?php echo WCPOST()->plugin_url() . "/assets/img/offset.svg"; ?>"
+                          src="<?php echo WCPOST()->plugin_url() . "/assets/img/print-offset-icon.png"; ?>"
                           alt="<?php implode(", ", WCPN_Export::DEFAULT_POSITIONS) ?>"
                           class="wcpn__offset-dialog__icon wcpn__pl--1"/>
                     </div>
@@ -461,18 +461,13 @@ class WCPOST_Admin
         $listing_actions = [
             $addShipments => [
                 "url" => admin_url("$baseUrl&request=$addShipments&order_ids=$order_id"),
-                "img" => WCPOST()->plugin_url() . "/assets/img/export.svg",
+                "img" => WCPOST()->plugin_url() . "/assets/img/postnl-up.png",
                 "alt" => __("Export to PostNL", "woocommerce-postnl"),
             ],
             $getLabels    => [
                 "url" => admin_url("$baseUrl&request=$getLabels&order_ids=$order_id"),
-                "img" => WCPOST()->plugin_url() . "/assets/img/print.svg",
+                "img" => WCPOST()->plugin_url() . "/assets/img/postnl-pdf.png",
                 "alt" => __("Print PostNL label", "woocommerce-postnl"),
-            ],
-            $addReturn    => [
-                "url" => admin_url("$baseUrl&request=$addReturn&order_ids=$order_id"),
-                "img" => WCPOST()->plugin_url() . "/assets/img/return.svg",
-                "alt" => __("Email return label", "woocommerce-postnl"),
             ],
         ];
 
@@ -593,7 +588,7 @@ class WCPOST_Admin
     public function add_order_meta_box(): void
     {
         add_meta_box(
-            "myparcel",
+            "postnl",
             __("PostNL", "woocommerce-postnl"),
             [$this, "createMetaBox"],
             "shop_order",
@@ -768,10 +763,10 @@ class WCPOST_Admin
             }
 
             $trackTraceUrl = sprintf(
-                'https://myparcel.me/track-trace/%s/%s/%s',
+                'https://jouw.postnl.nl/track-trace/%s/%s/%s',
                 $track_trace,
-                $postcode,
-                $country
+                $country,
+                $postcode
             );
         } else {
             $trackTraceUrl = sprintf(

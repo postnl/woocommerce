@@ -93,7 +93,7 @@ class WCPN_Cart_Fees
     /**
      * Get shipping tax class
      * adapted from WC_Tax::get_shipping_tax_rates
-     * assumes per order shipping (per item shipping not supported for myparcel yet)
+     * assumes per order shipping (per item shipping not supported for postnl yet)
      *
      * @return string tax class
      */

@@ -91,7 +91,7 @@ class WCPN_Assets
                 ),
                 "strings"                => [
                     "no_orders_selected" => __("You have not selected any orders!", "woocommerce-postnl"),
-                    "dialog" => [
+                    "dialog"             => [
                         "return" => __("Export options", "woocommerce-postnl")
                     ],
                 ],

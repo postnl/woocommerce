@@ -21,14 +21,14 @@ class WCPN_Frontend
     {
         new WCPN_Frontend_Track_Trace();
 
-		// Shipment information in confirmation mail
-	    add_action("woocommerce_email_customer_details", [$this, "confirmationEmail"], 19, 3);
+        // Shipment information in confirmation mail
+        add_action("woocommerce_email_customer_details", [$this, "confirmationEmail"], 19, 3);
 
-	    // Shipment information in my account
-	    add_action('woocommerce_view_order', [$this, "confirmationOrderReceived"]);
+        // Shipment information in my account
+        add_action('woocommerce_view_order', [$this, "confirmationOrderReceived"]);
 
-	    // Shipment information on the thank you page
-	    add_action("woocommerce_thankyou", [$this, "confirmationOrderReceived"], 10, 1);
+        // Shipment information on the thank you page
+        add_action("woocommerce_thankyou", [$this, "confirmationOrderReceived"], 10, 1);
         add_filter("wpo_wcpdf_templates_replace_myparcel_delivery_options", [$this, "wpo_wcpdf_delivery_options"], 10, 2);
 
         // Initialize delivery options fees
@@ -50,7 +50,7 @@ class WCPN_Frontend
      */
     public function confirmationEmail(WC_Order $order): void
     {
-	    WCPOST()->admin->showShipmentConfirmation($order, true);
+        WCPOST()->admin->showShipmentConfirmation($order, true);
     }
 
     /**
@@ -65,7 +65,7 @@ class WCPN_Frontend
     }
 
     /**
-     * @param string   $replacement
+     * @param string $replacement
      * @param WC_Order $order
      *
      * @return string
@@ -80,7 +80,7 @@ class WCPN_Frontend
     }
 
     /**
-     * @param string   $replacement
+     * @param string $replacement
      * @param WC_Order $order
      *
      * @return string
@@ -120,7 +120,7 @@ class WCPN_Frontend
 
         if ($shipping_class) {
             return sprintf(
-                '<input type="hidden" value="%s" name="myparcel_highest_shipping_class">',
+                '<input type="hidden" value="%s" name="postnl_highest_shipping_class">',
                 $shipping_class
             );
         }
@@ -171,8 +171,8 @@ class WCPN_Frontend
      */
     public function order_review_fragments($fragments)
     {
-        $myparcel_shipping_data            = $this->renderHighestShippingClassInput();
-        $fragments['.wcpn__shipping-data'] = $myparcel_shipping_data;
+        $postnl_shipping_data              = $this->renderHighestShippingClassInput();
+        $fragments['.wcpn__shipping-data'] = $postnl_shipping_data;
 
         return $fragments;
     }

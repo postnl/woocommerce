@@ -1,7 +1,6 @@
 <?php
 
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
-use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use WPO\WC\PostNL\Collections\SettingsCollection;
 
 class WCPN_Initialize_Settings_Collection

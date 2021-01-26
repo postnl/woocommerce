@@ -1,6 +1,5 @@
 <?php
 
-use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 
@@ -23,7 +22,6 @@ class WCPOST_Settings
     public const SETTINGS_CHECKOUT        = "checkout";
     public const SETTINGS_EXPORT_DEFAULTS = "export_defaults";
     public const SETTINGS_POSTNL          = PostNLConsignment::CARRIER_NAME;
-    public const SETTINGS_DPD             = DPDConsignment::CARRIER_NAME;
 
     /**
      * General
@@ -77,7 +75,7 @@ class WCPOST_Settings
     /*
      * Carrier settings, these will be prefixed with carrier names.
      *
-     * e.g. cutoff_time => postnl_cutoff_time/dpd_cutoff_time
+     * e.g. cutoff_time => postnl_cutoff_time
      */
     // Defaults
     public const SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE          = "export_signature";
@@ -146,7 +144,7 @@ class WCPOST_Settings
         require_once("class-wcpn-settings-data.php");
 
         // notice for WooCommerce PostNL plugin
-        add_action("woocommerce_postnl_before_settings_page", [$this, "myparcel_country_notice"], 10, 1);
+        add_action("woocommerce_postnl_before_settings_page", [$this, "postnl_country_notice"], 10, 1);
     }
 
     /**
@@ -237,32 +235,32 @@ class WCPOST_Settings
     /**
      * Show the user a notice if they might be using the wrong plugin.
      */
-    public function myparcel_country_notice()
+    public function postnl_country_notice()
     {
         $base_country = WC()->countries->get_base_country();
 
         // save or check option to hide notice
-        if (Arr::get($_GET, "myparcel_hide_be_notice")) {
-            update_option("myparcel_hide_be_notice", true);
+        if (Arr::get($_GET, "postnl_hide_be_notice")) {
+            update_option("postnl_hide_be_notice", true);
             $hide_notice = true;
         } else {
-            $hide_notice = get_option("myparcel_hide_be_notice");
+            $hide_notice = get_option("postnl_hide_be_notice");
         }
 
         // link to hide message when one of the premium extensions is installed
         if (! $hide_notice && $base_country === "BE") {
-            $myparcel_nl_link =
+            $postnl_nl_link =
                 '<a href="https://wordpress.org/plugins/woocommerce-postnl/" target="blank">WC PostNL Netherlands</a>';
             $text             = sprintf(
                 __(
                     "It looks like your shop is based in Netherlands. This plugin is for PostNL. If you are using PostNL Netherlands, download the %s plugin instead!",
                     "woocommerce-postnl"
                 ),
-                $myparcel_nl_link
+                $postnl_nl_link
             );
             $dismiss_button   = sprintf(
                 '<a href="%s" style="display:inline-block; margin-top: 10px;">%s</a>',
-                add_query_arg('myparcel_hide_be_notice', 'true'),
+                add_query_arg('postnl_hide_be_notice', 'true'),
                 __("Hide this message", "woocommerce-postnl")
             );
             printf('<div class="notice notice-warning"><p>%s %s</p></div>', $text, $dismiss_button);

@@ -105,7 +105,7 @@ jQuery(($) => {
      *
      * @type {String}
      */
-    highestShippingClassField: '[name="myparcel_highest_shipping_class"]',
+    highestShippingClassField: '[name="postnl_highest_shipping_class"]',
 
     addressField: 'address_1',
     cityField: 'city',

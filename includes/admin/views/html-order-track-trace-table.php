@@ -64,7 +64,7 @@ if (! count($shipments)) {
           WCPOST_Admin::renderAction(
               admin_url("admin-ajax.php?action=$action&request=$getLabels&shipment_ids=$shipment_id&return_shipment_id=$returnShipmentId"),
               __("Print PostNL label", "woocommerce-postnl"),
-              WCPOST()->plugin_url() . "/assets/img/print.svg"
+              WCPOST()->plugin_url() . "/assets/img/postnl-pdf.png"
           );
           ?>
       </td>
