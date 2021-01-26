@@ -59,7 +59,7 @@ class WCPN_Frontend_Track_Trace
         printf(
             '<p>%s %s</p>',
             apply_filters(
-                "wcmyparcel_email_text",
+                "wcpostnl_email_text",
                 __("You can track your order with the following Track & Trace link:", "woocommerce-postnl"),
                 $order
             ),
@@ -88,10 +88,10 @@ class WCPN_Frontend_Track_Trace
         $consignments = WCPN_Frontend::getTrackTraceLinks($order_id);
 
         foreach ($consignments as $key => $consignment) {
-            $actions['myparcel_tracktrace_' . $consignment['link']] = [
+            $actions['postnl_tracktrace_' . $consignment['link']] = [
                 'url'  => $consignment['url'],
                 'name' => apply_filters(
-                    'wcmyparcel_myaccount_tracktrace_button',
+                    'wcpostnl_myaccount_tracktrace_button',
                     __('Track & Trace', 'woocommerce-postnl')
                 ),
             ];

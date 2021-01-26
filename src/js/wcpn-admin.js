@@ -830,7 +830,7 @@ jQuery(($) => {
       url: url,
       data: data || {},
       afterDone(response) {
-        const redirectUrl = updateUrlParameter(window.location.href, 'myparcel_done', 'true');
+        const redirectUrl = updateUrlParameter(window.location.href, 'postnl_done', 'true');
         const responseError = JSON.parse(response).error;
 
         if (typeof responseError !== 'undefined' && response !== null) {

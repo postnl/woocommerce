@@ -1,6 +1,6 @@
 <?php
 
-use MyParcelNL\WooCommerce\Includes\Admin\OrderSettingsRows;
+use PostNL\WooCommerce\Includes\Admin\OrderSettingsRows;
 use WPO\WC\PostNL\Entity\SettingsFieldArguments;
 
 /**

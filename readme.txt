@@ -477,7 +477,7 @@ These are the biggest changes:
 = 2.0.5 =
 * Fix default insurance selection
 * Tweak: Show shipping 'method title' instead of 'title' in settings (with fallback to title)
-* Tweak: added `$order` object to `wcmyparcel_email_text` filter
+* Tweak: added `$order` object to `wcpostnl_email_text` filter
 
 = 2.0.4 =
 * Improved theme compatibility

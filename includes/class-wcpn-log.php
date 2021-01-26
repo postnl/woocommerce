@@ -45,7 +45,7 @@ class WCPN_Log
         // add file in upload folder - wp-content/uploads
         $upload_dir        = wp_upload_dir();
         $upload_base       = trailingslashit($upload_dir["basedir"]);
-        $log_file          = $upload_base . "myparcel_log.txt";
+        $log_file          = $upload_base . "postnl_log.txt";
         $current_date_time = date("Y-m-d H:i:s");
         $message           = $current_date_time . " " . $message . "n";
         file_put_contents($log_file, $message, FILE_APPEND);

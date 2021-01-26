@@ -2,7 +2,6 @@
 
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 
@@ -23,7 +22,6 @@ class WCPN_Data
      */
     public const CARRIERS_HUMAN = [
         PostNLConsignment::CARRIER_NAME => 'PostNL',
-        DPDConsignment::CARRIER_NAME    => 'DPD',
     ];
 
     /**
@@ -229,7 +227,6 @@ class WCPN_Data
     {
         return [
             PostNLConsignment::CARRIER_NAME => __("PostNL", "woocommerce-postnl"),
-            DPDConsignment::CARRIER_NAME    => __("DPD", "woocommerce-postnl"),
         ];
     }
 

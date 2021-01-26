@@ -27,7 +27,7 @@ $deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
         </td>
         <td>
             <?php
-            $name = "myparcel_options[{$order_id}][package_type]";
+            $name = "postnl_options[{$order_id}][package_type]";
             printf('<select name="%s" class="package_type">', $name);
             foreach (WCPN_Data::getPackageTypesHuman() as $key => $label) {
                 $isReturnPackageType = in_array(

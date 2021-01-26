@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MyParcelNL\WooCommerce\Includes\Admin;
+namespace PostNL\WooCommerce\Includes\Admin;
 
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;

@@ -1,6 +1,6 @@
 <?php
 
-use MyParcelNL\Sdk\src\Helper\PostNLCollection;
+use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use WPO\WC\PostNL\Compatibility\WC_Core;
 use WPO\WC\PostNL\Compatibility\WCPN_ChannelEngine_Compatibility as ChannelEngine;
 
@@ -153,7 +153,7 @@ class WCPN_API extends WCPN_Rest
      */
     public function getShipmentLabels(array $shipment_ids, array $order_ids, array $positions = [], $display = true)
     {
-        $collection = PostNLCollection::findMany($shipment_ids, $this->key);
+        $collection = MyParcelCollection::findMany($shipment_ids, $this->key);
 
         /**
          * @see https://github.com/MyParcelNL/Sdk#label-format-and-position
@@ -178,11 +178,11 @@ class WCPN_API extends WCPN_Rest
 
     /**
      * @param array              $orderIds
-     * @param PostNLCollection $collection
+     * @param MyParcelCollection $collection
      *
      * @throws Exception
      */
-    private function updateOrderBarcode(array $orderIds, PostNLCollection $collection): void
+    private function updateOrderBarcode(array $orderIds, MyParcelCollection $collection): void
     {
         foreach ($orderIds as $orderId) {
             $order           = WC_Core::get_order($orderId);

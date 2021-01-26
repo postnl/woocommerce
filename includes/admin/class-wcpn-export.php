@@ -3,7 +3,7 @@
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Exception\ApiException;
 use MyParcelNL\Sdk\src\Exception\MissingFieldException;
-use MyParcelNL\Sdk\src\Helper\PostNLCollection;
+use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
@@ -122,10 +122,10 @@ class WCPN_Export
     public function admin_notices()
     {
         // only do this when the user that initiated this
-        if (isset($_GET["myparcel_done"])) {
-            $action_return = get_option("wcmyparcel_admin_notices");
-            $print_queue   = get_option("wcmyparcel_print_queue", []);
-            $error_notice  = get_option("wcmyparcel_admin_error_notices");
+        if (isset($_GET["postnl_done"])) {
+            $action_return = get_option("wcpostnl_admin_notices");
+            $print_queue   = get_option("wcpostnl_print_queue", []);
+            $error_notice  = get_option("wcpostnl_admin_error_notices");
 
             if (! empty($action_return)) {
                 foreach ($action_return as $type => $message) {
@@ -146,7 +146,7 @@ class WCPN_Export
                         );
 
                         // Empty queue
-                        delete_option("wcmyparcel_print_queue");
+                        delete_option("wcpostnl_print_queue");
                     }
 
                     printf(
@@ -157,12 +157,12 @@ class WCPN_Export
                     );
                 }
                 // destroy after reading
-                delete_option("wcmyparcel_admin_notices");
-                wp_cache_delete("wcmyparcel_admin_notices", "options");
+                delete_option("wcpostnl_admin_notices");
+                wp_cache_delete("wcpostnl_admin_notices", "options");
             }
         }
 
-        if (! isset($_GET['myparcel_done'])) {
+        if (! isset($_GET['postnl_done'])) {
             unset($_COOKIE['response']);
             setcookie('response', null, -1, '/');
         }
@@ -174,11 +174,11 @@ class WCPN_Export
                 $print_queue_store ?? ""
             );
             // destroy after reading
-            delete_option("wcmyparcel_admin_error_notices");
-            wp_cache_delete("wcmyparcel_admin_error_notices", "options");
+            delete_option("wcpostnl_admin_error_notices");
+            wp_cache_delete("wcpostnl_admin_error_notices", "options");
         }
 
-        if (isset($_GET["myparcel"])) {
+        if (isset($_GET["postnl"])) {
             switch ($_GET["myparcel"]) {
                 case "no_consignments":
                     $message = __(
@@ -225,7 +225,7 @@ class WCPN_Export
 
         // Check the user privileges (maybe use order ids for filter?)
         if (apply_filters(
-            "wc_myparcel_check_privs",
+            "wc_postnl_check_privs",
             ! current_user_can("manage_woocommerce_orders") && ! current_user_can("edit_shop_orders")
         )) {
             $return["error"] = __(
@@ -275,7 +275,7 @@ class WCPN_Export
             } catch (Exception $e) {
                 $errorMessage = $e->getMessage();
                 $this->errors[] = "$request: {$errorMessage}";
-                add_option("wcmyparcel_admin_error_notices", $errorMessage);
+                add_option("wcpostnl_admin_error_notices", $errorMessage);
             }
         }
 
@@ -332,7 +332,7 @@ class WCPN_Export
     public function add_shipments(array $order_ids, bool $process)
     {
         $return          = [];
-        $collection      = new PostNLCollection();
+        $collection      = new MyParcelCollection();
         $processDirectly = WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_PROCESS_DIRECTLY) || $process === true;
 
         WCPN_Log::add("*** Creating shipments started ***");
@@ -394,7 +394,7 @@ class WCPN_Export
 
         if (! empty($this->success)) {
             $return["success"]     = sprintf(
-                __("%s shipments successfully exported to PostNL", "woocommerce-postnl"),
+                __("%s shipments successfully prepare for PostNL", "woocommerce-postnl"),
                 count($collection->getConsignmentIds())
             );
             $return["success_ids"] = $collection->getConsignmentIds();
@@ -457,7 +457,7 @@ class WCPN_Export
             } catch (Exception $e) {
                 $errorMessage = $e->getMessage();
                 $this->errors[$order_id] = $errorMessage;
-                add_option('wcmyparcel_admin_error_notices', $errorMessage);
+                add_option('wcpostnl_admin_error_notices', $errorMessage);
             }
         }
 
@@ -495,7 +495,7 @@ class WCPN_Export
             $api->getShipmentLabels($shipment_ids, $order_ids, $positions, $display);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
-            add_option('wcmyparcel_admin_error_notice', $e->getMessage());
+            add_option('wcpostnl_admin_error_notice', $e->getMessage());
         }
 
         return $return;
@@ -754,7 +754,7 @@ class WCPN_Export
 
         $address = array_merge($address, $address_intl);
 
-        return apply_filters("wc_myparcel_recipient", $address, $order);
+        return apply_filters("wc_postnl_recipient", $address, $order);
     }
 
     /**
@@ -1415,12 +1415,12 @@ class WCPN_Export
 
     /**
      * @param int               $colloAmount
-     * @param PostNLCollection  $collection
+     * @param MyParcelCollection  $collection
      * @param AbstractConsignment $consignment
      *
      * @throws MissingFieldException
      */
-    public function addFakeMultiCollo(int $colloAmount, PostNLCollection $collection, AbstractConsignment $consignment): void
+    public function addFakeMultiCollo(int $colloAmount, MyParcelCollection $collection, AbstractConsignment $consignment): void
     {
         for ($i = 1; $i <= $colloAmount; $i++) {
             $collection->addConsignment($consignment);
@@ -1429,14 +1429,14 @@ class WCPN_Export
 
     /**
      * @param WC_Order            $order
-     * @param PostNLCollection  $collection
+     * @param MyParcelCollection  $collection
      * @param AbstractConsignment $consignment
      * @param int               $colloAmount
      *
      * @throws MissingFieldException
      * @throws \Exception
      */
-    public function addMultiCollo(WC_Order $order, PostNLCollection $collection, AbstractConsignment $consignment, int $colloAmount): void
+    public function addMultiCollo(WC_Order $order, MyParcelCollection $collection, AbstractConsignment $consignment, int $colloAmount): void
     {
         $deliveryOptions     = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
         $packageType         = $this->getPackageTypeFromOrder($order, $deliveryOptions);
@@ -1594,14 +1594,14 @@ class WCPN_Export
         // When adding shipments, store $return for use in admin_notice
         // This way we can refresh the page (JS) to show all new buttons
         if ($print === "no" || $print === "after_reload") {
-            update_option("wcmyparcel_admin_notices", $return);
+            update_option("wcpostnl_admin_notices", $return);
             if ($print === "after_reload") {
                 $print_queue = [
                     "order_ids"    => $order_ids,
                     "shipment_ids" => $return["success_ids"],
                     "offset"       => isset($offset) && is_numeric($offset) ? $offset % 4 : 0,
                 ];
-                update_option("wcmyparcel_print_queue", $print_queue);
+                update_option("wcpostnl_print_queue", $print_queue);
             }
         }
 
@@ -1611,10 +1611,10 @@ class WCPN_Export
     /**
      * Save created track & trace information as meta data to the corresponding order(s).
      *
-     * @param PostNLCollection $collection
+     * @param MyParcelCollection $collection
      * @param array              $order_ids
      */
-    public static function saveTrackTracesToOrders(PostNLCollection $collection, array $order_ids): void
+    public static function saveTrackTracesToOrders(MyParcelCollection $collection, array $order_ids): void
     {
         foreach ($order_ids as $order_id) {
             $trackTraces = [];

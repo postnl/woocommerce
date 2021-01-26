@@ -547,7 +547,7 @@ class WCPN_NL_Postcode_Fields
      */
     public function user_profile_fields($meta_fields)
     {
-        $myparcel_billing_fields  = [
+        $postnl_billing_fields  = [
             'billing_street_name'         => [
                 'label'       => __("Street", "woocommerce-postnl"),
                 'description' => '',
@@ -561,7 +561,7 @@ class WCPN_NL_Postcode_Fields
                 'description' => '',
             ],
         ];
-        $myparcel_shipping_fields = [
+        $postnl_shipping_fields = [
             'shipping_street_name'         => [
                 'label'       => __("Street", "woocommerce-postnl"),
                 'description' => '',
@@ -576,10 +576,10 @@ class WCPN_NL_Postcode_Fields
             ],
         ];
 
-        // add myparcel fields to billing section
+        // add postnl fields to billing section
         $billing_fields                   = array_merge(
             $meta_fields['billing']['fields'],
-            $myparcel_billing_fields
+            $postnl_billing_fields
         );
         $billing_fields                   = $this->array_move_keys(
             $billing_fields,
@@ -589,10 +589,10 @@ class WCPN_NL_Postcode_Fields
         );
         $meta_fields['billing']['fields'] = $billing_fields;
 
-        // add myparcel fields to shipping section
+        // add postnl fields to shipping section
         $shipping_fields                   = array_merge(
             $meta_fields['shipping']['fields'],
-            $myparcel_shipping_fields
+            $postnl_shipping_fields
         );
         $shipping_fields                   = $this->array_move_keys(
             $shipping_fields,
