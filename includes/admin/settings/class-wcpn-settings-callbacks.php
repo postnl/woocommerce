@@ -1,16 +1,16 @@
 <?php
 
-use WPO\WC\PostNL\Entity\SettingsFieldArguments;
+use WPO\WC\MyParcel\Entity\SettingsFieldArguments;
 
 if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCPN_Settings_Callbacks')) {
-    return new WCPN_Settings_Callbacks();
+if (class_exists('WCMP_Settings_Callbacks')) {
+    return new WCMP_Settings_Callbacks();
 }
 
-class WCPN_Settings_Callbacks
+class WCMP_Settings_Callbacks
 {
     /**
      * Validate options.
@@ -47,7 +47,7 @@ class WCPN_Settings_Callbacks
     }
 
     /**
-     * @param \WPO\WC\PostNL\Entity\SettingsFieldArguments|array $args
+     * @param \WPO\WC\MyParcel\Entity\SettingsFieldArguments|array $args
      *
      * @throws \Exception
      */
@@ -58,7 +58,7 @@ class WCPN_Settings_Callbacks
         }
 
         include("class-wcpn-settings-callbacks-enhanced-select.php");
-        new WCPN_Settings_Callbacks_Enhanced_Select($args);
+        new WCMP_Settings_Callbacks_Enhanced_Select($args);
     }
 
     /**
@@ -102,7 +102,7 @@ class WCPN_Settings_Callbacks
 
         // Render the description here instead of inside the above function.
         if (isset($description)) {
-            WCPN_Settings_Callbacks::renderDescription($description);
+            WCMP_Settings_Callbacks::renderDescription($description);
         }
     }
 
@@ -143,7 +143,7 @@ class WCPN_Settings_Callbacks
     /**
      * Render a custom toggle element. Uses classes from WooCommerce but has a custom JS implementation.
      *
-     * @param \WPO\WC\PostNL\Entity\SettingsFieldArguments $class
+     * @param \WPO\WC\MyParcel\Entity\SettingsFieldArguments $class
      */
     private static function renderToggle(SettingsFieldArguments $class): void
     {
@@ -177,4 +177,4 @@ class WCPN_Settings_Callbacks
     }
 }
 
-return new WCPN_Settings_Callbacks();
+return new WCMP_Settings_Callbacks();

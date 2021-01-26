@@ -4,8 +4,9 @@
   "version": "4.1.0",
   "description": "Welcome to the WooCommerce PostNL repository on GitHub. Here you can browse the source, look at open issues and keep track of development.",
   "scripts": {
-    "postinstall": "cp -f node_modules/@postnl/delivery-options/dist/postnl.js assets/js",
-    "postcss": "node_modules/postcss-cli/bin/postcss assets/css --replace"
+    "build": "gulp",
+    "watch": "gulp watch",
+    "zip": "gulp build:zip"
   },
   "repository": {
     "type": "git",
@@ -18,12 +19,28 @@
   },
   "homepage": "https://github.com/postnl/woocommerce#readme",
   "dependencies": {
-    "@myparcel/delivery-options": "^3.3.8"
+    "@myparcel/delivery-options": "^3.4.2"
   },
   "devDependencies": {
-    "@myparcel/eslint-config": "^3.0.0",
-    "autoprefixer": "^10.0.2",
-    "husky": "^4.3.0",
-    "postcss-cli": "^8.2.0"
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@myparcel/eslint-config": "^3.0.1",
+    "autoprefixer": "^10.2.3",
+    "babelify": "^10.0.0",
+    "browserify": "^17.0.0",
+    "core-js": "^3.8.3",
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-po-sync": "^0.1.0",
+    "gulp-po2mo": "^1.0.3",
+    "gulp-postcss": "^9.0.0",
+    "gulp-sass": "^4.1.0",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-tap": "^2.0.0",
+    "gulp-uglify": "^3.0.2",
+    "gulp-wp-pot": "^2.5.0",
+    "gulp-zip": "^5.0.2",
+    "postcss": "^8.2.4",
+    "vinyl-buffer": "^1.0.1"
   }
 }

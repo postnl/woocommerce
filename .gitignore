@@ -1,4 +1,9 @@
 .idea
-.DS_Store
+assets
 node_modules
+vendor
+
+*.zip
+.DS_Store
 languages/*-backup-*
+languages/*.mo

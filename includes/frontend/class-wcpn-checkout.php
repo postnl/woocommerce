@@ -1,24 +1,24 @@
 <?php
 
-use MyParcelNL\Sdk\src\Factory\DeliveryOptionsAdapterFactory;
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
+use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
-use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
-use WPO\WC\PostNL\Compatibility\WC_Core as WCX;
+use WPO\WC\MyParcel\Compatibility\Order as WCX_Order;
+use WPO\WC\MyParcel\Compatibility\WC_Core as WCX;
 
 if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCPN_Checkout')) {
-    return new WCPN_Checkout();
+if (class_exists('WCMP_Checkout')) {
+    return new WCMP_Checkout();
 }
 
 /**
  * Frontend views
  */
-class WCPN_Checkout
+class WCMP_Checkout
 {
     private const DELIVERY_OPTIONS_KEY_MAP = [
         'deliveryType'                   => 'delivery_type',
@@ -29,12 +29,13 @@ class WCPN_Checkout
         'shipmentOptions'                => 'shipment_options',
         'shipmentOptions.ageCheck'       => 'shipment_options.age_check',
         'shipmentOptions.insuredAmount'  => 'shipment_options.insured_amount',
+        'shipmentOptions.largeFormat'    => 'shipment_options.large_format',
         'shipmentOptions.onlyRecipient'  => 'shipment_options.only_recipient',
         'shipmentOptions.returnShipment' => 'shipment_options.return_shipment',
     ];
 
     /**
-     * WCPN_Checkout constructor.
+     * WCMP_Checkout constructor.
      */
     public function __construct()
     {
@@ -57,19 +58,19 @@ class WCPN_Checkout
         }
 
         // if using split address fields
-        $useSplitAddressFields = WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_USE_SPLIT_ADDRESS_FIELDS);
+        $useSplitAddressFields = WCMYPA()->setting_collection->isEnabled(WCMYPA_Settings::SETTING_USE_SPLIT_ADDRESS_FIELDS);
         if ($useSplitAddressFields) {
             wp_enqueue_script(
                 "wcpn-checkout-fields",
-                WCPOST()->plugin_url() . "/assets/js/wcpn-checkout-fields.js",
+                WCMYPA()->plugin_url() . "/assets/js/wcpn-checkout-fields.js",
                 ["wc-checkout"],
-                WC_POSTNL_VERSION,
+                WC_MYPARCEL_NL_VERSION,
                 true
             );
         }
 
         // Don"t load the delivery options scripts if it"s disabled
-        if (! WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED)) {
+        if (! WCMYPA()->setting_collection->isEnabled(WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED)) {
             return;
         }
 
@@ -85,19 +86,26 @@ class WCPN_Checkout
             $deps[] = "wcpn-checkout-fields";
         }
 
+        /*
+         * Show delivery options also for shipments on backorder
+         */
+        if (! $this->shouldShowDeliveryOptions()) {
+            return;
+        }
+
         wp_enqueue_script(
-            "wc-postnl",
-            WCPOST()->plugin_url() . "/assets/js/postnl.js",
+            "wc-myparcel",
+            WCMYPA()->plugin_url() . "/assets/js/myparcel.js",
             $deps,
-            WC_POSTNL_VERSION,
+            WC_MYPARCEL_NL_VERSION,
             true
         );
 
         wp_enqueue_script(
-            "wc-postnl-frontend",
-            WCPOST()->plugin_url() . "/assets/js/wcpn-frontend.js",
-            array_merge($deps, ["wc-postnl", "jquery"]),
-            WC_POSTNL_VERSION,
+            "wc-myparcel-frontend",
+            WCMYPA()->plugin_url() . "/assets/js/wcpn-frontend.js",
+            array_merge($deps, ["wc-myparcel", "jquery"]),
+            WC_MYPARCEL_NL_VERSION,
             true
         );
 
@@ -112,7 +120,7 @@ class WCPN_Checkout
     public function inject_delivery_options_variables(): void
     {
         wp_localize_script(
-            'wc-postnl-frontend',
+            'wc-myparcel-frontend',
             'wcpn',
             [
                 "ajax_url" => admin_url("admin-ajax.php"),
@@ -120,30 +128,30 @@ class WCPN_Checkout
         );
 
         wp_localize_script(
-            "wc-postnl-frontend",
-            "PostNLDisplaySettings",
+            "wc-myparcel-frontend",
+            "MyParcelDisplaySettings",
             [
                 // Convert true/false to int for JavaScript
-                "isUsingSplitAddressFields" => (int) WCPOST()->setting_collection->isEnabled(
-                    WCPOST_Settings::SETTING_USE_SPLIT_ADDRESS_FIELDS
+                "isUsingSplitAddressFields" => (int) WCMYPA()->setting_collection->isEnabled(
+                    WCMYPA_Settings::SETTING_USE_SPLIT_ADDRESS_FIELDS
                 ),
-                "splitAddressFieldsCountries" => WCPN_NL_Postcode_Fields::COUNTRIES_WITH_SPLIT_ADDRESS_FIELDS,
+                "splitAddressFieldsCountries" => WCMP_NL_Postcode_Fields::COUNTRIES_WITH_SPLIT_ADDRESS_FIELDS,
             ]
         );
 
         wp_localize_script(
-            "wc-postnl",
+            "wc-myparcel",
             "MyParcelDeliveryOptions",
             [
                 "allowedShippingMethods"    => json_encode($this->getShippingMethodsAllowingDeliveryOptions()),
-                "disallowedShippingMethods" => json_encode(WCPN_Export::DISALLOWED_SHIPPING_METHODS),
+                "disallowedShippingMethods" => json_encode(WCMP_Export::DISALLOWED_SHIPPING_METHODS),
                 "alwaysShow"                => $this->alwaysDisplayDeliveryOptions(),
-                "hiddenInputName"           => WCPOST_Admin::META_DELIVERY_OPTIONS,
+                "hiddenInputName"           => WCMYPA_Admin::META_DELIVERY_OPTIONS,
             ]
         );
 
         wp_localize_script(
-            'wc-postnl',
+            'wc-myparcel',
             'MyParcelConfig',
             $this->get_delivery_options_config()
         );
@@ -152,7 +160,7 @@ class WCPN_Checkout
         add_action(
             apply_filters(
                 'wc_wcpn_delivery_options_location',
-                WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_DELIVERY_OPTIONS_POSITION)
+                WCMYPA()->setting_collection->getByName(WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_POSITION)
             ),
             [$this, 'output_delivery_options'],
             10
@@ -164,7 +172,7 @@ class WCPN_Checkout
      */
     public function get_delivery_options_shipping_methods()
     {
-        $packageTypes = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES);
+        $packageTypes = WCMYPA()->setting_collection->getByName(WCMYPA_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES);
 
         if (! is_array($packageTypes)) {
             $packageTypes = [];
@@ -187,36 +195,35 @@ class WCPN_Checkout
      */
     public function get_delivery_options_config()
     {
-        $settings = WCPOST()->setting_collection;
+        $settings = WCMYPA()->setting_collection;
         $carriers = $this->get_carriers();
 
-        $postNLConfig = [
+        $myParcelConfig = [
             "config"  => [
                 "currency" => get_woocommerce_currency(),
                 "locale"   => "nl-NL",
                 "platform" => "myparcel",
             ],
             "strings" => [
-                "addressNotFound"       => __("Address details are not entered", "woocommerce-postnl"),
-                "city"                  => __("City", "woocommerce-postnl"),
-                "closed"                => __("Closed", "woocommerce-postnl"),
-                "deliveryEveningTitle"  => $this->getDeliveryOptionsTitle(WCPOST_Settings::SETTING_EVENING_DELIVERY_TITLE),
-                "deliveryMorningTitle"  => $this->getDeliveryOptionsTitle(WCPOST_Settings::SETTING_MORNING_DELIVERY_TITLE),
-                "deliveryStandardTitle" => $this->getDeliveryOptionsTitle(WCPOST_Settings::SETTING_STANDARD_TITLE),
-                "deliveryTitle"         => $this->getDeliveryOptionsTitle(WCPOST_Settings::SETTING_DELIVERY_TITLE),
-                "headerDeliveryOptions" => $this->getDeliveryOptionsTitle(WCPOST_Settings::SETTING_HEADER_DELIVERY_OPTIONS_TITLE),
-                "houseNumber"           => __("House number", "woocommerce-postnl"),
-                "onlyRecipientTitle"    => $this->getDeliveryOptionsTitle(WCPOST_Settings::SETTING_ONLY_RECIPIENT_TITLE),
-                "openingHours"          => __("Opening hours", "woocommerce-postnl"),
-                "pickUpFrom"            => __("Pick up from", "woocommerce-postnl"),
-                "pickupTitle"           => $this->getDeliveryOptionsTitle(WCPOST_Settings::SETTING_PICKUP_TITLE),
-                "postcode"              => __("Postcode", "woocommerce-postnl"),
-                "retry"                 => __("Retry", "woocommerce-postnl"),
-                "signatureTitle"        => $this->getDeliveryOptionsTitle(WCPOST_Settings::SETTING_SIGNATURE_TITLE),
-                "wrongHouseNumberCity"  => __("Postcode/city combination unknown", "woocommerce-postnl"),
+                "addressNotFound"       => __("Address details are not entered", "woocommerce-myparcel"),
+                "city"                  => __("City", "woocommerce-myparcel"),
+                "closed"                => __("Closed", "woocommerce-myparcel"),
+                "deliveryEveningTitle"  => $this->getDeliveryOptionsTitle(WCMYPA_Settings::SETTING_EVENING_DELIVERY_TITLE),
+                "deliveryMorningTitle"  => $this->getDeliveryOptionsTitle(WCMYPA_Settings::SETTING_MORNING_DELIVERY_TITLE),
+                "deliveryStandardTitle" => $this->getDeliveryOptionsTitle(WCMYPA_Settings::SETTING_STANDARD_TITLE),
+                "deliveryTitle"         => $this->getDeliveryOptionsTitle(WCMYPA_Settings::SETTING_DELIVERY_TITLE),
+                "headerDeliveryOptions" => $this->getDeliveryOptionsTitle(WCMYPA_Settings::SETTING_HEADER_DELIVERY_OPTIONS_TITLE),
+                "houseNumber"           => __("House number", "woocommerce-myparcel"),
+                "onlyRecipientTitle"    => $this->getDeliveryOptionsTitle(WCMYPA_Settings::SETTING_ONLY_RECIPIENT_TITLE),
+                "openingHours"          => __("Opening hours", "woocommerce-myparcel"),
+                "pickUpFrom"            => __("Pick up from", "woocommerce-myparcel"),
+                "pickupTitle"           => $this->getDeliveryOptionsTitle(WCMYPA_Settings::SETTING_PICKUP_TITLE),
+                "postcode"              => __("Postcode", "woocommerce-myparcel"),
+                "retry"                 => __("Retry", "woocommerce-myparcel"),
+                "signatureTitle"        => $this->getDeliveryOptionsTitle(WCMYPA_Settings::SETTING_SIGNATURE_TITLE),
+                "wrongHouseNumberCity"  => __("Postcode/city combination unknown", "woocommerce-myparcel"),
             ],
         ];
-
         $chosenShippingMethodPrice = (float) WC()->session->get('cart_totals')['shipping_total'];
 
         foreach ($carriers as $carrier) {
@@ -228,12 +235,12 @@ class WCPN_Checkout
                     $value = $value + $chosenShippingMethodPrice;
                 }
 
-                Arr::set($postNLConfig, 'config.' . $key, $value);
+                Arr::set($myParcelConfig, 'config.' . $key, $value);
             }
         }
-        $postNLConfig['config']['priceStandardDelivery'] = $chosenShippingMethodPrice;
+        $myParcelConfig['config']['priceStandardDelivery'] = $chosenShippingMethodPrice;
 
-        return json_encode($postNLConfig, JSON_UNESCAPED_SLASHES);
+        return json_encode($myParcelConfig, JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -241,11 +248,11 @@ class WCPN_Checkout
      *
      * @return string
      */
-    public function getDeliveryOptionsTitle(string $title): string
+    public static function getDeliveryOptionsTitle(string $title): string
     {
-        $settings = WCPOST()->setting_collection;
+        $settings = WCMYPA()->setting_collection;
 
-        return __(strip_tags($settings->getStringByName($title)), "woocommerce-postnl");
+        return __(strip_tags($settings->getStringByName($title)), "woocommerce-myparcel");
     }
 
     /**
@@ -253,9 +260,9 @@ class WCPN_Checkout
      */
     public function output_delivery_options()
     {
-        do_action('woocommerce_postnl_before_delivery_options');
-        require_once(WCPOST()->includes . '/views/html-delivery-options-template.php');
-        do_action('woocommerce_postnl_after_delivery_options');
+        do_action('woocommerce_myparcel_before_delivery_options');
+        require_once(WCMYPA()->includes . '/views/html-delivery-options-template.php');
+        do_action('woocommerce_myparcel_after_delivery_options');
     }
 
     /**
@@ -265,13 +272,13 @@ class WCPN_Checkout
      */
     private function get_carriers(): array
     {
-        $settings = WCPOST()->setting_collection;
+        $settings = WCMYPA()->setting_collection;
         $carriers = [];
 
-        foreach ([PostNLConsignment::CARRIER_NAME] as $carrier) {
-            if ($settings->getByName("{$carrier}_" . WCPOST_Settings::SETTING_CARRIER_PICKUP_ENABLED)
+        foreach ([PostNLConsignment::CARRIER_NAME, DPDConsignment::CARRIER_NAME] as $carrier) {
+            if ($settings->getByName("{$carrier}_" . WCMYPA_Settings::SETTING_CARRIER_PICKUP_ENABLED)
                 || $settings->getByName(
-                    "{$carrier}_" . WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED
+                    "{$carrier}_" . WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED
                 )) {
                 $carriers[] = $carrier;
             }
@@ -294,15 +301,15 @@ class WCPN_Checkout
         $order = WCX::get_order($order_id);
 
         $shippingMethod       = Arr::get($_POST, "shipping_method");
-        $highestShippingClass = Arr::get($_POST, "postnl_highest_shipping_class") ?? $shippingMethod[0];
+        $highestShippingClass = Arr::get($_POST, "myparcel_highest_shipping_class") ?? $shippingMethod[0];
 
         /**
          * Save the current version of our plugin to the order.
          */
         WCX_Order::update_meta_data(
             $order,
-            WCPOST_Admin::META_ORDER_VERSION,
-            WCPOST()->version
+            WCMYPA_Admin::META_ORDER_VERSION,
+            WCMYPA()->version
         );
 
         /**
@@ -312,13 +319,13 @@ class WCPN_Checkout
          */
         WCX_Order::update_meta_data(
             $order,
-            WCPOST_Admin::META_ORDER_WEIGHT,
+            WCMYPA_Admin::META_ORDER_WEIGHT,
             WC()->cart->get_cart_contents_weight()
         );
 
         WCX_Order::update_meta_data(
             $order,
-            WCPOST_Admin::META_SHIPMENT_OPTIONS_EXTRA,
+            WCMYPA_Admin::META_SHIPMENT_OPTIONS_EXTRA,
             [
                 'collo_amount' => 1,
                 'weight'       => WC()->cart->get_cart_contents_weight(),
@@ -328,38 +335,46 @@ class WCPN_Checkout
         if ($highestShippingClass) {
             WCX_Order::update_meta_data(
                 $order,
-                WCPOST_Admin::META_HIGHEST_SHIPPING_CLASS,
+                WCMYPA_Admin::META_HIGHEST_SHIPPING_CLASS,
                 $highestShippingClass
             );
         }
 
-        $deliveryOptionsFromPost = stripslashes(Arr::get($_POST, WCPOST_Admin::META_DELIVERY_OPTIONS));
+        $deliveryOptionsFromPost          = Arr::get($_POST, WCMYPA_Admin::META_DELIVERY_OPTIONS);
         $deliveryOptionsFromShippingClass = $highestShippingClass
             ? [
-                'packageType' => WCPN_Export::getPackageTypeFromShippingMethod(
+                'packageType' => WCMP_Export::getPackageTypeFromShippingMethod(
                     $shippingMethod[0],
                     $highestShippingClass
                 ),
             ]
             : null;
 
-        $deliveryOptions = $deliveryOptionsFromPost ?? $deliveryOptionsFromShippingClass;
+        $deliveryOptions = empty($deliveryOptionsFromPost)
+            ? $deliveryOptionsFromShippingClass
+            : stripslashes($deliveryOptionsFromPost);
 
         if ($deliveryOptions) {
-            $deliveryOptions = json_decode($deliveryOptions, true);
+            if (! is_array($deliveryOptions)) {
+                $deliveryOptions = json_decode($deliveryOptions, true);
+            }
             $deliveryOptions = self::convertDeliveryOptionsForAdapter($deliveryOptions);
+            $deliveryOptions = WCMYPA_Admin::removeDisallowedDeliveryOptions(
+                $deliveryOptions,
+                $order->get_shipping_country()
+            );
 
             /*
              * Create a new DeliveryOptions class from the data.
              */
-            $deliveryOptions = new WCPN_DeliveryOptionsFromOrderAdapter(null, $deliveryOptions);
+            $deliveryOptions = new WCMP_DeliveryOptionsFromOrderAdapter(null, $deliveryOptions);
 
             /*
              * Store it in the meta data. It will be serialized so class references will be kept.
              */
             WCX_Order::update_meta_data(
                 $order,
-                WCPOST_Admin::META_DELIVERY_OPTIONS,
+                WCMYPA_Admin::META_DELIVERY_OPTIONS,
                 $deliveryOptions
             );
         }
@@ -371,24 +386,24 @@ class WCPN_Checkout
      *
      * @return string[]
      * @throws Exception
-     * @see WCPN_Export::DISALLOWED_SHIPPING_METHODS
+     * @see WCMP_Export::DISALLOWED_SHIPPING_METHODS
      */
     private function getShippingMethodsAllowingDeliveryOptions(): array
     {
         $allowedMethods = [];
-        $displayFor     = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_DELIVERY_OPTIONS_DISPLAY);
+        $displayFor     = WCMYPA()->setting_collection->getByName(WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_DISPLAY);
 
-        if ($displayFor === WCPN_Settings_Data::DISPLAY_FOR_ALL_METHODS) {
+        if ($displayFor === WCMP_Settings_Data::DISPLAY_FOR_ALL_METHODS) {
             return $allowedMethods;
         }
 
-        $shippingMethodsByPackageType = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES);
+        $shippingMethodsByPackageType = WCMYPA()->setting_collection->getByName(WCMYPA_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES);
         $shippingMethodsForPackage    = $shippingMethodsByPackageType[AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME];
 
         foreach ($shippingMethodsForPackage as $shippingMethod) {
             [$methodId] = self::splitShippingMethodString($shippingMethod);
 
-            if (!in_array($methodId, WCPN_Export::DISALLOWED_SHIPPING_METHODS)) {
+            if (!in_array($methodId, WCMP_Export::DISALLOWED_SHIPPING_METHODS)) {
                 $allowedMethods[] = $shippingMethod;
             }
         }
@@ -401,9 +416,9 @@ class WCPN_Checkout
      */
     private function alwaysDisplayDeliveryOptions(): bool
     {
-        $display = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_DELIVERY_OPTIONS_DISPLAY);
+        $display = WCMYPA()->setting_collection->getByName(WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_DISPLAY);
 
-        return $display === WCPN_Settings_Data::DISPLAY_FOR_ALL_METHODS;
+        return $display === WCMP_Settings_Data::DISPLAY_FOR_ALL_METHODS;
     }
 
     /**
@@ -453,29 +468,59 @@ class WCPN_Checkout
     private static function getDeliveryOptionsConfigMap(string $carrier): array
     {
         return [
-            "carrierSettings.$carrier.allowDeliveryOptions"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED, 'isEnabled', false],
-            "carrierSettings.$carrier.allowEveningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED, 'isEnabled', false],
-            "carrierSettings.$carrier.allowMondayDelivery"   => [WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED, 'isEnabled', false],
-            "carrierSettings.$carrier.allowMorningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED, 'isEnabled', false],
-            "carrierSettings.$carrier.allowOnlyRecipient"    => [WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED, 'isEnabled', false],
-            "carrierSettings.$carrier.allowPickupLocations"  => [WCPOST_Settings::SETTING_CARRIER_PICKUP_ENABLED, 'isEnabled', false],
-            "carrierSettings.$carrier.allowSaturdayDelivery" => [WCPOST_Settings::SETTING_CARRIER_SATURDAY_DELIVERY_ENABLED, 'isEnabled', false],
-            "carrierSettings.$carrier.allowSignature"        => [WCPOST_Settings::SETTING_CARRIER_SIGNATURE_ENABLED, 'isEnabled', false],
-            "carrierSettings.$carrier.priceEveningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE, 'getFloatByName', true],
-            "carrierSettings.$carrier.priceMondayDelivery"   => [WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_FEE, 'getFloatByName', true],
-            "carrierSettings.$carrier.priceMorningDelivery"  => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE, 'getFloatByName', true],
-            "carrierSettings.$carrier.priceOnlyRecipient"    => [WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE, 'getFloatByName', false],
-            "carrierSettings.$carrier.pricePickup"           => [WCPOST_Settings::SETTING_CARRIER_PICKUP_FEE, 'getFloatByName', true],
-            "carrierSettings.$carrier.priceSaturdayDelivery" => [WCPOST_Settings::SETTING_CARRIER_SATURDAY_DELIVERY_FEE, 'getFloatByName', true],
-            "carrierSettings.$carrier.priceSignature"        => [WCPOST_Settings::SETTING_CARRIER_SIGNATURE_FEE, 'getFloatByName', false],
-            "cutoffTime"                                     => [WCPOST_Settings::SETTING_CARRIER_CUTOFF_TIME, 'getStringByName', false],
-            "deliveryDaysWindow"                             => [WCPOST_Settings::SETTING_CARRIER_DELIVERY_DAYS_WINDOW, 'getIntegerByName', false],
-            "dropOffDays"                                    => [WCPOST_Settings::SETTING_CARRIER_DROP_OFF_DAYS, 'getByName', false],
-            "dropOffDelay"                                   => [WCPOST_Settings::SETTING_CARRIER_DROP_OFF_DELAY, 'getIntegerByName', false],
-            "fridayCutoffTime"                               => [WCPOST_Settings::SETTING_CARRIER_FRIDAY_CUTOFF_TIME, 'getStringByName', false],
-            "saturdayCutoffTime"                             => [WCPOST_Settings::SETTING_CARRIER_CUTOFF_TIME, 'getStringByName', false],
+            "carrierSettings.$carrier.allowDeliveryOptions"  => [WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowEveningDelivery"  => [WCMYPA_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowMondayDelivery"   => [WCMYPA_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowMorningDelivery"  => [WCMYPA_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowOnlyRecipient"    => [WCMYPA_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowPickupLocations"  => [WCMYPA_Settings::SETTING_CARRIER_PICKUP_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowSaturdayDelivery" => [WCMYPA_Settings::SETTING_CARRIER_SATURDAY_DELIVERY_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.allowSignature"        => [WCMYPA_Settings::SETTING_CARRIER_SIGNATURE_ENABLED, 'isEnabled', false],
+            "carrierSettings.$carrier.priceEveningDelivery"  => [WCMYPA_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE, 'getFloatByName', true],
+            "carrierSettings.$carrier.priceMondayDelivery"   => [WCMYPA_Settings::SETTING_CARRIER_MONDAY_DELIVERY_FEE, 'getFloatByName', true],
+            "carrierSettings.$carrier.priceMorningDelivery"  => [WCMYPA_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE, 'getFloatByName', true],
+            "carrierSettings.$carrier.priceOnlyRecipient"    => [WCMYPA_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE, 'getFloatByName', false],
+            "carrierSettings.$carrier.pricePickup"           => [WCMYPA_Settings::SETTING_CARRIER_PICKUP_FEE, 'getFloatByName', true],
+            "carrierSettings.$carrier.priceSaturdayDelivery" => [WCMYPA_Settings::SETTING_CARRIER_SATURDAY_DELIVERY_FEE, 'getFloatByName', true],
+            "carrierSettings.$carrier.priceSignature"        => [WCMYPA_Settings::SETTING_CARRIER_SIGNATURE_FEE, 'getFloatByName', false],
+            "cutoffTime"                                     => [WCMYPA_Settings::SETTING_CARRIER_CUTOFF_TIME, 'getStringByName', false],
+            "deliveryDaysWindow"                             => [WCMYPA_Settings::SETTING_CARRIER_DELIVERY_DAYS_WINDOW, 'getIntegerByName', false],
+            "dropOffDays"                                    => [WCMYPA_Settings::SETTING_CARRIER_DROP_OFF_DAYS, 'getByName', false],
+            "dropOffDelay"                                   => [WCMYPA_Settings::SETTING_CARRIER_DROP_OFF_DELAY, 'getIntegerByName', false],
+            "fridayCutoffTime"                               => [WCMYPA_Settings::SETTING_CARRIER_FRIDAY_CUTOFF_TIME, 'getStringByName', false],
+            "saturdayCutoffTime"                             => [WCMYPA_Settings::SETTING_CARRIER_CUTOFF_TIME, 'getStringByName', false],
         ];
+    }
+
+    /**
+     * Show delivery options also for shipments on backorder
+     * @return bool
+     */
+    private function shouldShowDeliveryOptions(): bool
+    {
+        // $backorderDeliveryOptions causes the options to be displayed also when product is in backorder
+        $backorderDeliveryOptions = WCMYPA()->setting_collection->isEnabled(WCMYPA_Settings::SETTINGS_SHOW_DELIVERY_OPTIONS_FOR_BACKORDERS);
+        $show                     = true;
+
+        if ($backorderDeliveryOptions) {
+            return $show;
+        }
+
+        foreach (WC()->cart->get_cart() as $cartItem) {
+            /**
+             * @var WC_Product $product
+             */
+            $product       = $cartItem['data'];
+            $isOnBackorder = $product->is_on_backorder($cartItem['quantity']);
+
+            if ($isOnBackorder) {
+                $show = false;
+                break;
+            }
+        }
+
+        return $show;
     }
 }
 
-return new WCPN_Checkout();
+return new WCMP_Checkout();

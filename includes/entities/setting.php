@@ -1,10 +1,10 @@
 <?php
 
-namespace WPO\WC\PostNL\Entity;
+namespace WPO\WC\MyParcel\Entity;
 
 defined('ABSPATH') or exit;
 
-if (class_exists('\\WPO\\WC\\PostNL\\Entity\\Setting')) {
+if (class_exists('\\WPO\\WC\\MyParcel\\Entity\\Setting')) {
     return;
 }
 

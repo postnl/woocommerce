@@ -1,5 +1,6 @@
 <?php
 
+use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 
@@ -7,14 +8,14 @@ if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCPOST_Settings')) {
-    return new WCPOST_Settings();
+if (class_exists('WCMYPA_Settings')) {
+    return new WCMYPA_Settings();
 }
 
 /**
  * Create & render settings page
  */
-class WCPOST_Settings
+class WCMYPA_Settings
 {
     public const SETTINGS_MENU_SLUG = "wcpn_settings";
 
@@ -22,6 +23,7 @@ class WCPOST_Settings
     public const SETTINGS_CHECKOUT        = "checkout";
     public const SETTINGS_EXPORT_DEFAULTS = "export_defaults";
     public const SETTINGS_POSTNL          = PostNLConsignment::CARRIER_NAME;
+    public const SETTINGS_DPD             = DPDConsignment::CARRIER_NAME;
 
     /**
      * General
@@ -43,39 +45,44 @@ class WCPOST_Settings
      * Export defaults
      */
     public const SETTING_SHIPPING_METHODS_PACKAGE_TYPES = "shipping_methods_package_types";
+    public const SETTING_CONNECT_EMAIL                  = "connect_email";
     public const SETTING_CONNECT_PHONE                  = "connect_phone";
     public const SETTING_LABEL_DESCRIPTION              = "label_description";
     public const SETTING_EMPTY_PARCEL_WEIGHT            = "empty_parcel_weight";
     public const SETTING_HS_CODE                        = "hs_code";
     public const SETTING_PACKAGE_CONTENT                = "package_contents";
     public const SETTING_COUNTRY_OF_ORIGIN              = "country_of_origin";
+    public const SETTING_AUTOMATIC_EXPORT               = "export_automatic";
+    public const SETTING_RETURN_IN_THE_BOX              = "return_in_the_box";
 
     /**
      * Checkout
      */
-    public const SETTING_DELIVERY_OPTIONS_CUSTOM_CSS   = "delivery_options_custom_css";
-    public const SETTING_DELIVERY_OPTIONS_DISPLAY      = "delivery_options_display";
-    public const SETTING_DELIVERY_OPTIONS_ENABLED      = "delivery_options_enabled";
-    public const SETTING_DELIVERY_OPTIONS_POSITION     = "delivery_options_position";
-    public const SETTING_SHOW_DELIVERY_DAY             = "show_delivery_day";
-    public const SETTING_DELIVERY_TITLE                = "delivery_title";
-    public const SETTING_HEADER_DELIVERY_OPTIONS_TITLE = "header_delivery_options_title";
-    public const SETTING_PICKUP_TITLE                  = "pickup_title";
-    public const SETTING_MORNING_DELIVERY_TITLE        = "morning_title";
-    public const SETTING_EVENING_DELIVERY_TITLE        = "evening_title";
-    public const SETTING_ONLY_RECIPIENT_TITLE          = "only_recipient_title";
-    public const SETTING_SIGNATURE_TITLE               = "signature_title";
-    public const SETTING_STANDARD_TITLE                = "standard_title";
-    public const SETTING_USE_SPLIT_ADDRESS_FIELDS      = "use_split_address_fields";
+    public const SETTING_DELIVERY_OPTIONS_CUSTOM_CSS           = "delivery_options_custom_css";
+    public const SETTING_DELIVERY_OPTIONS_DISPLAY              = "delivery_options_display";
+    public const SETTING_DELIVERY_OPTIONS_ENABLED              = "delivery_options_enabled";
+    public const SETTING_DELIVERY_OPTIONS_POSITION             = "delivery_options_position";
+    public const SETTINGS_SHOW_DELIVERY_OPTIONS_FOR_BACKORDERS = "delivery_options_enabled_for_backorders";
+    public const SETTING_SHOW_DELIVERY_DAY                     = "show_delivery_day";
+    public const SETTING_DELIVERY_TITLE                        = "delivery_title";
+    public const SETTING_HEADER_DELIVERY_OPTIONS_TITLE         = "header_delivery_options_title";
+    public const SETTING_PICKUP_TITLE                          = "pickup_title";
+    public const SETTING_MORNING_DELIVERY_TITLE                = "morning_title";
+    public const SETTING_EVENING_DELIVERY_TITLE                = "evening_title";
+    public const SETTING_ONLY_RECIPIENT_TITLE                  = "only_recipient_title";
+    public const SETTING_SIGNATURE_TITLE                       = "signature_title";
+    public const SETTING_STANDARD_TITLE                        = "standard_title";
+    public const SETTING_USE_SPLIT_ADDRESS_FIELDS              = "use_split_address_fields";
 
     /*
      * Carrier settings, these will be prefixed with carrier names.
      *
-     * e.g. cutoff_time => postnl_cutoff_time
+     * e.g. cutoff_time => postnl_cutoff_time/dpd_cutoff_time
      */
     // Defaults
     public const SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE          = "export_signature";
     public const SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT     = "export_only_recipient";
+    public const SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT       = "export_large_format";
     public const SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK          = "export_age_check";
     public const SETTING_CARRIER_DEFAULT_EXPORT_RETURN             = "export_return_shipments";
     public const SETTING_CARRIER_DEFAULT_EXPORT_INSURED            = "export_insured";
@@ -116,7 +123,7 @@ class WCPOST_Settings
     {
         add_action("admin_menu", [$this, "menu"]);
         add_filter(
-            "plugin_action_links_" . WCPOST()->plugin_basename,
+            "plugin_action_links_" . WCMYPA()->plugin_basename,
             [
                 $this,
                 "add_settings_link",
@@ -138,8 +145,8 @@ class WCPOST_Settings
         // Create the admin settings
         require_once("class-wcpn-settings-data.php");
 
-        // notice for WooCommerce PostNL plugin
-        add_action("woocommerce_postnl_before_settings_page", [$this, "postnl_country_notice"], 10, 1);
+        // notice for WooCommerce MyParcel plugin
+        add_action("woocommerce_myparcel_before_settings_page", [$this, "myparcel_country_notice"], 10, 1);
     }
 
     /**
@@ -149,8 +156,8 @@ class WCPOST_Settings
     {
         add_submenu_page(
             "woocommerce",
-            __("PostNL", "woocommerce-postnl"),
-            __("PostNL", "woocommerce-postnl"),
+            __("MyParcel", "woocommerce-myparcel"),
+            __("MyParcel", "woocommerce-myparcel"),
             "manage_options",
             self::SETTINGS_MENU_SLUG,
             [$this, "settings_page"]
@@ -173,7 +180,7 @@ class WCPOST_Settings
             sprintf(
                 '<a href="%s">%s</a>',
                 $url,
-                __("Settings", "woocommerce-postnl")
+                __("Settings", "woocommerce-myparcel")
             )
         );
 
@@ -187,13 +194,13 @@ class WCPOST_Settings
     {
         $settings_tabs = apply_filters(
             self::SETTINGS_MENU_SLUG . "_tabs",
-            WCPN_Settings_Data::getTabs()
+            WCMP_Settings_Data::getTabs()
         );
 
         $active_tab = isset($_GET["tab"]) ? $_GET["tab"] : self::SETTINGS_GENERAL;
         ?>
         <div class="wrap woocommerce">
-            <h1><?php _e("WooCommerce PostNL Settings", "woocommerce-postnl"); ?></h1>
+            <h1><?php _e("WooCommerce PostNL Settings", "woocommerce-myparcel"); ?></h1>
             <h2 class="nav-tab-wrapper">
                 <?php
                 foreach ($settings_tabs as $tab_slug => $tab_title) :
@@ -208,21 +215,21 @@ class WCPOST_Settings
                 endforeach;
                 ?>
             </h2>
-            <?php do_action("woocommerce_postnl_before_settings_page", $active_tab); ?>
+            <?php do_action("woocommerce_myparcel_before_settings_page", $active_tab); ?>
             <form
                     method="post"
                     action="options.php"
                     id="<?php echo self::SETTINGS_MENU_SLUG; ?>">
                 <?php
-                do_action("woocommerce_postnl_before_settings", $active_tab);
+                do_action("woocommerce_myparcel_before_settings", $active_tab);
                 settings_fields(self::getOptionId($active_tab));
                 $this->render_settings_sections(self::getOptionId($active_tab));
-                do_action("woocommerce_postnl_after_settings", $active_tab);
+                do_action("woocommerce_myparcel_after_settings", $active_tab);
 
                 submit_button();
                 ?>
             </form>
-            <?php do_action("woocommerce_postnl_after_settings_page", $active_tab); ?>
+            <?php do_action("woocommerce_myparcel_after_settings_page", $active_tab); ?>
         </div>
         <?php
     }
@@ -230,33 +237,33 @@ class WCPOST_Settings
     /**
      * Show the user a notice if they might be using the wrong plugin.
      */
-    public function postnl_country_notice()
+    public function myparcel_country_notice()
     {
         $base_country = WC()->countries->get_base_country();
 
         // save or check option to hide notice
-        if (Arr::get($_GET, "postnl_hide_be_notice")) {
-            update_option("postnl_hide_be_notice", true);
+        if (Arr::get($_GET, "myparcel_hide_be_notice")) {
+            update_option("myparcel_hide_be_notice", true);
             $hide_notice = true;
         } else {
-            $hide_notice = get_option("postnl_hide_be_notice");
+            $hide_notice = get_option("myparcel_hide_be_notice");
         }
 
         // link to hide message when one of the premium extensions is installed
         if (! $hide_notice && $base_country === "BE") {
-            $postnl_nl_link =
-                '<a href="https://wordpress.org/plugins/woocommerce-postnl/" target="blank">WC PostNL Netherlands</a>';
+            $myparcel_nl_link =
+                '<a href="https://wordpress.org/plugins/woocommerce-myparcel/" target="blank">WC MyParcel Netherlands</a>';
             $text             = sprintf(
                 __(
-                    "It looks like your shop is based in Netherlands. This plugin is for PostNL. If you are using PostNL Netherlands, download the %s plugin instead!",
-                    "woocommerce-postnl"
+                    "It looks like your shop is based in Netherlands. This plugin is for MyParcel. If you are using MyParcel Netherlands, download the %s plugin instead!",
+                    "woocommerce-myparcel"
                 ),
-                $postnl_nl_link
+                $myparcel_nl_link
             );
             $dismiss_button   = sprintf(
                 '<a href="%s" style="display:inline-block; margin-top: 10px;">%s</a>',
-                add_query_arg('postnl_hide_be_notice', 'true'),
-                __("Hide this message", "woocommerce-postnl")
+                add_query_arg('myparcel_hide_be_notice', 'true'),
+                __("Hide this message", "woocommerce-myparcel")
             );
             printf('<div class="notice notice-warning"><p>%s %s</p></div>', $text, $dismiss_button);
         }
@@ -269,7 +276,7 @@ class WCPOST_Settings
      */
     public static function getOptionId(string $option)
     {
-        return "woocommerce_postnl_{$option}_settings";
+        return "woocommerce_myparcel_{$option}_settings";
     }
 
     /**
@@ -343,7 +350,7 @@ class WCPOST_Settings
             $helpText = Arr::get($field, "args.help_text");
             $label    = Arr::get($field, "args.label_for");
 
-            printf('<th scope="row""><label class="wcpn__white-space--nowrap" %s>%s%s</label></th>',
+            printf('<th scope="row""><label class="wcpn__ws--nowrap" %s>%s%s</label></th>',
                 $label ? "for=\"" . esc_attr($label) . "\"" : "",
                 Arr::get($field, "title"),
                 $helpText ? wc_help_tip($helpText) : ""
@@ -363,4 +370,4 @@ class WCPOST_Settings
     }
 }
 
-return new WCPOST_Settings();
+return new WCMYPA_Settings();

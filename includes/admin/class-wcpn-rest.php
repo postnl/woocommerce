@@ -6,14 +6,14 @@ if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCPN_Rest')) {
+if (class_exists('WCMP_Rest')) {
     return;
 }
 
 /**
  * A simple JSON REST request abstraction layer
  */
-class WCPN_Rest
+class WCMP_Rest
 {
 
     /**
@@ -181,7 +181,7 @@ class WCPN_Rest
         // Set the method and related options
         switch ($method) {
             case "PUT":
-                throw new Exception('Can not put PostNL shipment', 500);
+                throw new Exception('Can not put MyParcel shipment', 500);
                 break;
 
             case "POST":
@@ -189,7 +189,7 @@ class WCPN_Rest
                 break;
 
             case "DELETE":
-                throw new Exception('Can not delete PostNL shipment', 500);
+                throw new Exception('Can not delete MyParcel shipment', 500);
                 break;
 
             case "GET":

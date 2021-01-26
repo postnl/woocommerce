@@ -1,0 +1,80 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "55c60685364320c33cc31c4f98f2bfdd",
+    "packages": [
+        {
+            "name": "myparcelnl/sdk",
+            "version": "v5.2.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/myparcelnl/sdk.git",
+                "reference": "41cc4fc8562ffd6f6b1c4b6965c79ea37ffbbb34"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/41cc4fc8562ffd6f6b1c4b6965c79ea37ffbbb34",
+                "reference": "41cc4fc8562ffd6f6b1c4b6965c79ea37ffbbb34",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.5"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/AutoLoader.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Reindert Vetter",
+                    "email": "support@myparcel.nl",
+                    "homepage": "https://www.myparcel.nl",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Richard Perdaan",
+                    "email": "support@myparcel.nl",
+                    "homepage": "https://www.myparcel.nl",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Edie Lemoine",
+                    "email": "support@myparcel.nl",
+                    "homepage": "https://www.myparcel.nl",
+                    "role": "Developer"
+                }
+            ],
+            "description": "This package is designed to send and receive data from MyParcel by means of an API.",
+            "homepage": "https://www.myparcel.nl",
+            "keywords": [
+                "Flespakket",
+                "My Parcel",
+                "Post NL",
+                "myparcel",
+                "postnl"
+            ],
+            "time": "2021-01-25T15:47:37+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
+}

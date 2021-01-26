@@ -7,14 +7,14 @@ if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCPN_Cart_Fees')) {
+if (class_exists('WCMP_Cart_Fees')) {
     return;
 }
 
 /**
  * Frontend views
  */
-class WCPN_Cart_Fees
+class WCMP_Cart_Fees
 {
     /**
      * @var array
@@ -41,26 +41,35 @@ class WCPN_Cart_Fees
      */
     public function get_delivery_options_fees(WC_Cart $cart): void
     {
-        if (is_admin() && ! defined('DOING_AJAX')) {
+        if (! defined('DOING_AJAX') && is_admin()) {
             return;
         }
 
         if (isset($_POST['post_data'])) {
             // non-default post data for AJAX calls
-            parse_str($_POST['post_data'], $post_data);
+            parse_str($_POST['post_data'], $postData);
         } else {
             // checkout finalization
-            $post_data = $_POST;
+            $postData = $_POST;
         }
 
-        /*  check for delivery options & add fees*/
-        if (empty($post_data[WCPOST_Admin::META_DELIVERY_OPTIONS])) {
+        // Check if delivery options exist at all.
+        if (empty($postData[WCMYPA_Admin::META_DELIVERY_OPTIONS])) {
             return;
         }
 
-        $delivery_options_data = $post_data[WCPOST_Admin::META_DELIVERY_OPTIONS];
-        $delivery_options_data = json_decode(stripslashes($delivery_options_data), true);
-        $this->deliveryOptions = DeliveryOptionsAdapterFactory::create($delivery_options_data);
+        $deliveryOptionsData = $postData[WCMYPA_Admin::META_DELIVERY_OPTIONS];
+        $deliveryOptionsData = json_decode(stripslashes($deliveryOptionsData), true);
+
+        /*
+         * Check if delivery options is null. Happens when when switching to a shipping method that does not allow
+         * showing delivery options, for example.
+         */
+        if (!$deliveryOptionsData) {
+            return;
+        }
+
+        $this->deliveryOptions = DeliveryOptionsAdapterFactory::create($deliveryOptionsData);
 
         $this->addDeliveryFee();
         $this->addShipmentOptionFees();
@@ -84,7 +93,7 @@ class WCPN_Cart_Fees
     /**
      * Get shipping tax class
      * adapted from WC_Tax::get_shipping_tax_rates
-     * assumes per order shipping (per item shipping not supported for postnl yet)
+     * assumes per order shipping (per item shipping not supported for myparcel yet)
      *
      * @return string tax class
      */
@@ -154,16 +163,13 @@ class WCPN_Cart_Fees
             if ($enabled) {
                 $this->addFee($shipmentOption);
             }
-
         }
-
-        return;
     }
 
     /**
      * @param WC_Cart $cart
      */
-    private function addFees(WC_Cart $cart)
+    private function addFees(WC_Cart $cart): void
     {
         $tax = $this->get_shipping_tax_class();
 
@@ -171,7 +177,7 @@ class WCPN_Cart_Fees
             [$string, $fee] = $this->getFee($name);
 
             if ($string) {
-                $cart->add_fee($string, $fee, ! ! $tax, $tax ?? "");
+                $cart->add_fee($string, $fee, (bool) $tax, $tax ?? "");
             }
         }
     }
@@ -196,15 +202,15 @@ class WCPN_Cart_Fees
         $carrier = $this->deliveryOptions->getCarrier();
 
         $getCarrierFee = function(string $setting) use ($carrier): float {
-            return WCPOST()->setting_collection->getFloatByName("{$carrier}_{$setting}");
+            return WCMYPA()->setting_collection->getFloatByName("{$carrier}_{$setting}");
         };
 
         return [
-            "delivery_evening" => $getCarrierFee(WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE),
-            "delivery_morning" => $getCarrierFee(WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE),
-            "delivery_pickup"  => $getCarrierFee(WCPOST_Settings::SETTING_CARRIER_PICKUP_FEE),
-            "only_recipient"   => $getCarrierFee(WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE),
-            "signature"        => $getCarrierFee(WCPOST_Settings::SETTING_CARRIER_SIGNATURE_FEE),
+            "delivery_evening" => $getCarrierFee(WCMYPA_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE),
+            "delivery_morning" => $getCarrierFee(WCMYPA_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE),
+            "delivery_pickup"  => $getCarrierFee(WCMYPA_Settings::SETTING_CARRIER_PICKUP_FEE),
+            "only_recipient"   => $getCarrierFee(WCMYPA_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE),
+            "signature"        => $getCarrierFee(WCMYPA_Settings::SETTING_CARRIER_SIGNATURE_FEE),
         ];
     }
 
@@ -215,14 +221,14 @@ class WCPN_Cart_Fees
      */
     private function getFeeTitles(): array
     {
-        $carrierName = WCPN_Data::getCarriersHuman()[$this->deliveryOptions->getCarrier()];
+        $carrierName = WCMP_Data::getCarriersHuman()[$this->deliveryOptions->getCarrier()];
 
         return [
-            "delivery_evening" => __("Evening delivery", "woocommerce-postnl"),
-            "delivery_morning" => __("Morning delivery", "woocommerce-postnl"),
-            "delivery_pickup"  => __("Pick up at", "woocommerce-postnl") . " $carrierName",
-            "only_recipient"   => __("Only recipient", "woocommerce-postnl"),
-            "signature"        => __("Signature on delivery", "woocommerce-postnl"),
+            "delivery_evening" => __("Evening delivery", "woocommerce-myparcel"),
+            "delivery_morning" => __("Morning delivery", "woocommerce-myparcel"),
+            "delivery_pickup"  => __("Pick up at", "woocommerce-myparcel") . " $carrierName",
+            "only_recipient"   => __("Only recipient", "woocommerce-myparcel"),
+            "signature"        => __("Signature on delivery", "woocommerce-myparcel"),
         ];
     }
 

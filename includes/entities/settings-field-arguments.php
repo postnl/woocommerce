@@ -1,13 +1,13 @@
 <?php
 
-namespace WPO\WC\PostNL\Entity;
+namespace WPO\WC\MyParcel\Entity;
 
 use MyParcelNL\Sdk\src\Support\Arr;
-use WCPN_Settings_Data;
+use WCMP_Settings_Data;
 
 defined('ABSPATH') or exit;
 
-if (class_exists('\\WPO\\WC\\PostNL\\Entity\\SettingsFieldArguments')) {
+if (class_exists('\\WPO\\WC\\MyParcel\\Entity\\SettingsFieldArguments')) {
     return;
 }
 
@@ -129,10 +129,9 @@ class SettingsFieldArguments
      */
     public function __construct(array $args, string $prefix = '' , string $suffix = '')
     {
-        $this->input     = $args;
-        $this->prefix     = $prefix;
-        $this->suffix     = $suffix;
-        $this->option_id = $args["option_id"] ?? null;
+        $this->input  = $args;
+        $this->prefix = $prefix;
+        $this->suffix = $suffix;
 
         $this->name        = $this->wrap($this->getInputArgument("name"));
         $this->id          = $this->getInputArgument("id") ?? $this->name;
@@ -167,8 +166,8 @@ class SettingsFieldArguments
                 $this->addArgument(
                     "options",
                     [
-                        "1" => __("Enabled", "woocommerce-postnl"),
-                        "0" => __("Disabled", "woocommerce-postnl"),
+                        "1" => __("Enabled", "woocommerce-myparcel"),
+                        "0" => __("Disabled", "woocommerce-myparcel"),
                     ]
                 );
                 break;
@@ -208,10 +207,10 @@ class SettingsFieldArguments
             return;
         }
 
-        if (is_array($conditionArgument)) {
-            $conditions = $conditionArgument;
-        } else {
+        if (!is_array($conditionArgument) || Arr::isAssoc($conditionArgument)) {
             $conditions[] = $conditionArgument;
+        } else {
+            $conditions = $conditionArgument;
         }
 
         $conditionData = array_map([$this, "createCondition"], $conditions);
@@ -368,14 +367,6 @@ class SettingsFieldArguments
     }
 
     /**
-     * @return string|null
-     */
-    public function getOptionId(): ?string
-    {
-        return $this->option_id;
-    }
-
-    /**
      * @return string
      */
     public function getType(): string
@@ -424,19 +415,19 @@ class SettingsFieldArguments
     }
 
     /**
-     * @param string $id
-     */
-    public function setId(string $id): void
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return mixed
      */
     public function getDefault()
     {
         return $this->default;
+    }
+
+    /**
+     * @param string $id
+     */
+    public function setId(string $id): void
+    {
+        $this->id = $id;
     }
 
     /**
@@ -464,7 +455,7 @@ class SettingsFieldArguments
     {
         if (is_array($condition)) {
             $parentName  = $this->wrap($condition['parent_name']);
-            $parentValue = $condition['parent_value'] ?? WCPN_Settings_Data::ENABLED;
+            $parentValue = $condition['parent_value'] ?? WCMP_Settings_Data::ENABLED;
 
             $condition['parents'] = [
                 $parentName => $parentValue,
@@ -483,7 +474,7 @@ class SettingsFieldArguments
                 self::CONDITION_DEFAULTS,
                 [
                     "parents" => [
-                        $parentName => WCPN_Settings_Data::ENABLED,
+                        $parentName => WCMP_Settings_Data::ENABLED,
                     ],
                 ]
             );

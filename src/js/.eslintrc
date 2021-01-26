@@ -1,0 +1,13 @@
+{
+  "env": {
+    "jquery": true
+  },
+  "globals": {
+    "MyParcel": "readonly",
+    "MyParcelDeliveryOptions": "readonly",
+    "MyParcelDisplaySettings": "readonly",
+    "MyParcelFrontend": "readonly",
+    "tb_show": "readonly",
+    "wcpn": "readonly"
+  }
+}

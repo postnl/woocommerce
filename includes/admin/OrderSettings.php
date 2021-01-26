@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
-use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
-use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
+use WPO\WC\MyParcel\Compatibility\Order as WCX_Order;
+use WPO\WC\MyParcel\Compatibility\Product as WCX_Product;
 
 class OrderSettings
 {
@@ -32,6 +32,12 @@ class OrderSettings
      * @var float
      */
     private $weight;
+
+    /**
+     * @var int
+     */
+    private $digitalStampRangeWeight;
+
     /**
      * @var bool
      */
@@ -99,10 +105,10 @@ class OrderSettings
     ) {
         $this->order           = $order;
         $this->deliveryOptions = $deliveryOptions;
-        $this->carrier         = $deliveryOptions->getCarrier() ?? WCPN_Data::DEFAULT_CARRIER;
+        $this->carrier         = $deliveryOptions->getCarrier() ?? WCMP_Data::DEFAULT_CARRIER;
         $this->shipmentOptions = $deliveryOptions->getShipmentOptions();
 
-        $this->extraOptionsMeta = WCX_Order::get_meta($this->order, WCPOST_Admin::META_SHIPMENT_OPTIONS_EXTRA);
+        $this->extraOptionsMeta = WCX_Order::get_meta($this->order, WCMYPA_Admin::META_SHIPMENT_OPTIONS_EXTRA);
 
         $this->setAllData();
     }
@@ -115,6 +121,13 @@ class OrderSettings
         return $this->weight;
     }
 
+    /**
+     * @return int
+     */
+    public function getDigitalStampRangeWeight(): int
+    {
+        return $this->digitalStampRangeWeight;
+    }
 
     /**
      * @return bool
@@ -206,6 +219,7 @@ class OrderSettings
         $this->setLabelDescription();
 
         $this->setAgeCheck();
+        $this->setLargeFormat();
         $this->setOnlyRecipient();
         $this->setReturnShipment();
         $this->setSignature();
@@ -213,6 +227,7 @@ class OrderSettings
         $this->setInsuranceData();
 
         $this->setWeight();
+        $this->setDigitalStampRangeWeight();
     }
 
     /**
@@ -220,7 +235,7 @@ class OrderSettings
      */
     private function setWeight(): void
     {
-        $orderWeight = $this->order->get_meta(WCPOST_Admin::META_ORDER_WEIGHT);
+        $orderWeight = $this->order->get_meta(WCMYPA_Admin::META_ORDER_WEIGHT);
 
         $this->weight = (float) $orderWeight;
     }
@@ -230,10 +245,37 @@ class OrderSettings
      */
     private function setAgeCheck(): void
     {
-        $this->ageCheck = (bool) WCPN_Export::getChosenOrDefaultShipmentOption(
-            $this->shipmentOptions->hasAgeCheck(),
-            "{$this->carrier}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK
-        );
+        $settingName                 = "{$this->carrier}_" . WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK;
+        $ageCheckFromShipmentOptions = $this->shipmentOptions->hasAgeCheck();
+        $ageCheckOfProduct           = $this->getAgeCheckOfProduct();
+        $ageCheckFromSettings        = (bool) WCMYPA()->setting_collection->getByName($settingName);
+
+        $this->ageCheck = $ageCheckFromShipmentOptions ?? $ageCheckOfProduct ?? $ageCheckFromSettings;
+    }
+
+    /**
+     * Gets product age check value based on if it was explicitly set to either true or false. It defaults to inheriting from the default export settings.
+     *
+     * @return ?bool
+     */
+    private function getAgeCheckOfProduct(): ?bool
+    {
+        $hasAgeCheck = null;
+
+        foreach ($this->order->get_items() as $item) {
+            $product         = $item->get_product();
+            $productAgeCheck = WCX_Product::get_meta($product, WCMYPA_Admin::META_AGE_CHECK, true);
+
+            if ($productAgeCheck === 1) {
+                return true;
+            }
+
+            if ($productAgeCheck === 0) {
+                $hasAgeCheck = false;
+            }
+        }
+
+        return $hasAgeCheck;
     }
 
     /**
@@ -242,6 +284,17 @@ class OrderSettings
     private function setColloAmount(): void
     {
         $this->colloAmount = (int) ($this->extraOptionsMeta['collo_amount'] ?? 1);
+    }
+
+    /**
+     * @return void
+     */
+    private function setDigitalStampRangeWeight(): void
+    {
+        $orderWeight = $this->getWeight();
+        $metaWeight  = ((float) $this->extraOptionsMeta["weight"]) ?? null;
+
+        $this->digitalStampRangeWeight = WCMP_Export::getDigitalStampRangeFromWeight($metaWeight ?? $orderWeight);
     }
 
     /**
@@ -255,10 +308,10 @@ class OrderSettings
         $insuranceAmount = 0;
 
         $isDefaultInsured                  = $this->getCarrierSetting(
-            WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED
+            WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED
         );
         $isDefaultInsuredFromPrice         = $this->getCarrierSetting(
-            WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FROM_PRICE
+            WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FROM_PRICE
         );
         $orderTotalExceedsInsuredFromPrice = $this->order->get_total() >= $isDefaultInsuredFromPrice;
         $insuranceFromDeliveryOptions      = $this->shipmentOptions->getInsurance();
@@ -268,7 +321,7 @@ class OrderSettings
             $insuranceAmount = $insuranceFromDeliveryOptions;
         } elseif ($isDefaultInsured && $orderTotalExceedsInsuredFromPrice) {
             $isInsured       = true;
-            $insuranceAmount = $this->getCarrierSetting(WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT);
+            $insuranceAmount = $this->getCarrierSetting(WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT);
         }
 
         $this->insured         = $isInsured;
@@ -281,7 +334,7 @@ class OrderSettings
     private function setLabelDescription(): void
     {
         $defaultValue     = "Order: " . $this->order->get_id();
-        $valueFromSetting = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_LABEL_DESCRIPTION);
+        $valueFromSetting = WCMYPA()->setting_collection->getByName(WCMYPA_Settings::SETTING_LABEL_DESCRIPTION);
         $valueFromOrder   = $this->shipmentOptions->getLabelDescription();
 
         $this->labelDescription = (string) ($valueFromOrder ?? $valueFromSetting ?? $defaultValue);
@@ -290,11 +343,22 @@ class OrderSettings
     /**
      * @return void
      */
+    private function setLargeFormat(): void
+    {
+        $this->largeFormat = (bool) WCMP_Export::getChosenOrDefaultShipmentOption(
+            $this->shipmentOptions->hasLargeFormat(),
+            "{$this->carrier}_" . WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT
+        );
+    }
+
+    /**
+     * @return void
+     */
     private function setOnlyRecipient(): void
     {
-        $this->onlyRecipient = (bool) WCPN_Export::getChosenOrDefaultShipmentOption(
+        $this->onlyRecipient = (bool) WCMP_Export::getChosenOrDefaultShipmentOption(
             $this->shipmentOptions->hasOnlyRecipient(),
-            "{$this->carrier}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT
+            "{$this->carrier}_" . WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT
         );
     }
 
@@ -304,7 +368,7 @@ class OrderSettings
      */
     private function setPackageType(): void
     {
-        $packageType = WCPOST()->export->getPackageTypeFromOrder($this->order, $this->deliveryOptions);
+        $packageType = WCMYPA()->export->getPackageTypeFromOrder($this->order, $this->deliveryOptions);
         $this->packageType = $packageType;
     }
 
@@ -313,9 +377,9 @@ class OrderSettings
      */
     private function setReturnShipment(): void
     {
-        $this->returnShipment = (bool) WCPN_Export::getChosenOrDefaultShipmentOption(
+        $this->returnShipment = (bool) WCMP_Export::getChosenOrDefaultShipmentOption(
             $this->shipmentOptions->isReturn(),
-            "{$this->carrier}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN
+            "{$this->carrier}_" . WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN
         );
     }
 
@@ -324,9 +388,9 @@ class OrderSettings
      */
     private function setSignature(): void
     {
-        $this->signature = (bool) WCPN_Export::getChosenOrDefaultShipmentOption(
+        $this->signature = (bool) WCMP_Export::getChosenOrDefaultShipmentOption(
             $this->shipmentOptions->hasSignature(),
-            "{$this->carrier}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE
+            "{$this->carrier}_" . WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE
         );
     }
 
@@ -337,6 +401,6 @@ class OrderSettings
      */
     private function getCarrierSetting(string $settingName)
     {
-        return WCPOST()->setting_collection->getByName("{$this->carrier}_" . $settingName);
+        return WCMYPA()->setting_collection->getByName("{$this->carrier}_" . $settingName);
     }
 }
