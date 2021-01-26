@@ -91,7 +91,7 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 == Changelog ==
 
 = 4.2.0 (2021-01-21) =
-* Fix: Rename `WCMP`, `WCMP()`, `WCMP_Admin` and `WCMP_Settings`
+* Fix: Rename `WCPN`, `WCPN()`, `WCPN_Admin` and `WCPN_Settings`
 * Fix: Weight calculation for all shipment types
 * Fix: Delivery options after woocommerce subtotal for solving conflicts with multiple themes
 * Fix: Error array_replace_recursive second parameter must be array
@@ -154,7 +154,7 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 = 4.1.1 (2020-11-11) =
 * Fix: 4.1.0 migration fatal errors
-* Fix: PHP Fatal error: Uncaught TypeError: Return value of WCMP_Export::getPackageTypeFromOrder()
+* Fix: PHP Fatal error: Uncaught TypeError: Return value of WCPN_Export::getPackageTypeFromOrder()
 
 = 4.1.0 (2020-11-11) =
 * Improvement: All enabled/disabled dropdowns replaced with clickable toggles.
@@ -175,7 +175,7 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 = 4.0.6 (2020-10-14) =
 * Fix: Free_shipping linked to package then you should also see the delivery options
 * Fix: If you have a shipping method with flatrate: 181 and the method gives flatrate: 18 then you should not see the delivery options
-* Fix: Error CRITICAL Uncaught TypeError: Return value of WCMP_Export::getShippingMethod()
+* Fix: Error CRITICAL Uncaught TypeError: Return value of WCPN_Export::getShippingMethod()
 
 = 4.0.5 (2020-10-05) =
 * Fix: Disable order status delivered
@@ -223,10 +223,10 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Warning: invalid argument supplied .... class-wc-shipping-flat-rate.php.
 
 = 3.1.8 (2019-11-12) =
-* Fix: Check if there is connection with MyParcel
+* Fix: Check if there is connection with PostNL
 
 = 3.1.7 (2019-07-16) =
-* Fix: Search in order grid MyParcel shipment
+* Fix: Search in order grid PostNL shipment
 * Fix: More than 5 products for World shipments
 
 = 3.1.6 (2019-07-04) =
@@ -287,7 +287,7 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 = 3.0.8 (2018-12-04) =
 * Fix: The multiple calls that are made to retrieve the shipping data.
 * Fix: The option for Pick up extra early
-* Fix: Wrong house number / postcode message and the possibility to adjust the address in the MyParcel checkout
+* Fix: Wrong house number / postcode message and the possibility to adjust the address in the PostNL checkout
 * Fix: Woocommerce tabel rates
 * Improvement: Better support the default WooCommerce checkout address fields
 
@@ -316,7 +316,7 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: error about "Bewaar barcode in een notitie" size
 * Fix: Turn of the option allow Pickup Express
 * Fix: Save settings with a new update
-* Improvement: MyParcel delivery header titel
+* Improvement: PostNL delivery header titel
 * Improvement: Support WooCommerce 3.5.0
 * Improvement: add preliminary support for "digitale postzegel"
 
@@ -389,7 +389,7 @@ These are the biggest changes:
       ```des/class-wcpn-rest-api-integration.php): failed to open stream```
 
 = 2.4.3 (2018-01-05) =
-* Fix: Add MyParcel fields to REST api to create order request
+* Fix: Add PostNL fields to REST api to create order request
 * Fix: Hide days when the pickup delivery is selected
 
 = 2.4.2 (2017-10-29) =
@@ -501,7 +501,7 @@ These are the biggest changes:
 	* PostNL Pickup & Early PostNL Pickup
 	* Possibility to assign cost to the above delivery options
 * Create return labels from the WooCommerce backend
-* Uses new MyParcel API
+* Uses new PostNL API
 
 = 1.5.6 =
 * Fix: Disable pakjegemak if 'ship to different address' is disabled after selecting Pakjegemak location
@@ -511,11 +511,11 @@ These are the biggest changes:
 * Fix: Foreign postcodes validation fix.
 
 = 1.5.4 =
-* Fix: Various Pakjegemak related issues (now saves & sends pakjegemak address separately to MyParcel)
+* Fix: Various Pakjegemak related issues (now saves & sends pakjegemak address separately to PostNL)
 * Fix: Postcode validation issues with Portugal
 
 = 1.5.3 =
-* Feature: Edit MyParcel address fields on user profile page
+* Feature: Edit PostNL address fields on user profile page
 * Fix: Bug with automatic order completion
 
 = 1.5.2 =
@@ -568,7 +568,7 @@ These are the biggest changes:
 = 1.4.0 =
 * Feature: Print order number on label
 * Feature: PakjeGemak integration
-* Feature: Option to autocomplete order after successful export to MyParcel
+* Feature: Option to autocomplete order after successful export to PostNL
 * Feature: Option to display Track & Trace link on my account page
 
 = 1.3.8 =
@@ -605,14 +605,14 @@ These are the biggest changes:
 * Fix: button image width
 
 = 1.3.0 =
-* New MyParcel icons
+* New PostNL icons
 * Export & PDF buttons compatible with WC2.1 / MP6 styles
 * Button styles are now in CSS instead of inline
 
 = 1.2.0 =
-* Feature: The MyParcel checkout fields (street name / house number) can now also be modified on the my account page
+* Feature: The PostNL checkout fields (street name / house number) can now also be modified on the my account page
 * Fix: WooCommerce 2.1 compatibility (checkout field localisation is now in WC core)
-* Updated MyParcel tariffs
+* Updated PostNL tariffs
 
 = 1.1.1 =
 * Fix: Labels for Custom id ('Eigen kenmerk') & Message ('Optioneel bericht') in the export window were reversed

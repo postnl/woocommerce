@@ -4,14 +4,14 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-if (class_exists('WCMP_Upgrade_Migration_v2_4_0_beta_4')) {
-    return new WCMP_Upgrade_Migration_v2_4_0_beta_4();
+if (class_exists('WCPN_Upgrade_Migration_v2_4_0_beta_4')) {
+    return new WCPN_Upgrade_Migration_v2_4_0_beta_4();
 }
 
 /**
  * Migrates pre v2.4.0-beta-4 settings
  */
-class WCMP_Upgrade_Migration_v2_4_0_beta_4
+class WCPN_Upgrade_Migration_v2_4_0_beta_4
 {
     public function __construct()
     {
@@ -25,4 +25,4 @@ class WCMP_Upgrade_Migration_v2_4_0_beta_4
     }
 }
 
-new WCMP_Upgrade_Migration_v2_4_0_beta_4();
+new WCPN_Upgrade_Migration_v2_4_0_beta_4();

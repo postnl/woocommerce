@@ -8,14 +8,14 @@ if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCMYPA_Settings')) {
-    return new WCMYPA_Settings();
+if (class_exists('WCPOST_Settings')) {
+    return new WCPOST_Settings();
 }
 
 /**
  * Create & render settings page
  */
-class WCMYPA_Settings
+class WCPOST_Settings
 {
     public const SETTINGS_MENU_SLUG = "wcpn_settings";
 
@@ -123,7 +123,7 @@ class WCMYPA_Settings
     {
         add_action("admin_menu", [$this, "menu"]);
         add_filter(
-            "plugin_action_links_" . WCMYPA()->plugin_basename,
+            "plugin_action_links_" . WCPOST()->plugin_basename,
             [
                 $this,
                 "add_settings_link",
@@ -145,8 +145,8 @@ class WCMYPA_Settings
         // Create the admin settings
         require_once("class-wcpn-settings-data.php");
 
-        // notice for WooCommerce MyParcel plugin
-        add_action("woocommerce_myparcel_before_settings_page", [$this, "myparcel_country_notice"], 10, 1);
+        // notice for WooCommerce PostNL plugin
+        add_action("woocommerce_postnl_before_settings_page", [$this, "myparcel_country_notice"], 10, 1);
     }
 
     /**
@@ -156,8 +156,8 @@ class WCMYPA_Settings
     {
         add_submenu_page(
             "woocommerce",
-            __("MyParcel", "woocommerce-myparcel"),
-            __("MyParcel", "woocommerce-myparcel"),
+            __("PostNL", "woocommerce-postnl"),
+            __("PostNL", "woocommerce-postnl"),
             "manage_options",
             self::SETTINGS_MENU_SLUG,
             [$this, "settings_page"]
@@ -180,7 +180,7 @@ class WCMYPA_Settings
             sprintf(
                 '<a href="%s">%s</a>',
                 $url,
-                __("Settings", "woocommerce-myparcel")
+                __("Settings", "woocommerce-postnl")
             )
         );
 
@@ -194,13 +194,13 @@ class WCMYPA_Settings
     {
         $settings_tabs = apply_filters(
             self::SETTINGS_MENU_SLUG . "_tabs",
-            WCMP_Settings_Data::getTabs()
+            WCPN_Settings_Data::getTabs()
         );
 
         $active_tab = isset($_GET["tab"]) ? $_GET["tab"] : self::SETTINGS_GENERAL;
         ?>
         <div class="wrap woocommerce">
-            <h1><?php _e("WooCommerce PostNL Settings", "woocommerce-myparcel"); ?></h1>
+            <h1><?php _e("WooCommerce PostNL Settings", "woocommerce-postnl"); ?></h1>
             <h2 class="nav-tab-wrapper">
                 <?php
                 foreach ($settings_tabs as $tab_slug => $tab_title) :
@@ -215,21 +215,21 @@ class WCMYPA_Settings
                 endforeach;
                 ?>
             </h2>
-            <?php do_action("woocommerce_myparcel_before_settings_page", $active_tab); ?>
+            <?php do_action("woocommerce_postnl_before_settings_page", $active_tab); ?>
             <form
                     method="post"
                     action="options.php"
                     id="<?php echo self::SETTINGS_MENU_SLUG; ?>">
                 <?php
-                do_action("woocommerce_myparcel_before_settings", $active_tab);
+                do_action("woocommerce_postnl_before_settings", $active_tab);
                 settings_fields(self::getOptionId($active_tab));
                 $this->render_settings_sections(self::getOptionId($active_tab));
-                do_action("woocommerce_myparcel_after_settings", $active_tab);
+                do_action("woocommerce_postnl_after_settings", $active_tab);
 
                 submit_button();
                 ?>
             </form>
-            <?php do_action("woocommerce_myparcel_after_settings_page", $active_tab); ?>
+            <?php do_action("woocommerce_postnl_after_settings_page", $active_tab); ?>
         </div>
         <?php
     }
@@ -252,18 +252,18 @@ class WCMYPA_Settings
         // link to hide message when one of the premium extensions is installed
         if (! $hide_notice && $base_country === "BE") {
             $myparcel_nl_link =
-                '<a href="https://wordpress.org/plugins/woocommerce-myparcel/" target="blank">WC MyParcel Netherlands</a>';
+                '<a href="https://wordpress.org/plugins/woocommerce-postnl/" target="blank">WC PostNL Netherlands</a>';
             $text             = sprintf(
                 __(
-                    "It looks like your shop is based in Netherlands. This plugin is for MyParcel. If you are using MyParcel Netherlands, download the %s plugin instead!",
-                    "woocommerce-myparcel"
+                    "It looks like your shop is based in Netherlands. This plugin is for PostNL. If you are using PostNL Netherlands, download the %s plugin instead!",
+                    "woocommerce-postnl"
                 ),
                 $myparcel_nl_link
             );
             $dismiss_button   = sprintf(
                 '<a href="%s" style="display:inline-block; margin-top: 10px;">%s</a>',
                 add_query_arg('myparcel_hide_be_notice', 'true'),
-                __("Hide this message", "woocommerce-myparcel")
+                __("Hide this message", "woocommerce-postnl")
             );
             printf('<div class="notice notice-warning"><p>%s %s</p></div>', $text, $dismiss_button);
         }
@@ -276,7 +276,7 @@ class WCMYPA_Settings
      */
     public static function getOptionId(string $option)
     {
-        return "woocommerce_myparcel_{$option}_settings";
+        return "woocommerce_postnl_{$option}_settings";
     }
 
     /**
@@ -370,4 +370,4 @@ class WCMYPA_Settings
     }
 }
 
-return new WCMYPA_Settings();
+return new WCPOST_Settings();

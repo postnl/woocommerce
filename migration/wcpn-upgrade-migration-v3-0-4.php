@@ -4,18 +4,18 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-if (class_exists('WCMP_Upgrade_Migration_v3_0_4')) {
-    return new WCMP_Upgrade_Migration_v3_0_4();
+if (class_exists('WCPN_Upgrade_Migration_v3_0_4')) {
+    return new WCPN_Upgrade_Migration_v3_0_4();
 }
 
 /**
  * Migrates pre v3.0.4 settings
  */
-class WCMP_Upgrade_Migration_v3_0_4
+class WCPN_Upgrade_Migration_v3_0_4
 {
     public function __construct()
     {
-        $old_settings = get_option('woocommerce_myparcel_checkout_settings');
+        $old_settings = get_option('woocommerce_postnl_checkout_settings');
         $new_settings = $old_settings;
 
         // Add/replace new settings
@@ -31,8 +31,8 @@ class WCMP_Upgrade_Migration_v3_0_4
         unset($new_settings['signed_title']);
         unset($new_settings['signed_fee']);
 
-        update_option('woocommerce_myparcel_checkout_settings', $new_settings);
+        update_option('woocommerce_postnl_checkout_settings', $new_settings);
     }
 }
 
-new WCMP_Upgrade_Migration_v3_0_4();
+new WCPN_Upgrade_Migration_v3_0_4();

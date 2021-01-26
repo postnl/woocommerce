@@ -1,20 +1,20 @@
 <?php
 
-use WPO\WC\MyParcel\Compatibility\Order as WCX_Order;
-use WPO\WC\MyParcel\Compatibility\WCMP_WCPDF_Compatibility;
+use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
+use WPO\WC\PostNL\Compatibility\WCPN_WCPDF_Compatibility;
 
 if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCMP_Frontend_Track_Trace')) {
+if (class_exists('WCPN_Frontend_Track_Trace')) {
     return;
 }
 
 /**
  * Track & Trace
  */
-class WCMP_Frontend_Track_Trace
+class WCPN_Frontend_Track_Trace
 {
     public function __construct()
     {
@@ -24,7 +24,7 @@ class WCMP_Frontend_Track_Trace
         // Track & Trace in my account
         add_filter("woocommerce_my_account_my_orders_actions", [$this, "showTrackTraceActionInMyAccount"], 10, 2);
 
-        WCMP_WCPDF_Compatibility::add_filters();
+        WCPN_WCPDF_Compatibility::add_filters();
     }
 
     /**
@@ -37,7 +37,7 @@ class WCMP_Frontend_Track_Trace
      */
     public function addTrackTraceToEmail(WC_Order $order, bool $sentToAdmin): void
     {
-        if (! WCMYPA()->setting_collection->isEnabled(WCMYPA_Settings::SETTING_TRACK_TRACE_EMAIL)) {
+        if (! WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_TRACK_TRACE_EMAIL)) {
             return;
         }
 
@@ -46,7 +46,7 @@ class WCMP_Frontend_Track_Trace
         }
 
         $orderId         = WCX_Order::get_id($order);
-        $trackTraceLinks = WCMP_Frontend::getTrackTraceLinks($orderId);
+        $trackTraceLinks = WCPN_Frontend::getTrackTraceLinks($orderId);
 
         if (empty($trackTraceLinks)) {
             return;
@@ -60,7 +60,7 @@ class WCMP_Frontend_Track_Trace
             '<p>%s %s</p>',
             apply_filters(
                 "wcmyparcel_email_text",
-                __("You can track your order with the following Track & Trace link:", "woocommerce-myparcel"),
+                __("You can track your order with the following Track & Trace link:", "woocommerce-postnl"),
                 $order
             ),
             implode(
@@ -79,20 +79,20 @@ class WCMP_Frontend_Track_Trace
      */
     public function showTrackTraceActionInMyAccount(array $actions, WC_Order $order): array
     {
-        if (! WCMYPA()->setting_collection->isEnabled(WCMYPA_Settings::SETTING_TRACK_TRACE_MY_ACCOUNT)) {
+        if (! WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_TRACK_TRACE_MY_ACCOUNT)) {
             return $actions;
         }
 
         $order_id = WCX_Order::get_id($order);
 
-        $consignments = WCMP_Frontend::getTrackTraceLinks($order_id);
+        $consignments = WCPN_Frontend::getTrackTraceLinks($order_id);
 
         foreach ($consignments as $key => $consignment) {
             $actions['myparcel_tracktrace_' . $consignment['link']] = [
                 'url'  => $consignment['url'],
                 'name' => apply_filters(
                     'wcmyparcel_myaccount_tracktrace_button',
-                    __('Track & Trace', 'woocommerce-myparcel')
+                    __('Track & Trace', 'woocommerce-postnl')
                 ),
             ];
         }

@@ -4,11 +4,11 @@ if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCMP_Log')) {
+if (class_exists('WCPN_Log')) {
     return;
 }
 
-class WCMP_Log
+class WCPN_Log
 {
 
     /**
@@ -18,7 +18,7 @@ class WCMP_Log
      */
     public static function add(string ...$messages): void
     {
-        if (! WCMYPA()->setting_collection->isEnabled(WCMYPA_Settings::SETTING_ERROR_LOGGING)) {
+        if (! WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_ERROR_LOGGING)) {
             return;
         }
 
@@ -27,7 +27,7 @@ class WCMP_Log
         // Starting with WooCommerce 2.7, logging can be grouped by context and severity.
         if (class_exists("WC_Logger") && version_compare(WOOCOMMERCE_VERSION, "2.7", ">=")) {
             try {
-                (wc_get_logger())->debug($message, ["source" => "wc-myparcel"]);
+                (wc_get_logger())->debug($message, ["source" => "wc-postnl"]);
             } catch (Exception $e) {
                 exit($e);
             }
@@ -36,7 +36,7 @@ class WCMP_Log
 
         if (class_exists("WC_Logger")) {
             $wc_logger = function_exists("wc_get_logger") ? wc_get_logger() : new WC_Logger();
-            $wc_logger->add("wc-myparcel", $message);
+            $wc_logger->add("wc-postnl", $message);
 
             return;
         }

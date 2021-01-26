@@ -7,7 +7,7 @@ if (! defined('ABSPATH')) {
 /**
  * Creates the array of available shipping methods in the checkout.
  */
-class WCMP_Shipping_Methods
+class WCPN_Shipping_Methods
 {
     public const FLAT_RATE                   = 'flat_rate';
     public const FREE_SHIPPING               = 'free_shipping';

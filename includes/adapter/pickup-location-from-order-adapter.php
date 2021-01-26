@@ -3,7 +3,7 @@
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractPickupLocationAdapter;
 
-class WCMP_PickupLocationFromOrderAdapter extends AbstractPickupLocationAdapter
+class WCPN_PickupLocationFromOrderAdapter extends AbstractPickupLocationAdapter
 {
     /**
      * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter|null $originAdapter

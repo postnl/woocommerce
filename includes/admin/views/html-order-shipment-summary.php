@@ -5,7 +5,7 @@
  */
 
 use MyParcelNL\Sdk\src\Support\Arr;
-use WPO\WC\MyParcel\Compatibility\WC_Core as WCX;
+use WPO\WC\PostNL\Compatibility\WC_Core as WCX;
 
 if (! defined('ABSPATH')) {
     exit;
@@ -16,12 +16,12 @@ $shipment_id = $_POST["shipment_id"];
 
 $order = WCX::get_order($order_id);
 
-$shipments       = WCMYPA()->export->getShipmentData([$shipment_id], $order);
-$deliveryOptions = WCMYPA_Admin::getDeliveryOptionsFromOrder($order);
+$shipments       = WCPOST()->export->getShipmentData([$shipment_id], $order);
+$deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
 
 $option_strings = [
-    "signature"      => __("Signature on delivery", "woocommerce-myparcel"),
-    "only_recipient" => __("Only recipient", "woocommerce-myparcel"),
+    "signature"      => __("Signature on delivery", "woocommerce-postnl"),
+    "only_recipient" => __("Only recipient", "woocommerce-postnl"),
 ];
 
 $firstShipment = $shipments[$shipment_id];
@@ -39,8 +39,8 @@ echo '<ul class="wcpn__shipment-summary wcpn__ws--nowrap">';
  */
 printf(
     '%s: %s',
-    __("Shipment type", "woocommerce-myparcel"),
-    WCMP_Data::getPackageTypeHuman(Arr::get($firstShipment, "shipment.options.package_type"))
+    __("Shipment type", "woocommerce-postnl"),
+    WCPN_Data::getPackageTypeHuman(Arr::get($firstShipment, "shipment.options.package_type"))
 );
 
 foreach ($option_strings as $key => $label) {
@@ -52,13 +52,13 @@ foreach ($option_strings as $key => $label) {
 
 if ($insurance) {
     $price = number_format(Arr::get($insurance, "amount") / 100, 2);
-    printf('<li>%s: € %s</li>', __("Insured for", "woocommerce-myparcel"), $price);
+    printf('<li>%s: € %s</li>', __("Insured for", "woocommerce-postnl"), $price);
 }
 
 if ($labelDescription) {
     printf(
         '<li>%s: %s</li>',
-        __("Label description", "woocommerce-myparcel"),
+        __("Label description", "woocommerce-postnl"),
         $labelDescription
     );
 }
@@ -81,8 +81,8 @@ foreach ($shipments as $shipment_id => $shipment) {
 
     printf(
         '<a href="%2$s" target="_blank" title="%3$s">%3$s</a><br/> %1$s: %4$s<br/>',
-        __("Status", "woocommerce-myparcel"),
-        WCMYPA_Admin::getTrackTraceUrl($order_id, $trackTrace),
+        __("Status", "woocommerce-postnl"),
+        WCPOST_Admin::getTrackTraceUrl($order_id, $trackTrace),
         $trackTrace,
         Arr::get($shipment, "status")
     );

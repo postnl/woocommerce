@@ -1,12 +1,12 @@
 <?php
 /*
-Plugin Name: WooCommerce MyParcel
+Plugin Name: WooCommerce PostNL
 Plugin URI: https://myparcel.nl/
-Description: Export your WooCommerce orders to MyParcel (https://myparcel.nl/) and print labels directly from the WooCommerce admin
-Author: MyParcel
-Author URI: https://myparcel.nl
+Description: Export your WooCommerce orders to PostNL (https://postnl.nl/) and print labels directly from the WooCommerce admin
+Author: PostNL
+Author URI: https://postnl.nl
 Version: 4.2.0
-Text Domain: woocommerce-myparcel
+Text Domain: woocommerce-postnl
 
 License: GPLv3 or later
 License URI: http://www.opensource.org/licenses/gpl-license.php
@@ -16,15 +16,15 @@ if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (! class_exists('WCMYPA')) :
+if (! class_exists('WCPOST')) :
 
-    class WCMYPA
+    class WCPOST
     {
         /**
          * Translations domain
          */
-        const DOMAIN               = 'woocommerce-myparcel';
-        const NONCE_ACTION         = 'wc_myparcel';
+        const DOMAIN               = 'woocommerce-postnl';
+        const NONCE_ACTION         = 'wc_postnl';
         const PHP_VERSION_7_1      = '7.1';
         const PHP_VERSION_REQUIRED = self::PHP_VERSION_7_1;
 
@@ -35,7 +35,7 @@ if (! class_exists('WCMYPA')) :
         protected static $_instance = null;
 
         /**
-         * @var WPO\WC\MyParcel\Collections\SettingsCollection
+         * @var WPO\WC\PostNL\Collections\SettingsCollection
          */
         public $setting_collection;
 
@@ -45,12 +45,12 @@ if (! class_exists('WCMYPA')) :
         public $includes;
 
         /**
-         * @var WCMP_Export
+         * @var WCPN_Export
          */
         public $export;
 
         /**
-         * @var WCMYPA_Admin
+         * @var WCPOST_Admin
          */
         public $admin;
 
@@ -72,7 +72,7 @@ if (! class_exists('WCMYPA')) :
          */
         public function __construct()
         {
-            $this->define('WC_MYPARCEL_NL_VERSION', $this->version);
+            $this->define('WC_POSTNL_VERSION', $this->version);
             $this->plugin_basename = plugin_basename(__FILE__);
 
             // load the localisation & classes
@@ -109,14 +109,14 @@ if (! class_exists('WCMYPA')) :
 
             /**
              * Frontend/global Locale. Looks in:
-             *        - WP_LANG_DIR/woocommerce-myparcel/woocommerce-myparcel-LOCALE.mo
-             *        - WP_LANG_DIR/plugins/woocommerce-myparcel-LOCALE.mo
-             *        - woocommerce-myparcel/languages/woocommerce-myparcel-LOCALE.mo (which if not found falls back to:)
-             *        - WP_LANG_DIR/plugins/woocommerce-myparcel-LOCALE.mo
+             *        - WP_LANG_DIR/woocommerce-postnl/woocommerce-postnl-LOCALE.mo
+             *        - WP_LANG_DIR/plugins/woocommerce-postnl-LOCALE.mo
+             *        - woocommerce-postnl/languages/woocommerce-postnl-LOCALE.mo (which if not found falls back to:)
+             *        - WP_LANG_DIR/plugins/woocommerce-postnl-LOCALE.mo
              */
             load_textdomain(
                 self::DOMAIN,
-                $dir . 'woocommerce-myparcel/' . self::DOMAIN . '-' . $locale . '.mo'
+                $dir . 'woocommerce-postnl/' . self::DOMAIN . '-' . $locale . '.mo'
             );
             load_textdomain(self::DOMAIN, $dir . 'plugins/' . self::DOMAIN . '-' . $locale . '.mo');
             load_plugin_textdomain(self::DOMAIN, false, dirname(plugin_basename(__FILE__)) . '/languages');
@@ -128,7 +128,7 @@ if (! class_exists('WCMYPA')) :
         public function includes()
         {
             // Use php version 5.6
-            if (! $this->phpVersionMeets(WCMYPA::PHP_VERSION_7_1)) {
+            if (! $this->phpVersionMeets(WCPOST::PHP_VERSION_7_1)) {
                 $this->includes = $this->plugin_path() . "/includes_php56";
 
                 // include compatibility classes
@@ -205,7 +205,7 @@ if (! class_exists('WCMYPA')) :
                 return;
             }
 
-            if (! $this->phpVersionMeets(\WCMYPA::PHP_VERSION_7_1)) {
+            if (! $this->phpVersionMeets(\WCPOST::PHP_VERSION_7_1)) {
                 // php 5.6
                 $this->initSettings();
                 $this->includes();
@@ -238,8 +238,8 @@ if (! class_exists('WCMYPA')) :
         public function need_woocommerce()
         {
             $error = sprintf(
-                __("WooCommerce MyParcel requires %sWooCommerce%s to be installed & activated!",
-                    "woocommerce-myparcel"
+                __("WooCommerce PostNL requires %sWooCommerce%s to be installed & activated!",
+                    "woocommerce-postnl"
                 ),
                 '<a href="http://wordpress.org/extend/plugins/woocommerce/">',
                 '</a>'
@@ -256,10 +256,10 @@ if (! class_exists('WCMYPA')) :
 
         public function required_php_version()
         {
-            $error = __("WooCommerce MyParcel requires PHP {PHP_VERSION} or higher.", "woocommerce-myparcel");
+            $error = __("WooCommerce PostNL requires PHP {PHP_VERSION} or higher.", "woocommerce-postnl");
             $error = str_replace('{PHP_VERSION}', self::PHP_VERSION_REQUIRED, $error);
 
-            $how_to_update = __("How to update your PHP version", "woocommerce-myparcel");
+            $how_to_update = __("How to update your PHP version", "woocommerce-postnl");
             $message       = sprintf(
                 '<div class="error"><p>%s</p><p><a href="%s">%s</a></p></div>',
                 $error,
@@ -281,7 +281,7 @@ if (! class_exists('WCMYPA')) :
          */
         public function do_install()
         {
-            $version_setting   = "woocommerce_myparcel_version";
+            $version_setting   = "woocommerce_postnl_version";
             $installed_version = get_option($version_setting);
 
             // installed version lower than plugin version?
@@ -303,7 +303,7 @@ if (! class_exists('WCMYPA')) :
         protected function install()
         {
             // Pre 2.0.0
-            if (! empty(get_option('wcmyparcel_settings'))) {
+            if (! empty(get_option('wcpostnl_settings'))) {
                 require_once('migration/wcpn-installation-migration-v2-0-0.php');
             }
             // todo: Pre 4.0.0?
@@ -324,7 +324,7 @@ if (! class_exists('WCMYPA')) :
                 require_once('migration/wcpn-upgrade-migration-v3-0-4.php');
             }
 
-            if ($this->phpVersionMeets(\WCMYPA::PHP_VERSION_7_1)) {
+            if ($this->phpVersionMeets(\WCPOST::PHP_VERSION_7_1)) {
                 // Import the migration class base
                 require_once('migration/wcpn-upgrade-migration.php');
 
@@ -365,10 +365,10 @@ if (! class_exists('WCMYPA')) :
          */
         public function initSettings()
         {
-            if (! $this->phpVersionMeets(\WCMYPA::PHP_VERSION_7_1)) {
-                $this->general_settings  = get_option('woocommerce_myparcel_general_settings');
-                $this->export_defaults   = get_option('woocommerce_myparcel_export_defaults_settings');
-                $this->checkout_settings = get_option('woocommerce_myparcel_checkout_settings');
+            if (! $this->phpVersionMeets(\WCPOST::PHP_VERSION_7_1)) {
+                $this->general_settings  = get_option('woocommerce_postnl_general_settings');
+                $this->export_defaults   = get_option('woocommerce_postnl_export_defaults_settings');
+                $this->checkout_settings = get_option('woocommerce_postnl_checkout_settings');
 
                 return;
             }
@@ -377,7 +377,7 @@ if (! class_exists('WCMYPA')) :
             // imports in the legacy version.
             require_once('includes/wcpn-initialize-settings-collection.php');
             if (empty($this->setting_collection)) {
-                $this->setting_collection = (new WCMP_Initialize_Settings_Collection())->initialize();
+                $this->setting_collection = (new WCPN_Initialize_Settings_Collection())->initialize();
             }
         }
 
@@ -397,22 +397,22 @@ endif;
 /**
  * Returns the main instance of the plugin class to prevent the need to use globals.
  *
- * @return WCMYPA
+ * @return WCPOST
  * @since  2.0
  */
-function WCMYPA()
+function WCPOST()
 {
-    return WCMYPA::instance();
+    return WCPOST::instance();
 }
 
 /**
  * For PHP < 7.1 support.
  *
- * @return WCMYPA
+ * @return WCPOST
  */
-function WooCommerce_MyParcel()
+function WooCommerce_PostNL()
 {
-    return WCMYPA();
+    return WCPOST();
 }
 
-WCMYPA(); // load plugin
+WCPOST(); // load plugin

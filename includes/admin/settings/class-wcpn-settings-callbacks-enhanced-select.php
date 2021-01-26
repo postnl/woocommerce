@@ -1,21 +1,21 @@
 <?php
 
-use WPO\WC\MyParcel\Entity\SettingsFieldArguments;
+use WPO\WC\PostNL\Entity\SettingsFieldArguments;
 
 if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCMP_Settings_Callbacks_Enhanced_Select')) {
+if (class_exists('WCPN_Settings_Callbacks_Enhanced_Select')) {
     return;
 }
 
-class WCMP_Settings_Callbacks_Enhanced_Select
+class WCPN_Settings_Callbacks_Enhanced_Select
 {
     /**
-     * WCMP_Settings_Callbacks_Enhanced_Select constructor.
+     * WCPN_Settings_Callbacks_Enhanced_Select constructor.
      *
-     * @param \WPO\WC\MyParcel\Entity\SettingsFieldArguments $class
+     * @param \WPO\WC\PostNL\Entity\SettingsFieldArguments $class
      *
      * @throws Exception
      */

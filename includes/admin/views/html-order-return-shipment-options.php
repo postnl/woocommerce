@@ -12,16 +12,16 @@ if (! defined('ABSPATH')) {
  */
 
 /** @noinspection PhpUnhandledExceptionInspection */
-$deliveryOptions = WCMYPA_Admin::getDeliveryOptionsFromOrder($order);
+$deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
 
 ?>
 <table class="wcpn__settings-table" style="width: auto">
     <tr>
         <td>
-            <?php _e("Shipment type", "woocommerce-myparcel") ?>:<br/> <small class="calculated_weight">
+            <?php _e("Shipment type", "woocommerce-postnl") ?>:<br/> <small class="calculated_weight">
                 <?php printf(
-                    __("Calculated weight: %s", "woocommerce-myparcel"),
-                    wc_format_weight($order->get_meta(WCMYPA_Admin::META_ORDER_WEIGHT))
+                    __("Calculated weight: %s", "woocommerce-postnl"),
+                    wc_format_weight($order->get_meta(WCPOST_Admin::META_ORDER_WEIGHT))
                 ) ?>
             </small>
         </td>
@@ -29,7 +29,7 @@ $deliveryOptions = WCMYPA_Admin::getDeliveryOptionsFromOrder($order);
             <?php
             $name = "myparcel_options[{$order_id}][package_type]";
             printf('<select name="%s" class="package_type">', $name);
-            foreach (WCMP_Data::getPackageTypesHuman() as $key => $label) {
+            foreach (WCPN_Data::getPackageTypesHuman() as $key => $label) {
                 $isReturnPackageType = in_array(
                     $key,
                     [
@@ -44,7 +44,7 @@ $deliveryOptions = WCMYPA_Admin::getDeliveryOptionsFromOrder($order);
 
                 printf(
                     '<option value="%s">%s</option>',
-                    WCMP_Data::getPackageTypeId($key),
+                    WCPN_Data::getPackageTypeId($key),
                     $label
                 );
             }
@@ -55,8 +55,8 @@ $deliveryOptions = WCMYPA_Admin::getDeliveryOptionsFromOrder($order);
 </table><br>
 <?php if (! isset($skip_save)): ?>
     <div class="wcpn__d--flex">
-        <a class="button save" data-order="<?php echo $order_id; ?>"><?php _e("Save", "woocommerce-myparcel") ?>
-            <?php WCMYPA_Admin::renderSpinner() ?>
+        <a class="button save" data-order="<?php echo $order_id; ?>"><?php _e("Save", "woocommerce-postnl") ?>
+            <?php WCPOST_Admin::renderSpinner() ?>
         </a>
     </div>
 <?php endif ?>

@@ -1,25 +1,25 @@
 <?php
 
 use MyParcelNL\Sdk\src\Support\Arr;
-use WPO\WC\MyParcel\Compatibility\WC_Core as WCX;
-use WPO\WC\MyParcel\Compatibility\Order as WCX_Order;
+use WPO\WC\PostNL\Compatibility\WC_Core as WCX;
+use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
 
 if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCMP_Frontend')) {
-    return new WCMP_Frontend();
+if (class_exists('WCPN_Frontend')) {
+    return new WCPN_Frontend();
 }
 
 /**
  * Frontend views
  */
-class WCMP_Frontend
+class WCPN_Frontend
 {
     public function __construct()
     {
-        new WCMP_Frontend_Track_Trace();
+        new WCPN_Frontend_Track_Trace();
 
 		// Shipment information in confirmation mail
 	    add_action("woocommerce_email_customer_details", [$this, "confirmationEmail"], 19, 3);
@@ -32,7 +32,7 @@ class WCMP_Frontend
         add_filter("wpo_wcpdf_templates_replace_myparcel_delivery_options", [$this, "wpo_wcpdf_delivery_options"], 10, 2);
 
         // Initialize delivery options fees
-        new WCMP_Cart_Fees();
+        new WCPN_Cart_Fees();
 
         // Output most expensive shipping class in frontend data
         add_action("woocommerce_checkout_before_order_review", [$this, "injectShippingClassInput"], 100);
@@ -50,7 +50,7 @@ class WCMP_Frontend
      */
     public function confirmationEmail(WC_Order $order): void
     {
-	    WCMYPA()->admin->showShipmentConfirmation($order, true);
+	    WCPOST()->admin->showShipmentConfirmation($order, true);
     }
 
     /**
@@ -61,7 +61,7 @@ class WCMP_Frontend
     public function confirmationOrderReceived(int $order_id): void
     {
         $order = wc_get_order($order_id);
-        WCMYPA()->admin->showShipmentConfirmation($order, false);
+        WCPOST()->admin->showShipmentConfirmation($order, false);
     }
 
     /**
@@ -74,7 +74,7 @@ class WCMP_Frontend
     public function wpo_wcpdf_delivery_options(string $replacement, WC_Order $order): string
     {
         ob_start();
-        WCMYPA()->admin->showDeliveryDateForOrder($order);
+        WCPOST()->admin->showDeliveryDateForOrder($order);
 
         return ob_get_clean();
     }
@@ -88,7 +88,7 @@ class WCMP_Frontend
      */
     public function wpo_wcpdf_delivery_date(string $replacement, WC_Order $order): string
     {
-        $deliveryOptions = WCMYPA_Admin::getDeliveryOptionsFromOrder($order);
+        $deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
         $deliveryDate    = $deliveryOptions->getDate();
 
         if ($deliveryDate) {
@@ -116,7 +116,7 @@ class WCMP_Frontend
      */
     public function renderHighestShippingClassInput()
     {
-        $shipping_class = WCMP_Frontend::get_cart_shipping_class();
+        $shipping_class = WCPN_Frontend::get_cart_shipping_class();
 
         if ($shipping_class) {
             return sprintf(
@@ -141,7 +141,7 @@ class WCMP_Frontend
         }
 
         $shippingMethodString = WC()->session->get('chosen_shipping_methods')[0] ?? '';
-        $shippingMethod       = WCMP_Export::getShippingMethod($shippingMethodString);
+        $shippingMethod       = WCPN_Export::getShippingMethod($shippingMethodString);
 
         if (empty($shippingMethod)) {
             return null;
@@ -158,7 +158,7 @@ class WCMP_Frontend
             $shippingClasses = [];
         }
 
-        return WCMYPA()->export->getShippingClass(
+        return WCPOST()->export->getShippingClass(
             $shippingMethod,
             $shippingClasses
         );
@@ -186,7 +186,7 @@ class WCMP_Frontend
     public static function getTrackTraceShipments($order_id): array
     {
         $order     = WCX::get_order($order_id);
-        $shipments = WCMYPA_Admin::get_order_shipments($order);
+        $shipments = WCPOST_Admin::get_order_shipments($order);
 
         if (empty($shipments)) {
             return [];
@@ -201,7 +201,7 @@ class WCMP_Frontend
                 continue;
             }
 
-            $track_trace_url = WCMYPA_Admin::getTrackTraceUrl(
+            $track_trace_url = WCPOST_Admin::getTrackTraceUrl(
                 $order_id,
                 $trackTrace
             );
@@ -250,9 +250,9 @@ class WCMP_Frontend
      */
     public function ajaxGetHighestShippingClass(): ?int
     {
-        echo WCMP_Frontend::get_cart_shipping_class();
+        echo WCPN_Frontend::get_cart_shipping_class();
         die();
     }
 }
 
-return new WCMP_Frontend();
+return new WCPN_Frontend();
