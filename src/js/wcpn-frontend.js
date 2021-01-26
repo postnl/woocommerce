@@ -3,9 +3,9 @@
  */
 
 /**
- * @property {Object} MyParcelDisplaySettings
- * @property {String} MyParcelDisplaySettings.isUsingSplitAddressFields
- * @property {String[]} MyParcelDisplaySettings.splitAddressFieldsCountries
+ * @property {Object} PostNLDisplaySettings
+ * @property {String} PostNLDisplaySettings.isUsingSplitAddressFields
+ * @property {String[]} PostNLDisplaySettings.splitAddressFieldsCountries
  *
  * @see \wcpn_checkout::inject_delivery_options_variables
  */
@@ -18,16 +18,16 @@
  */
 
 /**
- * @property {Object} MyParcelDeliveryOptions
- * @property {String} MyParcelDeliveryOptions.allowedShippingMethods
- * @property {String} MyParcelDeliveryOptions.disallowedShippingMethods
- * @property {String} MyParcelDeliveryOptions.hiddenInputName
+ * @property {Object} PostNLDeliveryOptions
+ * @property {String} PostNLDeliveryOptions.allowedShippingMethods
+ * @property {String} PostNLDeliveryOptions.disallowedShippingMethods
+ * @property {String} PostNLDeliveryOptions.hiddenInputName
  * @see \wcpn_checkout::inject_delivery_options_variables
  */
 /* eslint-disable-next-line max-lines-per-function */
 jQuery(($) => {
   // eslint-disable-next-line no-var
-  var MyParcelFrontend = {
+  var PostNLFrontend = {
     /**
      * Whether the delivery options are currently shown or not. Defaults to true and can be set to false depending on
      *  shipping methods.
@@ -44,27 +44,27 @@ jQuery(($) => {
     /**
      * @type {Boolean}
      */
-    isUsingSplitAddressFields: Boolean(Number(MyParcelDisplaySettings.isUsingSplitAddressFields)),
+    isUsingSplitAddressFields: Boolean(Number(PostNLDisplaySettings.isUsingSplitAddressFields)),
 
     /**
      * @type {String[]}
      */
-    splitAddressFieldsCountries: MyParcelDisplaySettings.splitAddressFieldsCountries,
+    splitAddressFieldsCountries: PostNLDisplaySettings.splitAddressFieldsCountries,
 
     /**
      * @type {Array}
      */
-    allowedShippingMethods: JSON.parse(MyParcelDeliveryOptions.allowedShippingMethods),
+    allowedShippingMethods: JSON.parse(PostNLDeliveryOptions.allowedShippingMethods),
 
     /**
      * @type {Array}
      */
-    disallowedShippingMethods: JSON.parse(MyParcelDeliveryOptions.disallowedShippingMethods),
+    disallowedShippingMethods: JSON.parse(PostNLDeliveryOptions.disallowedShippingMethods),
 
     /**
      * @type {Boolean}
      */
-    alwaysShow: Boolean(parseInt(MyParcelDeliveryOptions.alwaysShow)),
+    alwaysShow: Boolean(parseInt(PostNLDeliveryOptions.alwaysShow)),
 
     /**
      * @type {Object<String, String>}
@@ -137,8 +137,8 @@ jQuery(($) => {
      * Initialize the script.
      */
     init() {
-      MyParcelFrontend.addListeners();
-      MyParcelFrontend.injectHiddenInput();
+      PostNLFrontend.addListeners();
+      PostNLFrontend.injectHiddenInput();
     },
 
     /**
@@ -154,26 +154,26 @@ jQuery(($) => {
         value = JSON.stringify(event.detail);
       }
 
-      MyParcelFrontend.hiddenDataInput.value = value;
+      PostNLFrontend.hiddenDataInput.value = value;
 
       /**
        * Remove this event before triggering and re-add it after because it will cause an infinite loop otherwise.
        */
-      $(document.body).off(MyParcelFrontend.updatedWooCommerceCheckoutEvent, MyParcelFrontend.updateShippingMethod);
-      MyParcelFrontend.triggerEvent(MyParcelFrontend.updateWooCommerceCheckoutEvent);
+      $(document.body).off(PostNLFrontend.updatedWooCommerceCheckoutEvent, PostNLFrontend.updateShippingMethod);
+      PostNLFrontend.triggerEvent(PostNLFrontend.updateWooCommerceCheckoutEvent);
 
       const restoreEventListener = () => {
-        $(document.body).on(MyParcelFrontend.updatedWooCommerceCheckoutEvent, MyParcelFrontend.updateShippingMethod);
-        $(document.body).off(MyParcelFrontend.updatedWooCommerceCheckoutEvent, restoreEventListener);
+        $(document.body).on(PostNLFrontend.updatedWooCommerceCheckoutEvent, PostNLFrontend.updateShippingMethod);
+        $(document.body).off(PostNLFrontend.updatedWooCommerceCheckoutEvent, restoreEventListener);
       };
 
-      $(document.body).on(MyParcelFrontend.updatedWooCommerceCheckoutEvent, restoreEventListener);
+      $(document.body).on(PostNLFrontend.updatedWooCommerceCheckoutEvent, restoreEventListener);
 
       /**
        * After the "updated_checkout" event the shipping methods will be rendered, restore the event listener and delete
        *  this one in the process.
        */
-      $(document.body).on(MyParcelFrontend.updatedWooCommerceCheckoutEvent, restoreEventListener);
+      $(document.body).on(PostNLFrontend.updatedWooCommerceCheckoutEvent, restoreEventListener);
     },
 
     /**
@@ -182,48 +182,48 @@ jQuery(($) => {
      * @returns {String}
      */
     getSplitField() {
-      return MyParcelFrontend.hasSplitAddressFields()
-        ? MyParcelFrontend.houseNumberField
-        : MyParcelFrontend.addressField;
+      return PostNLFrontend.hasSplitAddressFields()
+        ? PostNLFrontend.houseNumberField
+        : PostNLFrontend.addressField;
     },
 
     /**
      * Add all event listeners.
      */
     addListeners() {
-      MyParcelFrontend.addAddressListeners();
-      MyParcelFrontend.updateShippingMethod();
+      PostNLFrontend.addAddressListeners();
+      PostNLFrontend.updateShippingMethod();
 
-      const addressCheckbox = $(MyParcelFrontend.shipToDifferentAddressField).val();
+      const addressCheckbox = $(PostNLFrontend.shipToDifferentAddressField).val();
 
       if (addressCheckbox) {
         document
-          .querySelector(MyParcelFrontend.shipToDifferentAddressField)
-          .addEventListener('change', MyParcelFrontend.addAddressListeners);
+          .querySelector(PostNLFrontend.shipToDifferentAddressField)
+          .addEventListener('change', PostNLFrontend.addAddressListeners);
       }
 
-      document.addEventListener(MyParcelFrontend.updatedAddressEvent, MyParcelFrontend.onDeliveryOptionsAddressUpdate);
-      document.addEventListener(MyParcelFrontend.updatedDeliveryOptionsEvent, MyParcelFrontend.onDeliveryOptionsUpdate);
+      document.addEventListener(PostNLFrontend.updatedAddressEvent, PostNLFrontend.onDeliveryOptionsAddressUpdate);
+      document.addEventListener(PostNLFrontend.updatedDeliveryOptionsEvent, PostNLFrontend.onDeliveryOptionsUpdate);
 
       /*
        * jQuery events.
        */
-      $(document.body).on(MyParcelFrontend.countryToStateChangedEvent, MyParcelFrontend.synchronizeAddress);
-      $(document.body).on(MyParcelFrontend.countryToStateChangedEvent, MyParcelFrontend.updateAddress);
-      $(document.body).on(MyParcelFrontend.updatedWooCommerceCheckoutEvent, MyParcelFrontend.updateShippingMethod);
+      $(document.body).on(PostNLFrontend.countryToStateChangedEvent, PostNLFrontend.synchronizeAddress);
+      $(document.body).on(PostNLFrontend.countryToStateChangedEvent, PostNLFrontend.updateAddress);
+      $(document.body).on(PostNLFrontend.updatedWooCommerceCheckoutEvent, PostNLFrontend.updateShippingMethod);
     },
 
     /**
-     * Get field by name. Will return element with MyParcelFrontend selector: "#<billing|shipping>_<name>".
+     * Get field by name. Will return element with PostNLFrontend selector: "#<billing|shipping>_<name>".
      *
      * @param {String} name - The part after `shipping/billing` in the id of an element in WooCommerce.
      * @param {?String} addressType - "shipping" or "billing".
      *
      * @returns {Element}
      */
-    getField(name, addressType = MyParcelFrontend.addressType) {
+    getField(name, addressType = PostNLFrontend.addressType) {
       if (!addressType) {
-        addressType = MyParcelFrontend.getAddressType();
+        addressType = PostNLFrontend.getAddressType();
       }
 
       const selector = `#${addressType}_${name}`;
@@ -244,15 +244,15 @@ jQuery(($) => {
      */
     getAddressType: function() {
       let useShipping = false;
-      const addressCheckbox = document.querySelector(MyParcelFrontend.shipToDifferentAddressField);
+      const addressCheckbox = document.querySelector(PostNLFrontend.shipToDifferentAddressField);
 
       if (addressCheckbox) {
-        useShipping = document.querySelector(MyParcelFrontend.shipToDifferentAddressField).checked;
+        useShipping = document.querySelector(PostNLFrontend.shipToDifferentAddressField).checked;
       }
 
-      MyParcelFrontend.addressType = useShipping ? 'shipping' : 'billing';
+      PostNLFrontend.addressType = useShipping ? 'shipping' : 'billing';
 
-      return MyParcelFrontend.addressType;
+      return PostNLFrontend.addressType;
     },
 
     /**
@@ -262,29 +262,29 @@ jQuery(($) => {
      * @returns {String}
      */
     getHouseNumber() {
-      const hasBillingNumber = $(`#billing_${MyParcelFrontend.houseNumberField}`).val() !== '';
-      const hasShippingNumber = $(`#shipping_${MyParcelFrontend.houseNumberField}`).val() !== '';
+      const hasBillingNumber = $(`#billing_${PostNLFrontend.houseNumberField}`).val() !== '';
+      const hasShippingNumber = $(`#shipping_${PostNLFrontend.houseNumberField}`).val() !== '';
       const hasNumber = hasBillingNumber || hasShippingNumber;
 
-      if (MyParcelFrontend.hasSplitAddressFields() && hasNumber) {
-        return MyParcelFrontend.getField(MyParcelFrontend.houseNumberField).value;
+      if (PostNLFrontend.hasSplitAddressFields() && hasNumber) {
+        return PostNLFrontend.getField(PostNLFrontend.houseNumberField).value;
       }
 
-      return MyParcelFrontend.getAddressParts().house_number;
+      return PostNLFrontend.getAddressParts().house_number;
     },
 
     /**
      * @returns {{house_number_suffix: (String | null), house_number: (String | null), street_name: (String | null)}}
      */
     getAddressParts: function() {
-      const address = MyParcelFrontend.getField(MyParcelFrontend.addressField).value;
-      const result = MyParcelFrontend.splitStreetRegex.exec(address);
+      const address = PostNLFrontend.getField(PostNLFrontend.addressField).value;
+      const result = PostNLFrontend.splitStreetRegex.exec(address);
 
       const parts = {};
 
-      parts[MyParcelFrontend.streetNameField] = result ? result[1] : null;
-      parts[MyParcelFrontend.houseNumberField] = result ? result[2] : null;
-      parts[MyParcelFrontend.houseNumberSuffixField] = result ? result[3] : null;
+      parts[PostNLFrontend.streetNameField] = result ? result[1] : null;
+      parts[PostNLFrontend.houseNumberField] = result ? result[2] : null;
+      parts[PostNLFrontend.houseNumberSuffixField] = result ? result[3] : null;
 
       return parts;
     },
@@ -303,40 +303,40 @@ jQuery(($) => {
     },
 
     /**
-     * Check if the country changed by comparing the old value with the new value before overwriting the MyParcelConfig
+     * Check if the country changed by comparing the old value with the new value before overwriting the PostNLConfig
      *  with the new value. Returns true if none was set yet.
      *
      * @returns {Boolean}
      */
     countryHasChanged() {
-      if (window.MyParcelConfig.address && window.MyParcelConfig.address.hasOwnProperty('cc')) {
-        return window.MyParcelConfig.address.cc !== MyParcelFrontend.getField(MyParcelFrontend.countryField).value;
+      if (window.PostNLConfig.address && window.PostNLConfig.address.hasOwnProperty('cc')) {
+        return window.PostNLConfig.address.cc !== PostNLFrontend.getField(PostNLFrontend.countryField).value;
       }
 
       return true;
     },
 
     /**
-     * Get data from form fields, put it in the global MyParcelConfig, then trigger updating the delivery options.
+     * Get data from form fields, put it in the global PostNLConfig, then trigger updating the delivery options.
      */
     updateAddress() {
-      if (!window.hasOwnProperty('MyParcelConfig')) {
-        throw 'window.MyParcelConfig not found!';
+      if (!window.hasOwnProperty('PostNLConfig')) {
+        throw 'window.PostNLConfig not found!';
       }
 
-      if (typeof window.MyParcelConfig === 'string') {
-        window.MyParcelConfig = JSON.parse(window.MyParcelConfig);
+      if (typeof window.PostNLConfig === 'string') {
+        window.PostNLConfig = JSON.parse(window.PostNLConfig);
       }
 
-      window.MyParcelConfig.address = {
-        cc: MyParcelFrontend.getField(MyParcelFrontend.countryField).value,
-        postalCode: MyParcelFrontend.getField(MyParcelFrontend.postcodeField).value,
-        number: MyParcelFrontend.getHouseNumber(),
-        city: MyParcelFrontend.getField(MyParcelFrontend.cityField).value,
+      window.PostNLConfig.address = {
+        cc: PostNLFrontend.getField(PostNLFrontend.countryField).value,
+        postalCode: PostNLFrontend.getField(PostNLFrontend.postcodeField).value,
+        number: PostNLFrontend.getHouseNumber(),
+        city: PostNLFrontend.getField(PostNLFrontend.cityField).value,
       };
 
-      if (MyParcelFrontend.hasDeliveryOptions) {
-        MyParcelFrontend.triggerEvent(MyParcelFrontend.updateDeliveryOptionsEvent);
+      if (PostNLFrontend.hasDeliveryOptions) {
+        PostNLFrontend.triggerEvent(PostNLFrontend.updateDeliveryOptionsEvent);
       }
     },
 
@@ -352,15 +352,15 @@ jQuery(($) => {
       address = address || {};
 
       if (address.postalCode) {
-        MyParcelFrontend.getField(MyParcelFrontend.postcodeField).value = address.postalCode;
+        PostNLFrontend.getField(PostNLFrontend.postcodeField).value = address.postalCode;
       }
 
       if (address.city) {
-        MyParcelFrontend.getField(MyParcelFrontend.cityField).value = address.city;
+        PostNLFrontend.getField(PostNLFrontend.cityField).value = address.city;
       }
 
       if (address.number) {
-        MyParcelFrontend.setHouseNumber(address.number);
+        PostNLFrontend.setHouseNumber(address.number);
       }
     },
 
@@ -377,7 +377,7 @@ jQuery(($) => {
       Object
         .keys(address)
         .forEach((fieldName) => {
-          const field = MyParcelFrontend.getField(fieldName);
+          const field = PostNLFrontend.getField(fieldName);
           const value = address[fieldName];
 
           if (!field || !value) {
@@ -394,17 +394,17 @@ jQuery(($) => {
      * @param {String|Number} number - New house number to set.
      */
     setHouseNumber(number) {
-      const address = MyParcelFrontend.getField(MyParcelFrontend.addressField).value;
-      const oldHouseNumber = MyParcelFrontend.getHouseNumber();
+      const address = PostNLFrontend.getField(PostNLFrontend.addressField).value;
+      const oldHouseNumber = PostNLFrontend.getHouseNumber();
 
-      if (MyParcelFrontend.hasSplitAddressFields()) {
+      if (PostNLFrontend.hasSplitAddressFields()) {
         if (oldHouseNumber) {
-          MyParcelFrontend.getField(MyParcelFrontend.addressField).value = address.replace(oldHouseNumber, number);
+          PostNLFrontend.getField(PostNLFrontend.addressField).value = address.replace(oldHouseNumber, number);
         } else {
-          MyParcelFrontend.getField(MyParcelFrontend.addressField).value = address + number;
+          PostNLFrontend.getField(PostNLFrontend.addressField).value = address + number;
         }
       } else {
-        MyParcelFrontend.getField(MyParcelFrontend.houseNumberField).value = number;
+        PostNLFrontend.getField(PostNLFrontend.houseNumberField).value = number;
       }
     },
 
@@ -415,11 +415,11 @@ jQuery(($) => {
      * @see includes/class-wcpn-checkout.php::save_delivery_options();
      */
     injectHiddenInput() {
-      MyParcelFrontend.hiddenDataInput = document.createElement('input');
-      MyParcelFrontend.hiddenDataInput.setAttribute('hidden', 'hidden');
-      MyParcelFrontend.hiddenDataInput.setAttribute('name', MyParcelDeliveryOptions.hiddenInputName);
+      PostNLFrontend.hiddenDataInput = document.createElement('input');
+      PostNLFrontend.hiddenDataInput.setAttribute('hidden', 'hidden');
+      PostNLFrontend.hiddenDataInput.setAttribute('name', PostNLDeliveryOptions.hiddenInputName);
 
-      document.querySelector('form[name="checkout"]').appendChild(MyParcelFrontend.hiddenDataInput);
+      document.querySelector('form[name="checkout"]').appendChild(PostNLFrontend.hiddenDataInput);
     },
 
     /**
@@ -428,7 +428,7 @@ jQuery(($) => {
      * @param {CustomEvent} event - The event containing the new address.
      */
     onDeliveryOptionsAddressUpdate: function(event) {
-      MyParcelFrontend.setAddressFromDeliveryOptions(event.detail);
+      PostNLFrontend.setAddressFromDeliveryOptions(event.detail);
     },
 
     /**
@@ -436,8 +436,8 @@ jQuery(($) => {
      */
     updateShippingMethod() {
       let shippingMethod;
-      const shippingMethodField = document.querySelectorAll(MyParcelFrontend.shippingMethodField);
-      const selectedShippingMethodField = document.querySelector(`${MyParcelFrontend.shippingMethodField}:checked`);
+      const shippingMethodField = document.querySelectorAll(PostNLFrontend.shippingMethodField);
+      const selectedShippingMethodField = document.querySelector(`${PostNLFrontend.shippingMethodField}:checked`);
 
       /**
        * Check if shipping method field exists. It doesn't exist if there are no shipping methods available for the
@@ -455,19 +455,19 @@ jQuery(($) => {
          * All variants of flat_rate (including shipping classes) do already have their suffix set properly.
          */
         if (shippingMethod.indexOf('flat_rate') === 0) {
-          const shippingClass = MyParcelFrontend.getHighestShippingClass();
+          const shippingClass = PostNLFrontend.getHighestShippingClass();
 
           if (shippingClass) {
             shippingMethod = `flat_rate:${shippingClass}`;
           }
         }
 
-        MyParcelFrontend.selectedShippingMethod = shippingMethod;
+        PostNLFrontend.selectedShippingMethod = shippingMethod;
       } else {
-        MyParcelFrontend.selectedShippingMethod = null;
+        PostNLFrontend.selectedShippingMethod = null;
       }
 
-      MyParcelFrontend.toggleDeliveryOptions();
+      PostNLFrontend.toggleDeliveryOptions();
     },
 
     /**
@@ -475,13 +475,13 @@ jQuery(($) => {
      *  unless necessary by checking if hasDeliveryOptions is true or false.
      */
     toggleDeliveryOptions() {
-      if (MyParcelFrontend.currentShippingMethodHasDeliveryOptions()) {
-        MyParcelFrontend.hasDeliveryOptions = true;
-        MyParcelFrontend.triggerEvent(MyParcelFrontend.showDeliveryOptionsEvent, document);
-        MyParcelFrontend.updateAddress();
+      if (PostNLFrontend.currentShippingMethodHasDeliveryOptions()) {
+        PostNLFrontend.hasDeliveryOptions = true;
+        PostNLFrontend.triggerEvent(PostNLFrontend.showDeliveryOptionsEvent, document);
+        PostNLFrontend.updateAddress();
       } else {
-        MyParcelFrontend.hasDeliveryOptions = false;
-        MyParcelFrontend.triggerEvent(MyParcelFrontend.hideDeliveryOptionsEvent, document);
+        PostNLFrontend.hasDeliveryOptions = false;
+        PostNLFrontend.triggerEvent(PostNLFrontend.hideDeliveryOptionsEvent, document);
       }
     },
 
@@ -497,8 +497,8 @@ jQuery(($) => {
     currentShippingMethodHasDeliveryOptions() {
       let display = false;
       let invert = false;
-      let list = MyParcelFrontend.allowedShippingMethods;
-      let shippingMethod = MyParcelFrontend.getSelectedShippingMethod();
+      let list = PostNLFrontend.allowedShippingMethods;
+      let shippingMethod = PostNLFrontend.getSelectedShippingMethod();
 
       if (!shippingMethod) {
         return false;
@@ -512,8 +512,8 @@ jQuery(($) => {
        * If "all" is selected for allowed shipping methods check if the current method is NOT in the
        *  disallowedShippingMethods array.
        */
-      if (MyParcelFrontend.alwaysShow) {
-        list = MyParcelFrontend.disallowedShippingMethods;
+      if (PostNLFrontend.alwaysShow) {
+        list = PostNLFrontend.disallowedShippingMethods;
         invert = true;
       }
 
@@ -541,22 +541,22 @@ jQuery(($) => {
      *  function on the update event so it doesn't matter if we send 5 updates at once.
      */
     addAddressListeners() {
-      const fields = [MyParcelFrontend.countryField, MyParcelFrontend.postcodeField, MyParcelFrontend.getSplitField()];
+      const fields = [PostNLFrontend.countryField, PostNLFrontend.postcodeField, PostNLFrontend.getSplitField()];
 
       /* If address type is already set, remove the existing listeners before adding new ones. */
-      if (MyParcelFrontend.addressType) {
+      if (PostNLFrontend.addressType) {
         fields.forEach((field) => {
-          MyParcelFrontend.getField(field).removeEventListener('change', MyParcelFrontend.updateAddress);
+          PostNLFrontend.getField(field).removeEventListener('change', PostNLFrontend.updateAddress);
         });
       }
 
-      MyParcelFrontend.getAddressType();
+      PostNLFrontend.getAddressType();
 
       fields.forEach((field) => {
-        MyParcelFrontend.getField(field).addEventListener('change', MyParcelFrontend.updateAddress);
+        PostNLFrontend.getField(field).addEventListener('change', PostNLFrontend.updateAddress);
       });
 
-      MyParcelFrontend.updateAddress();
+      PostNLFrontend.updateAddress();
     },
 
     /**
@@ -565,7 +565,7 @@ jQuery(($) => {
      * @returns {String}
      */
     getShippingMethodWithoutClass() {
-      let shippingMethod = MyParcelFrontend.selectedShippingMethod;
+      let shippingMethod = PostNLFrontend.selectedShippingMethod;
       const indexOfSemicolon = shippingMethod.indexOf(':');
 
       shippingMethod = shippingMethod.substring(0, indexOfSemicolon === -1 ? shippingMethod.length : indexOfSemicolon);
@@ -602,10 +602,10 @@ jQuery(($) => {
      * @returns {String}
      */
     getSelectedShippingMethod() {
-      let shippingMethod = MyParcelFrontend.selectedShippingMethod;
+      let shippingMethod = PostNLFrontend.selectedShippingMethod;
 
       if (shippingMethod === 'flat_rate') {
-        shippingMethod += `:${document.querySelectorAll(MyParcelFrontend.highestShippingClassField).length}`;
+        shippingMethod += `:${document.querySelectorAll(PostNLFrontend.highestShippingClassField).length}`;
       }
 
       return shippingMethod;
@@ -618,7 +618,7 @@ jQuery(($) => {
      * @param {String} newCountry
      */
     synchronizeAddress: function(event, newCountry) {
-      if (!MyParcelFrontend.isUsingSplitAddressFields) {
+      if (!PostNLFrontend.isUsingSplitAddressFields) {
         return;
       }
 
@@ -626,42 +626,42 @@ jQuery(($) => {
 
       ['shipping', 'billing'].forEach((addressType) => {
         const typeCountry = data.find((item) => item.name === `${addressType}_country`);
-        const hasAddressTypeCountry = MyParcelFrontend.previousCountry.hasOwnProperty(addressType);
-        const countryChanged = MyParcelFrontend.previousCountry[addressType] !== newCountry;
+        const hasAddressTypeCountry = PostNLFrontend.previousCountry.hasOwnProperty(addressType);
+        const countryChanged = PostNLFrontend.previousCountry[addressType] !== newCountry;
 
         if (!hasAddressTypeCountry || countryChanged) {
-          MyParcelFrontend.previousCountry[addressType] = typeCountry.value;
+          PostNLFrontend.previousCountry[addressType] = typeCountry.value;
         }
 
         if (!countryChanged) {
           return;
         }
 
-        if (MyParcelFrontend.hasSplitAddressFields(newCountry)) {
-          const parts = MyParcelFrontend.getAddressParts();
+        if (PostNLFrontend.hasSplitAddressFields(newCountry)) {
+          const parts = PostNLFrontend.getAddressParts();
 
-          MyParcelFrontend.fillCheckoutFields(parts);
+          PostNLFrontend.fillCheckoutFields(parts);
         } else {
           const [
             houseNumberField,
             houseNumberSuffixField,
             streetNameField,
           ] = [
-            MyParcelFrontend.houseNumberField,
-            MyParcelFrontend.houseNumberSuffixField,
-            MyParcelFrontend.streetNameField,
-          ].map((fieldName) => MyParcelFrontend.getField(fieldName));
+            PostNLFrontend.houseNumberField,
+            PostNLFrontend.houseNumberSuffixField,
+            PostNLFrontend.streetNameField,
+          ].map((fieldName) => PostNLFrontend.getField(fieldName));
 
           const number = houseNumberField.value || '';
           const street = streetNameField.value || '';
           const suffix = houseNumberSuffixField.value || '';
 
-          MyParcelFrontend.fillCheckoutFields({
+          PostNLFrontend.fillCheckoutFields({
             address_1: `${street} ${number}${suffix}`.trim(),
           });
         }
 
-        MyParcelFrontend.updateAddress();
+        PostNLFrontend.updateAddress();
       });
     },
 
@@ -672,17 +672,17 @@ jQuery(($) => {
      */
     hasSplitAddressFields: function(country = null) {
       if (!country) {
-        country = MyParcelFrontend.getField(MyParcelFrontend.countryField).value;
+        country = PostNLFrontend.getField(PostNLFrontend.countryField).value;
       }
 
-      if (!MyParcelFrontend.isUsingSplitAddressFields) {
+      if (!PostNLFrontend.isUsingSplitAddressFields) {
         return false;
       }
 
-      return MyParcelFrontend.splitAddressFieldsCountries.includes(country.toUpperCase());
+      return PostNLFrontend.splitAddressFieldsCountries.includes(country.toUpperCase());
     },
   };
 
-  window.MyParcelFrontend = MyParcelFrontend;
-  MyParcelFrontend.init();
+  window.PostNLFrontend = PostNLFrontend;
+  PostNLFrontend.init();
 });

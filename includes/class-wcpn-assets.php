@@ -4,11 +4,11 @@ if (! defined("ABSPATH")) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists("WCMP_Assets")) {
-    return new WCMP_Assets();
+if (class_exists("WCPN_Assets")) {
+    return new WCPN_Assets();
 }
 
-class WCMP_Assets
+class WCPN_Assets
 {
     public function __construct()
     {
@@ -59,40 +59,40 @@ class WCMP_Assets
         wp_enqueue_style("thickbox");
         wp_enqueue_script(
             "wcpn-admin",
-            WCMYPA()->plugin_url() . "/assets/js/wcpn-admin.js",
+            WCPOST()->plugin_url() . "/assets/js/wcpn-admin.js",
             ["jquery", "thickbox"],
-            WC_MYPARCEL_NL_VERSION
+            WC_POSTNL_VERSION
         );
 
         wp_localize_script(
             "wcpn-admin",
             "wcpn",
             [
-                "api_url"                => WCMP_Data::API_URL,
+                "api_url"                => WCPN_Data::API_URL,
                 "actions"                => [
-                    "export"        => WCMP_Export::EXPORT,
-                    "add_return"    => WCMP_Export::ADD_RETURN,
-                    "add_shipments" => WCMP_Export::ADD_SHIPMENTS,
-                    "get_labels"    => WCMP_Export::GET_LABELS,
-                    "modal_dialog"  => WCMP_Export::MODAL_DIALOG,
+                    "export"        => WCPN_Export::EXPORT,
+                    "add_return"    => WCPN_Export::ADD_RETURN,
+                    "add_shipments" => WCPN_Export::ADD_SHIPMENTS,
+                    "get_labels"    => WCPN_Export::GET_LABELS,
+                    "modal_dialog"  => WCPN_Export::MODAL_DIALOG,
                 ],
                 "bulk_actions"           => [
-                    "export"       => WCMYPA_Admin::BULK_ACTION_EXPORT,
-                    "print"        => WCMYPA_Admin::BULK_ACTION_PRINT,
-                    "export_print" => WCMYPA_Admin::BULK_ACTION_EXPORT_PRINT,
+                    "export"       => WCPOST_Admin::BULK_ACTION_EXPORT,
+                    "print"        => WCPOST_Admin::BULK_ACTION_PRINT,
+                    "export_print" => WCPOST_Admin::BULK_ACTION_EXPORT_PRINT,
                 ],
                 "ajax_url"               => admin_url("admin-ajax.php"),
-                "nonce"                  => wp_create_nonce(WCMYPA::NONCE_ACTION),
-                "download_display"       => WCMYPA()->setting_collection->getByName(
-                    WCMYPA_Settings::SETTING_DOWNLOAD_DISPLAY
+                "nonce"                  => wp_create_nonce(WCPOST::NONCE_ACTION),
+                "download_display"       => WCPOST()->setting_collection->getByName(
+                    WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY
                 ),
-                "ask_for_print_position" => WCMYPA()->setting_collection->isEnabled(
-                    WCMYPA_Settings::SETTING_ASK_FOR_PRINT_POSITION
+                "ask_for_print_position" => WCPOST()->setting_collection->isEnabled(
+                    WCPOST_Settings::SETTING_ASK_FOR_PRINT_POSITION
                 ),
                 "strings"                => [
-                    "no_orders_selected" => __("You have not selected any orders!", "woocommerce-myparcel"),
+                    "no_orders_selected" => __("You have not selected any orders!", "woocommerce-postnl"),
                     "dialog" => [
-                        "return" => __("Export options", "woocommerce-myparcel")
+                        "return" => __("Export options", "woocommerce-postnl")
                     ],
                 ],
             ]
@@ -100,9 +100,9 @@ class WCMP_Assets
 
         wp_enqueue_style(
             "wcpn-admin-styles",
-            WCMYPA()->plugin_url() . "/assets/css/wcpn-admin-styles.css",
+            WCPOST()->plugin_url() . "/assets/css/wcpn-admin-styles.css",
             [],
-            WC_MYPARCEL_NL_VERSION,
+            WC_POSTNL_VERSION,
             "all"
         );
 
@@ -110,13 +110,13 @@ class WCMP_Assets
         if (version_compare(WOOCOMMERCE_VERSION, "2.1", "<=")) {
             wp_enqueue_style(
                 "wcpn-admin-styles-legacy",
-                WCMYPA()->plugin_url() . "/assets/css/wcpn-admin-styles-legacy.css",
+                WCPOST()->plugin_url() . "/assets/css/wcpn-admin-styles-legacy.css",
                 [],
-                WC_MYPARCEL_NL_VERSION,
+                WC_POSTNL_VERSION,
                 "all"
             );
         }
     }
 }
 
-return new WCMP_Assets();
+return new WCPN_Assets();

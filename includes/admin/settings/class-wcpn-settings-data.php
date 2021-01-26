@@ -1,20 +1,20 @@
 <?php
 
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
-use WPO\WC\MyParcel\Entity\SettingsFieldArguments;
+use WPO\WC\PostNL\Entity\SettingsFieldArguments;
 
 if (! defined('ABSPATH')) {
     exit;
 }
 
-if (class_exists('WCMP_Settings_Data')) {
-    return new WCMP_Settings_Data();
+if (class_exists('WCPN_Settings_Data')) {
+    return new WCPN_Settings_Data();
 }
 
 /**
  * This class contains all data for the admin settings screens created by the plugin.
  */
-class WCMP_Settings_Data
+class WCPN_Settings_Data
 {
     public const ENABLED  = "1";
     public const DISABLED = "0";
@@ -27,7 +27,7 @@ class WCMP_Settings_Data
     public const EQUAL_TO_SHIPMENT = "equalToShipment";
 
     /**
-     * @var WCMP_Settings_Callbacks
+     * @var WCPN_Settings_Callbacks
      */
     private $callbacks;
 
@@ -35,7 +35,7 @@ class WCMP_Settings_Data
     {
         $this->callbacks = require 'class-wcpn-settings-callbacks.php';
 
-        // Create the MyParcel settings with the admin_init hook.
+        // Create the PostNL settings with the admin_init hook.
         add_action("admin_init", [$this, "create_all_settings"]);
     }
 
@@ -48,22 +48,22 @@ class WCMP_Settings_Data
     {
         $this->generate_settings(
             $this->get_sections_general(),
-            WCMYPA_Settings::SETTINGS_GENERAL
+            WCPOST_Settings::SETTINGS_GENERAL
         );
 
         $this->generate_settings(
             $this->get_sections_export_defaults(),
-            WCMYPA_Settings::SETTINGS_EXPORT_DEFAULTS
+            WCPOST_Settings::SETTINGS_EXPORT_DEFAULTS
         );
 
         $this->generate_settings(
             $this->get_sections_checkout(),
-            WCMYPA_Settings::SETTINGS_CHECKOUT
+            WCPOST_Settings::SETTINGS_CHECKOUT
         );
 
         $this->generate_settings(
             $this->get_sections_carrier_postnl(),
-            WCMYPA_Settings::SETTINGS_POSTNL,
+            WCPOST_Settings::SETTINGS_POSTNL,
             true
         );
     }
@@ -74,13 +74,13 @@ class WCMP_Settings_Data
     public static function getTabs(): array
     {
         $array = [
-            WCMYPA_Settings::SETTINGS_GENERAL         => __("General", "woocommerce-myparcel"),
-            WCMYPA_Settings::SETTINGS_EXPORT_DEFAULTS => __("Default export settings", "woocommerce-myparcel"),
-            WCMYPA_Settings::SETTINGS_CHECKOUT        => __("Checkout settings", "woocommerce-myparcel"),
+            WCPOST_Settings::SETTINGS_GENERAL         => __("General", "woocommerce-postnl"),
+            WCPOST_Settings::SETTINGS_EXPORT_DEFAULTS => __("Default export settings", "woocommerce-postnl"),
+            WCPOST_Settings::SETTINGS_CHECKOUT        => __("Checkout settings", "woocommerce-postnl"),
         ];
 
-        $array[WCMYPA_Settings::SETTINGS_POSTNL] = __("PostNL", "woocommerce-myparcel");
-//        $array[WCMYPA_Settings::SETTINGS_DPD]    = __("DPD", "woocommerce-myparcel");
+        $array[WCPOST_Settings::SETTINGS_POSTNL] = __("PostNL", "woocommerce-postnl");
+//        $array[WCPOST_Settings::SETTINGS_DPD]    = __("DPD", "woocommerce-postnl");
 
         return $array;
     }
@@ -96,7 +96,7 @@ class WCMP_Settings_Data
      */
     private function generate_settings(array $settingsArray, string $optionName, bool $prefix = false): void
     {
-        $optionIdentifier = WCMYPA_Settings::getOptionId($optionName);
+        $optionIdentifier = WCPOST_Settings::getOptionId($optionName);
         $defaults         = [];
 
         // Register settings.
@@ -113,7 +113,7 @@ class WCMP_Settings_Data
                      * Allows a description to be shown with a section title.
                      */
                     static function() use ($section) {
-                        WCMP_Settings_Callbacks::renderSection($section);
+                        WCPN_Settings_Callbacks::renderSection($section);
                     },
                     $optionIdentifier
                 );
@@ -134,7 +134,7 @@ class WCMP_Settings_Data
 
                     // Default callback
                     $callback = static function() use ($class) {
-                        WCMP_Settings_Callbacks::renderField($class);
+                        WCPN_Settings_Callbacks::renderField($class);
                     };
 
                     // Pass the class to custom callbacks as well.
@@ -179,20 +179,20 @@ class WCMP_Settings_Data
     private function get_sections_general()
     {
         return [
-            WCMYPA_Settings::SETTINGS_GENERAL => [
+            WCPOST_Settings::SETTINGS_GENERAL => [
                 [
                     "name"     => "api",
-                    "label"    => __("API settings", "woocommerce-myparcel"),
+                    "label"    => __("API settings", "woocommerce-postnl"),
                     "settings" => $this->get_section_general_api(),
                 ],
                 [
                     "name"     => "general",
-                    "label"    => __("General settings", "woocommerce-myparcel"),
+                    "label"    => __("General settings", "woocommerce-postnl"),
                     "settings" => $this->get_section_general_general(),
                 ],
                 [
                     "name"     => "diagnostics",
-                    "label"    => __("Diagnostic tools", "woocommerce-myparcel"),
+                    "label"    => __("Diagnostic tools", "woocommerce-postnl"),
                     "settings" => $this->get_section_general_diagnostics(),
                 ],
             ],
@@ -205,10 +205,10 @@ class WCMP_Settings_Data
     private function get_sections_export_defaults()
     {
         return [
-            WCMYPA_Settings::SETTINGS_EXPORT_DEFAULTS => [
+            WCPOST_Settings::SETTINGS_EXPORT_DEFAULTS => [
                 [
                     "name"     => "main",
-                    "label"    => __("Default export settings", "woocommerce-myparcel"),
+                    "label"    => __("Default export settings", "woocommerce-postnl"),
                     "settings" => $this->get_section_export_defaults_main(),
                 ],
             ],
@@ -218,16 +218,16 @@ class WCMP_Settings_Data
     private function get_sections_checkout()
     {
         return [
-            WCMYPA_Settings::SETTINGS_CHECKOUT => [
+            WCPOST_Settings::SETTINGS_CHECKOUT => [
                 [
                     "name"     => "main",
-                    "label"    => __("Checkout settings", "woocommerce-myparcel"),
+                    "label"    => __("Checkout settings", "woocommerce-postnl"),
                     "settings" => $this->get_section_checkout_main(),
                 ],
                 [
                     "name"      => "strings",
-                    "label"     => __("Titles", "woocommerce-myparcel"),
-                    "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                    "label"     => __("Titles", "woocommerce-postnl"),
+                    "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                     "settings"  => $this->get_section_checkout_strings(),
                 ],
             ],
@@ -245,21 +245,21 @@ class WCMP_Settings_Data
             PostNLConsignment::CARRIER_NAME => [
                 [
                     "name"        => "export_defaults",
-                    "label"       => __("PostNL export settings", "woocommerce-myparcel"),
+                    "label"       => __("PostNL export settings", "woocommerce-postnl"),
                     "description" => __(
                         "These settings will be applied to PostNL shipments you create in the backend.",
-                        "woocommerce-myparcel"
+                        "woocommerce-postnl"
                     ),
                     "settings"    => $this->get_section_carrier_postnl_export_defaults(),
                 ],
                 [
                     "name"     => "delivery_options",
-                    "label"    => __("PostNL delivery options", "woocommerce-myparcel"),
+                    "label"    => __("PostNL delivery options", "woocommerce-postnl"),
                     "settings" => $this->get_section_carrier_postnl_delivery_options(),
                 ],
                 [
                     "name"     => "pickup_options",
-                    "label"    => __("PostNL pickup options", "woocommerce-myparcel"),
+                    "label"    => __("PostNL pickup options", "woocommerce-postnl"),
                     "settings" => $this->get_section_carrier_postnl_pickup_options(),
                 ],
             ],
@@ -273,9 +273,9 @@ class WCMP_Settings_Data
     {
         return [
             [
-                "name"      => WCMYPA_Settings::SETTING_API_KEY,
-                "label"     => __("Key", "woocommerce-myparcel"),
-                "help_text" => __("api key", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_API_KEY,
+                "label"     => __("Key", "woocommerce-postnl"),
+                "help_text" => __("api key", "woocommerce-postnl"),
             ],
         ];
     }
@@ -287,28 +287,28 @@ class WCMP_Settings_Data
     {
         return [
             [
-                "name"    => WCMYPA_Settings::SETTING_DOWNLOAD_DISPLAY,
-                "label"   => __("Label display", "woocommerce-myparcel"),
+                "name"    => WCPOST_Settings::SETTING_DOWNLOAD_DISPLAY,
+                "label"   => __("Label display", "woocommerce-postnl"),
                 "type"    => "select",
                 "options" => [
-                    "download" => __("Download PDF", "woocommerce-myparcel"),
-                    "display"  => __("Open the PDF in a new tab", "woocommerce-myparcel"),
+                    "download" => __("Download PDF", "woocommerce-postnl"),
+                    "display"  => __("Open the PDF in a new tab", "woocommerce-postnl"),
                 ],
             ],
             [
-                "name"    => WCMYPA_Settings::SETTING_LABEL_FORMAT,
-                "label"   => __("Label format", "woocommerce-myparcel"),
+                "name"    => WCPOST_Settings::SETTING_LABEL_FORMAT,
+                "label"   => __("Label format", "woocommerce-postnl"),
                 "type"    => "select",
                 "options" => [
-                    "A4" => __("Standard printer (A4)", "woocommerce-myparcel"),
-                    "A6" => __("Label Printer (A6)", "woocommerce-myparcel"),
+                    "A4" => __("Standard printer (A4)", "woocommerce-postnl"),
+                    "A6" => __("Label Printer (A6)", "woocommerce-postnl"),
                 ],
             ],
             [
-                "name"       => WCMYPA_Settings::SETTING_ASK_FOR_PRINT_POSITION,
-                "label"      => __("Ask for print start position", "woocommerce-myparcel"),
+                "name"       => WCPOST_Settings::SETTING_ASK_FOR_PRINT_POSITION,
+                "label"      => __("Ask for print start position", "woocommerce-postnl"),
                 "condition" => [
-                    "parent_name"  => WCMYPA_Settings::SETTING_LABEL_FORMAT,
+                    "parent_name"  => WCPOST_Settings::SETTING_LABEL_FORMAT,
                     "type"         => "disable",
                     "parent_value" => "A4",
                     "set_value"    => self::DISABLED,
@@ -316,65 +316,65 @@ class WCMP_Settings_Data
                 "type"       => "toggle",
                 "help_text"  => __(
                     "This option enables you to continue printing where you left off last time",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_TRACK_TRACE_EMAIL,
-                "label"     => __("Track & Trace in email", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_TRACK_TRACE_EMAIL,
+                "label"     => __("Track & Trace in email", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "Add the Track & Trace code to emails to the customer.<br/><strong>Note!</strong> When you select this option, make sure you have not enabled the Track & Trace email in your MyParcel backend.",
-                    "woocommerce-myparcel"
+                    "Add the Track & Trace code to emails to the customer.<br/><strong>Note!</strong> When you select this option, make sure you have not enabled the Track & Trace email in your PostNL backend.",
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_TRACK_TRACE_MY_ACCOUNT,
-                "label"     => __("Track & Trace in My Account", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_TRACK_TRACE_MY_ACCOUNT,
+                "label"     => __("Track & Trace in My Account", "woocommerce-postnl"),
                 "type"      => "toggle",
-                "help_text" => __("Show Track & Trace trace code and link in My Account.", "woocommerce-myparcel"),
+                "help_text" => __("Show Track & Trace trace code and link in My Account.", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_PROCESS_DIRECTLY,
-                "label"     => __("Process shipments directly", "woocommerce-myparcel"),
-                "type"      => "toggle",
-                "help_text" => __(
-                    "When you enable this option, shipments will be directly processed when sent to MyParcel.",
-                    "woocommerce-myparcel"
-                ),
-            ],
-            [
-                "name"      => WCMYPA_Settings::SETTING_ORDER_STATUS_AUTOMATION,
-                "label"     => __("Order status automation", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_PROCESS_DIRECTLY,
+                "label"     => __("Process shipments directly", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "Automatically set order status to a predefined status after successful MyParcel export.<br/>Make sure <strong>Process shipments directly</strong> is enabled when you use this option together with the <strong>Track & Trace in email</strong> option, otherwise the Track & Trace code will not be included in the customer email.",
-                    "woocommerce-myparcel"
+                    "When you enable this option, shipments will be directly processed when sent to PostNL.",
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_AUTOMATIC_ORDER_STATUS,
-                "condition" => WCMYPA_Settings::SETTING_ORDER_STATUS_AUTOMATION,
+                "name"      => WCPOST_Settings::SETTING_ORDER_STATUS_AUTOMATION,
+                "label"     => __("Order status automation", "woocommerce-postnl"),
+                "type"      => "toggle",
+                "help_text" => __(
+                    "Automatically set order status to a predefined status after successful PostNL export.<br/>Make sure <strong>Process shipments directly</strong> is enabled when you use this option together with the <strong>Track & Trace in email</strong> option, otherwise the Track & Trace code will not be included in the customer email.",
+                    "woocommerce-postnl"
+                ),
+            ],
+            [
+                "name"      => WCPOST_Settings::SETTING_AUTOMATIC_ORDER_STATUS,
+                "condition" => WCPOST_Settings::SETTING_ORDER_STATUS_AUTOMATION,
                 "class"     => ["wcpn__child"],
-                "label"     => __("Automatic order status", "woocommerce-myparcel"),
+                "label"     => __("Automatic order status", "woocommerce-postnl"),
                 "type"      => "select",
-                "options"   => WCMP_Settings_Callbacks::get_order_status_options(),
+                "options"   => WCPN_Settings_Callbacks::get_order_status_options(),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_BARCODE_IN_NOTE,
-                "label"     => __("Place barcode inside note", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_BARCODE_IN_NOTE,
+                "label"     => __("Place barcode inside note", "woocommerce-postnl"),
                 "type"      => "toggle",
-                "help_text" => __("Place the barcode inside a note of the order", "woocommerce-myparcel"),
+                "help_text" => __("Place the barcode inside a note of the order", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_BARCODE_IN_NOTE_TITLE,
-                "condition" => WCMYPA_Settings::SETTING_BARCODE_IN_NOTE,
+                "name"      => WCPOST_Settings::SETTING_BARCODE_IN_NOTE_TITLE,
+                "condition" => WCPOST_Settings::SETTING_BARCODE_IN_NOTE,
                 "class"     => ["wcpn__child"],
-                "label"     => __("Title before the barcode", "woocommerce-myparcel"),
-                "default"   => __("Track & trace code:", "woocommerce-myparcel"),
+                "label"     => __("Title before the barcode", "woocommerce-postnl"),
+                "default"   => __("Track & trace code:", "woocommerce-postnl"),
                 "help_text" => __(
                     "You can change the text before the barcode inside an note",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
         ];
@@ -387,12 +387,12 @@ class WCMP_Settings_Data
     {
         return [
             [
-                "name"        => WCMYPA_Settings::SETTING_ERROR_LOGGING,
-                "label"       => __("Log API communication", "woocommerce-myparcel"),
+                "name"        => WCPOST_Settings::SETTING_ERROR_LOGGING,
+                "label"       => __("Log API communication", "woocommerce-postnl"),
                 "type"        => "toggle",
                 "description" => '<a href="' . esc_url_raw(
                         admin_url("admin.php?page=wc-status&tab=logs")
-                    ) . '" target="_blank">' . __("View logs", "woocommerce-myparcel") . "</a> (wc-myparcel)",
+                    ) . '" target="_blank">' . __("View logs", "woocommerce-postnl") . "</a> (wc-postnl)",
             ],
         ];
     }
@@ -406,78 +406,78 @@ class WCMP_Settings_Data
     {
         return [
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT,
-                "label"     => __("Home address only", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT,
+                "label"     => __("Home address only", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "If you don't want the parcel to be delivered at the neighbours, choose this option.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE,
-                "label"     => __("Signature on delivery", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE,
+                "label"     => __("Signature on delivery", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "The parcel will be offered at the delivery address. If the recipient is not at home, the parcel will be delivered to the neighbours. In both cases, a signature will be required.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT,
-                "label"     => __("Extra large size", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT,
+                "label"     => __("Extra large size", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "Enable this option when your shipment is bigger than 100 x 70 x 50 cm, but smaller than 175 x 78 x 58 cm. An extra fee will be charged. Note! If the parcel is bigger than 175 x 78 x 58 of or heavier than 30 kg, the pallet rate will be charged.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK,
-                "label"     => __("Age check 18+", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK,
+                "label"     => __("Age check 18+", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "The age check is intended for parcel shipments for which the recipient must show they are 18+ years old by means of a proof of identity. With this option 'signature for receipt' and 'delivery only at recipient' are included. This option can't be combined with morning or evening delivery.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN,
-                "label"     => __("Return if no answer", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN,
+                "label"     => __("Return if no answer", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "By default, a parcel will be offered twice. After two unsuccessful delivery attempts, the parcel will be available at the nearest pickup point for two weeks. There it can be picked up by the recipient with the note that was left by the courier. If you want to receive the parcel back directly and NOT forward it to the pickup point, enable this option.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
-                "label"     => __("Insured shipment", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
+                "label"     => __("Insured shipment", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "By default, there is no insurance on the shipments. If you still want to insure the shipment, you can do that. We insure the purchase value of the shipment, with a maximum insured value of € 5.000. Insured parcels always contain the options 'Home address only' en 'Signature for delivery'",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FROM_PRICE,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
-                "label"     => __("Insure from price", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FROM_PRICE,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
+                "label"     => __("Insure from price", "woocommerce-postnl"),
                 "type"      => "number",
                 "help_text" => __(
                     "Insure all orders that exceed this price point.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
-                "label"     => __("Max insured amount", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
+                "label"     => __("Max insured amount", "woocommerce-postnl"),
                 "type"      => "select",
-                "options"   => WCMP_Data::getInsuranceAmounts(),
+                "options"   => WCPN_Data::getInsuranceAmounts(),
                 "help_text" => __(
                     "Insure all parcels up to the selected amount.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
         ];
@@ -494,124 +494,124 @@ class WCMP_Settings_Data
     {
         return [
             [
-                "name"  => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label" => __("Enable PostNL delivery", "woocommerce-myparcel"),
+                "name"  => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label" => __("Enable PostNL delivery", "woocommerce-postnl"),
                 "type"  => "toggle",
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DROP_OFF_DAYS,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Drop-off days", "woocommerce-myparcel"),
-                "callback"  => [WCMP_Settings_Callbacks::class, "enhanced_select"],
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DROP_OFF_DAYS,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label"     => __("Drop-off days", "woocommerce-postnl"),
+                "callback"  => [WCPN_Settings_Callbacks::class, "enhanced_select"],
                 "options"   => $this->getWeekdays(null),
                 "default"   => [2],
-                "help_text" => __("Days of the week on which you hand over parcels to PostNL", "woocommerce-myparcel"),
+                "help_text" => __("Days of the week on which you hand over parcels to PostNL", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_CUTOFF_TIME,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Cut-off time", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_CUTOFF_TIME,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label"     => __("Cut-off time", "woocommerce-postnl"),
                 "help_text" => __(
                     "Time at which you stop processing orders for the day (format: hh:mm)",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
                 "default"   => "17:00",
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DROP_OFF_DELAY,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Drop-off delay", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DROP_OFF_DELAY,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label"     => __("Drop-off delay", "woocommerce-postnl"),
                 "type"      => "number",
                 "max"       => 14,
-                "help_text" => __("Number of days you need to process an order.", "woocommerce-myparcel"),
+                "help_text" => __("Number of days you need to process an order.", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_DAYS_WINDOW,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Delivery days window", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DELIVERY_DAYS_WINDOW,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label"     => __("Delivery days window", "woocommerce-postnl"),
                 "type"      => "number",
                 "max"       => 14,
                 "default"   => self::ENABLED,
                 "help_text" => __(
                     "Amount of days a customer can postpone a shipment. Default is 0 days with a maximum value of 14 days.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Morning delivery", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label"     => __("Morning delivery", "woocommerce-postnl"),
                 "type"      => "toggle",
             ],
             self::getFeeField(
-                WCMYPA_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE,
+                WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE,
                 [
-                    WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                    WCMYPA_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED,
                 ]
             ),
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Evening delivery", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label"     => __("Evening delivery", "woocommerce-postnl"),
                 "type"      => "toggle",
             ],
             self::getFeeField(
-                WCMYPA_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE,
+                WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE,
                 [
-                    WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                    WCMYPA_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED,
                 ]
             ),
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Home address only", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label"     => __("Home address only", "woocommerce-postnl"),
                 "type"      => "toggle",
             ],
             self::getFeeField(
-                WCMYPA_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE,
+                WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE,
                 [
-                    WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                    WCMYPA_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
                 ]
             ),
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_SIGNATURE_ENABLED,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Signature on delivery", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_SIGNATURE_ENABLED,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label"     => __("Signature on delivery", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "Enter an amount that is either positive or negative. For example, do you want to give a discount for using this function or do you want to charge extra for this delivery option.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             self::getFeeField(
-                WCMYPA_Settings::SETTING_CARRIER_SIGNATURE_FEE,
+                WCPOST_Settings::SETTING_CARRIER_SIGNATURE_FEE,
                 [
-                    WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                    WCMYPA_Settings::SETTING_CARRIER_SIGNATURE_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_SIGNATURE_ENABLED,
                 ]
             ),
             [
-                "name"      => WCMYPA_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED,
-                "condition" => WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Monday delivery", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED,
+                "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                "label"     => __("Monday delivery", "woocommerce-postnl"),
                 "type"      => "toggle",
             ],
             [
-                "name"        => WCMYPA_Settings::SETTING_CARRIER_SATURDAY_CUTOFF_TIME,
+                "name"        => WCPOST_Settings::SETTING_CARRIER_SATURDAY_CUTOFF_TIME,
                 "condition"   => [
-                    WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                    WCMYPA_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED,
                 ],
                 "class"       => ["wcpn__child"],
-                "label"       => __("Cut-off time on Saturday", "woocommerce-myparcel"),
+                "label"       => __("Cut-off time on Saturday", "woocommerce-postnl"),
                 "placeholder" => "14:30",
                 "default"     => "15:00",
                 "help_text"   => __(
                     "Time at which you stop processing orders for the day (format: hh:mm)",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
         ];
@@ -624,14 +624,14 @@ class WCMP_Settings_Data
     {
         return [
             [
-                "name"  => WCMYPA_Settings::SETTING_CARRIER_PICKUP_ENABLED,
-                "label" => __("Enable PostNL pickup", "woocommerce-myparcel"),
+                "name"  => WCPOST_Settings::SETTING_CARRIER_PICKUP_ENABLED,
+                "label" => __("Enable PostNL pickup", "woocommerce-postnl"),
                 "type"  => "toggle",
             ],
             self::getFeeField(
-                WCMYPA_Settings::SETTING_CARRIER_PICKUP_FEE,
+                WCPOST_Settings::SETTING_CARRIER_PICKUP_FEE,
                 [
-                    WCMYPA_Settings::SETTING_CARRIER_PICKUP_ENABLED,
+                    WCPOST_Settings::SETTING_CARRIER_PICKUP_ENABLED,
                 ]
             ),
         ];
@@ -644,106 +644,106 @@ class WCMP_Settings_Data
     {
         return [
             [
-                "name"      => WCMYPA_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES,
-                "label"     => __("Package types", "woocommerce-myparcel"),
-                "callback"  => [WCMP_Settings_Callbacks::class, "enhanced_select"],
-                "loop"      => WCMP_Data::getPackageTypesHuman(),
-                "options"   => (new WCMP_Shipping_Methods())->getShippingMethods(),
+                "name"      => WCPOST_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES,
+                "label"     => __("Package types", "woocommerce-postnl"),
+                "callback"  => [WCPN_Settings_Callbacks::class, "enhanced_select"],
+                "loop"      => WCPN_Data::getPackageTypesHuman(),
+                "options"   => (new WCPN_Shipping_Methods())->getShippingMethods(),
                 "default"   => [],
                 "help_text" => __(
-                    "Select one or more shipping methods for each MyParcel package type",
-                    "woocommerce-myparcel"
+                    "Select one or more shipping methods for each PostNL package type",
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CONNECT_EMAIL,
-                "label"     => __("Connect customer email", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CONNECT_EMAIL,
+                "label"     => __("Connect customer email", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "When you connect the customer's email, MyParcel can send a Track & Trace email to this address. In your MyParcel backend you can enable or disable this email and format it in your own style.",
-                    "woocommerce-myparcel"
+                    "When you connect the customer's email, PostNL can send a Track & Trace email to this address. In your PostNL backend you can enable or disable this email and format it in your own style.",
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_CONNECT_PHONE,
-                "label"     => __("Connect customer phone", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_CONNECT_PHONE,
+                "label"     => __("Connect customer phone", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "When you connect the customer's phone number, the courier can use this for the delivery of the parcel. This greatly increases the delivery success rate for foreign shipments.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_LABEL_DESCRIPTION,
-                "label"     => __("Label description", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_LABEL_DESCRIPTION,
+                "label"     => __("Label description", "woocommerce-postnl"),
                 "help_text" => __(
                     "With this option you can add a description to the shipment. This will be printed on the top left of the label, and you can use this to search or sort shipments in your backoffice. Because of limited space on the label which varies per package type, we recommend that you keep the label description as short as possible.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
                 "append"  => $this->getLabelDescriptionAddition(),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_EMPTY_PARCEL_WEIGHT,
+                "name"      => WCPOST_Settings::SETTING_EMPTY_PARCEL_WEIGHT,
                 "label"     => sprintf(
                     "%s (%s)",
-                    __("Empty parcel weight", "woocommerce-myparcel"),
+                    __("Empty parcel weight", "woocommerce-postnl"),
                     get_option('woocommerce_weight_unit')
                 ),
                 "help_text" => __(
                     "Default weight of your empty parcel.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_HS_CODE,
-                "label"     => __("Default HS Code", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_HS_CODE,
+                "label"     => __("Default HS Code", "woocommerce-postnl"),
                 "help_text" => __(
-                    "HS Codes are used for MyParcel world shipments, you can find the appropriate code on the site of the Dutch Customs.",
-                    "woocommerce-myparcel"
+                    "HS Codes are used for PostNL world shipments, you can find the appropriate code on the site of the Dutch Customs.",
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"    => WCMYPA_Settings::SETTING_PACKAGE_CONTENT,
-                "label"   => __("Customs shipment type", "woocommerce-myparcel"),
+                "name"    => WCPOST_Settings::SETTING_PACKAGE_CONTENT,
+                "label"   => __("Customs shipment type", "woocommerce-postnl"),
                 "type"    => "select",
                 "options" => [
-                    1 => __("Commercial goods", "woocommerce-myparcel"),
-                    2 => __("Commercial samples", "woocommerce-myparcel"),
-                    3 => __("Documents", "woocommerce-myparcel"),
-                    4 => __("Gifts", "woocommerce-myparcel"),
-                    5 => __("Return shipment", "woocommerce-myparcel"),
+                    1 => __("Commercial goods", "woocommerce-postnl"),
+                    2 => __("Commercial samples", "woocommerce-postnl"),
+                    3 => __("Documents", "woocommerce-postnl"),
+                    4 => __("Gifts", "woocommerce-postnl"),
+                    5 => __("Return shipment", "woocommerce-postnl"),
                 ],
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_COUNTRY_OF_ORIGIN,
-                "label"     => __("Default country of origin", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_COUNTRY_OF_ORIGIN,
+                "label"     => __("Default country of origin", "woocommerce-postnl"),
                 "type"      => "select",
                 "options"   => (new WC_Countries())->get_countries(),
                 "help-text" => __(
-                  "Country of origin is required for world shipments. Defaults to shop base or NL. Example: 'NL', 'BE', 'DE'", "woocommerce-myparcel"
+                  "Country of origin is required for world shipments. Defaults to shop base or NL. Example: 'NL', 'BE', 'DE'", "woocommerce-postnl"
               ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_AUTOMATIC_EXPORT,
-                "label"     => __("Automatic export", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_AUTOMATIC_EXPORT,
+                "label"     => __("Automatic export", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "With this setting enabled orders are exported to MyParcel automatically after payment.",
-                    "woocommerce-myparcel"
+                    "With this setting enabled orders are exported to PostNL automatically after payment.",
+                    "woocommerce-postnl"
                 ),
             ],
 //            [
-//                "name"      => WCMYPA_Settings::SETTING_RETURN_IN_THE_BOX,
-//                "label"     => __("Print return label directly", "woocommerce-myparcel"),
+//                "name"      => WCPOST_Settings::SETTING_RETURN_IN_THE_BOX,
+//                "label"     => __("Print return label directly", "woocommerce-postnl"),
 //                "type"      => "select",
 //                "options"   => [
-//                    self::NOT_ACTIVE        => __("No", "woocommerce-myparcel"),
-//                    self::NO_OPTIONS        => __("Without options", "woocommerce-myparcel"),
-//                    self::EQUAL_TO_SHIPMENT => __("Options equal to shipment", "woocommerce-myparcel"),
+//                    self::NOT_ACTIVE        => __("No", "woocommerce-postnl"),
+//                    self::NO_OPTIONS        => __("Without options", "woocommerce-postnl"),
+//                    self::EQUAL_TO_SHIPMENT => __("Options equal to shipment", "woocommerce-postnl"),
 //                ],
 //                "help_text" => __(
 //                    "Enabling this setting automatically creates a related return shipment for any shipment you export. When downloading the shipment labels the corresponding return shipment labels will be included.",
-//                    "woocommerce-myparcel"
+//                    "woocommerce-postnl"
 //                ),
 //            ],
         ];
@@ -756,96 +756,96 @@ class WCMP_Settings_Data
     {
         return [
             [
-                "name"      => WCMYPA_Settings::SETTING_USE_SPLIT_ADDRESS_FIELDS,
-                "label"     => __("MyParcel address fields", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_USE_SPLIT_ADDRESS_FIELDS,
+                "label"     => __("PostNL address fields", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "When enabled the checkout will use the MyParcel address fields. This means there will be three separate fields for street name, number and suffix. Want to use the WooCommerce default fields? Leave this option unchecked.",
-                    "woocommerce-myparcel"
+                    "When enabled the checkout will use the PostNL address fields. This means there will be three separate fields for street name, number and suffix. Want to use the WooCommerce default fields? Leave this option unchecked.",
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_SHOW_DELIVERY_DAY,
-                "label"     => __("Show delivery date", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_SHOW_DELIVERY_DAY,
+                "label"     => __("Show delivery date", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "Show delivery day options allow your customers to see the delivery day in order confirmation and My Account.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Enable MyParcel delivery options", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Enable PostNL delivery options", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
-                    "The MyParcel delivery options allow your customers to select whether they want their parcel delivered at home or to a pickup point. Depending on the settings you can allow them to select a date, time and even options like requiring a signature on delivery.",
-                    "woocommerce-myparcel"
+                    "The PostNL delivery options allow your customers to select whether they want their parcel delivered at home or to a pickup point. Depending on the settings you can allow them to select a date, time and even options like requiring a signature on delivery.",
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTINGS_SHOW_DELIVERY_OPTIONS_FOR_BACKORDERS,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Enable delivery options for backorders", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTINGS_SHOW_DELIVERY_OPTIONS_FOR_BACKORDERS,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Enable delivery options for backorders", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "When this option is enabled, delivery options and delivery day will be also shown for backorders.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_DISPLAY,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Display for", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_DISPLAY,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Display for", "woocommerce-postnl"),
                 "type"      => "select",
                 "help_text" => __(
                     "You can link the delivery options to specific shipping methods by adding them to the package types under \"Standard export settings\". The delivery options are not visible at foreign addresses.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
                 "options"   => [
                     self::DISPLAY_FOR_SELECTED_METHODS => __(
                         "Shipping methods associated with Parcels",
-                        "woocommerce-myparcel"
+                        "woocommerce-postnl"
                     ),
-                    self::DISPLAY_FOR_ALL_METHODS      => __("All shipping methods", "woocommerce-myparcel"),
+                    self::DISPLAY_FOR_ALL_METHODS      => __("All shipping methods", "woocommerce-postnl"),
                 ],
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_POSITION,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Checkout position", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_POSITION,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Checkout position", "woocommerce-postnl"),
                 "type"      => "select",
                 "default"   => "woocommerce_after_checkout_billing_form",
                 "options"   => [
                     "woocommerce_after_checkout_billing_form"     => __(
                         "Show after billing details",
-                        "woocommerce-myparcel"
+                        "woocommerce-postnl"
                     ),
                     "woocommerce_after_checkout_shipping_form"    => __(
                         "Show after shipping details",
-                        "woocommerce-myparcel"
+                        "woocommerce-postnl"
                     ),
                     "woocommerce_checkout_after_customer_details" => __(
                         "Show after customer details",
-                        "woocommerce-myparcel"
+                        "woocommerce-postnl"
                     ),
                     "woocommerce_after_order_notes"               => __(
                         "Show after notes",
-                        "woocommerce-myparcel"
+                        "woocommerce-postnl"
                     ),
                     "woocommerce_review_order_before_payment"     => __(
                         "Show after subtotal",
-                        "woocommerce-myparcel"
+                        "woocommerce-postnl"
                     ),
                 ],
                 "help_text" => __(
                     "You can change the place of the delivery options on the checkout page. By default it will be placed after shipping details.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"              => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_CUSTOM_CSS,
-                "condition"         => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"             => __("Custom styles", "woocommerce-myparcel"),
+                "name"              => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_CUSTOM_CSS,
+                "condition"         => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"             => __("Custom styles", "woocommerce-postnl"),
                 "type"              => "textarea",
                 "append"            => $this->getCustomCssAddition(),
                 "custom_attributes" => [
@@ -882,60 +882,60 @@ class WCMP_Settings_Data
     {
         return [
             [
-                "name"      => WCMYPA_Settings::SETTING_HEADER_DELIVERY_OPTIONS_TITLE,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Delivery options title", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_HEADER_DELIVERY_OPTIONS_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Delivery options title", "woocommerce-postnl"),
                 "title"     => "Delivery options title",
                 "help_text" => __(
-                    "You can place a delivery title above the MyParcel options. When there is no title, it will not be visible.",
-                    "woocommerce-myparcel"
+                    "You can place a delivery title above the PostNL options. When there is no title, it will not be visible.",
+                    "woocommerce-postnl"
                 ),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_DELIVERY_TITLE,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Delivery title", "woocommerce-myparcel"),
-                "default"   => __("Delivered at home or at work", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_DELIVERY_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Delivery title", "woocommerce-postnl"),
+                "default"   => __("Delivered at home or at work", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_MORNING_DELIVERY_TITLE,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Morning delivery title", "woocommerce-myparcel"),
-                "default"   => __("Morning delivery", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_MORNING_DELIVERY_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Morning delivery title", "woocommerce-postnl"),
+                "default"   => __("Morning delivery", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_STANDARD_TITLE,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Standard delivery title", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_STANDARD_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Standard delivery title", "woocommerce-postnl"),
                 "help_text" => __(
                     "When there is no title, the delivery time will automatically be visible.",
-                    "woocommerce-myparcel"
+                    "woocommerce-postnl"
                 ),
-                "default"   => __("Standard delivery", "woocommerce-myparcel"),
+                "default"   => __("Standard delivery", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_EVENING_DELIVERY_TITLE,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Evening delivery title", "woocommerce-myparcel"),
-                "default"   => __("Evening delivery", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_EVENING_DELIVERY_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Evening delivery title", "woocommerce-postnl"),
+                "default"   => __("Evening delivery", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_ONLY_RECIPIENT_TITLE,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Home address only title", "woocommerce-myparcel"),
-                "default"   => __("Home address only", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_ONLY_RECIPIENT_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Home address only title", "woocommerce-postnl"),
+                "default"   => __("Home address only", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_SIGNATURE_TITLE,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Signature on delivery title", "woocommerce-myparcel"),
-                "default"   => __("Signature on delivery", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_SIGNATURE_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Signature on delivery title", "woocommerce-postnl"),
+                "default"   => __("Signature on delivery", "woocommerce-postnl"),
             ],
             [
-                "name"      => WCMYPA_Settings::SETTING_PICKUP_TITLE,
-                "condition" => WCMYPA_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Pickup title", "woocommerce-myparcel"),
-                "default"   => __("Pickup", "woocommerce-myparcel"),
+                "name"      => WCPOST_Settings::SETTING_PICKUP_TITLE,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("Pickup title", "woocommerce-postnl"),
+                "default"   => __("Pickup", "woocommerce-postnl"),
             ],
         ];
     }
@@ -950,7 +950,7 @@ class WCMP_Settings_Data
         $currentTheme = wp_get_theme();
 
         $preset  = sanitize_title($currentTheme);
-        $cssPath = WCMYPA()->plugin_path() . "/assets/css/delivery-options/delivery-options-preset-$preset.css";
+        $cssPath = WCPOST()->plugin_path() . "/assets/css/delivery-options/delivery-options-preset-$preset.css";
 
         if (! file_exists($cssPath)) {
             return "";
@@ -958,9 +958,9 @@ class WCMP_Settings_Data
 
         return sprintf(
             '<p>%s <a class="" href="#" onclick="document.querySelector(`#delivery_options_custom_css`).value = `%s`">%s</a></p>',
-            sprintf(__("Theme \"%s\" detected.", "woocommerce-myparcel"), $currentTheme),
+            sprintf(__("Theme \"%s\" detected.", "woocommerce-postnl"), $currentTheme),
             file_get_contents($cssPath),
-            __("Apply preset.", "woocommerce-myparcel")
+            __("Apply preset.", "woocommerce-postnl")
         );
     }
 
@@ -973,13 +973,13 @@ class WCMP_Settings_Data
     {
         $output = '';
         $variables = [
-            '[DELIVERY_DATE]' => __('Delivery date', 'woocommerce-myparcel'),
-            '[ORDER_NR]'      => __('Order number', 'woocommerce-myparcel'),
-            '[PRODUCT_ID]'    => __('Product id', 'woocommerce-myparcel'),
-            '[PRODUCT_NAME]'  => __('Product name', 'woocommerce-myparcel'),
-            '[PRODUCT_QTY]'   => __('Product quantity', 'woocommerce-myparcel'),
-            '[PRODUCT_SKU]'   => __('Product SKU', 'woocommerce-myparcel'),
-            '[CUSTOMER_NOTE]' => __('Customer note', 'woocommerce-myparcel'),
+            '[DELIVERY_DATE]' => __('Delivery date', 'woocommerce-postnl'),
+            '[ORDER_NR]'      => __('Order number', 'woocommerce-postnl'),
+            '[PRODUCT_ID]'    => __('Product id', 'woocommerce-postnl'),
+            '[PRODUCT_NAME]'  => __('Product name', 'woocommerce-postnl'),
+            '[PRODUCT_QTY]'   => __('Product quantity', 'woocommerce-postnl'),
+            '[PRODUCT_SKU]'   => __('Product SKU', 'woocommerce-postnl'),
+            '[CUSTOMER_NOTE]' => __('Customer note', 'woocommerce-postnl'),
         ];
 
         foreach ($variables as $variable => $description) {
@@ -1001,14 +1001,14 @@ class WCMP_Settings_Data
             "name"       => $name,
             "condition" => $conditions,
             "class"      => ["wcpn__child"],
-            "label"      => __("Fee (optional)", "woocommerce-myparcel"),
+            "label"      => __("Fee (optional)", "woocommerce-postnl"),
             "type"       => "currency",
             "help_text"  => __(
                 "Enter an amount that is either positive or negative. For example, do you want to give a discount for using this function or do you want to charge extra for this delivery option.",
-                "woocommerce-myparcel"
+                "woocommerce-postnl"
             ),
         ];
     }
 }
 
-new WCMP_Settings_Data();
+new WCPN_Settings_Data();

@@ -1,18 +1,18 @@
 <?php
 
-namespace WPO\WC\MyParcel\Compatibility;
+namespace WPO\WC\PostNL\Compatibility;
 
 use WC_Order;
-use WPO\WC\MyParcel\Compatibility\Order as WCX_Order;
+use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
 
 /**
  * Class for compatibility with the ChannelEngine plugin.
  *
  * @see     https://wordpress.org/plugins/channelengine-woocommerce
  * @see     https://github.com/channelengine/woocommerce
- * @package WPO\WC\MyParcel\Compatibility
+ * @package WPO\WC\PostNL\Compatibility
  */
-class WCMP_ChannelEngine_Compatibility
+class WCPN_ChannelEngine_Compatibility
 {
     /**
      * Add the created Track & Trace code and set shipping method to postnl in ChannelEngine's meta data

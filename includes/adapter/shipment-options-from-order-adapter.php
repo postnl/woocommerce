@@ -3,12 +3,12 @@
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractShipmentOptionsAdapter;
 
-class WCMP_ShipmentOptionsFromOrderAdapter extends AbstractShipmentOptionsAdapter
+class WCPN_ShipmentOptionsFromOrderAdapter extends AbstractShipmentOptionsAdapter
 {
     const DEFAULT_INSURANCE = 0;
 
     /**
-     * WCMP_ShipmentOptionsFromOrderAdapter constructor.
+     * WCPN_ShipmentOptionsFromOrderAdapter constructor.
      *
      * @param AbstractDeliveryOptionsAdapter|null $originAdapter
      * @param array                               $inputData

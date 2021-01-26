@@ -10,7 +10,7 @@
  *    modal_dialog: String
  *  }
  * } wcpn.actions
- * @property {String} wcpn.api_url - The API Url we use in MyParcel requests.
+ * @property {String} wcpn.api_url - The API Url we use in PostNL requests.
  * @property {String} wcpn.ajax_url
  * @property {String} wcpn.ask_for_print_position
  * @property {Object} wcpn.bulk_actions
@@ -567,7 +567,7 @@ jQuery(($) => {
     switch (action) {
       // Export orders.
       case wcpn.bulk_actions.export:
-        exportToMyParcel.bind(spinnerWrapper)(orderIds);
+        exportToPostNL.bind(spinnerWrapper)(orderIds);
         break;
 
       // Print labels.
@@ -579,7 +579,7 @@ jQuery(($) => {
 
       // Export and print.
       case wcpn.bulk_actions.export_print:
-        exportToMyParcel.bind(spinnerWrapper)(orderIds, 'after_reload');
+        exportToPostNL.bind(spinnerWrapper)(orderIds, 'after_reload');
         break;
     }
   }
@@ -674,7 +674,7 @@ jQuery(($) => {
 
     switch (request) {
       case wcpn.actions.add_shipments:
-        exportToMyParcel.bind(this)();
+        exportToPostNL.bind(this)();
         break;
       case wcpn.actions.get_labels:
         if (askForPrintPosition && !$(this).hasClass('wcpn__offset-dialog__button')) {
@@ -800,12 +800,12 @@ jQuery(($) => {
   }
 
   /**
-   * Export orders to MyParcel via AJAX.
+   * Export orders to PostNL via AJAX.
    *
    * @param {String[]} orderIds
    * @param {String} print
    */
-  function exportToMyParcel(orderIds, print) {
+  function exportToPostNL(orderIds, print) {
     let url;
     let data;
 
@@ -914,7 +914,7 @@ jQuery(($) => {
   }
 
   /**
-   * Request MyParcel labels.
+   * Request PostNL labels.
    *
    * @param {Object} data
    */

@@ -3,7 +3,7 @@
     "woocommerce_page_wcpn_settings"
   ],
   "options": {
-    "woocommerce_myparcel_checkout_settings": {
+    "woocommerce_postnl_checkout_settings": {
       "barcode_in_note_title" : {},
       "label_description" : {},
 

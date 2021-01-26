@@ -13,9 +13,9 @@ window.addEventListener('load', function() {
    * Trigger hiding of address line 1 and 2 if necessary. The timeout is necessary, otherwise the order summary is going
    * to flash.
    *
-   * It checks for MyParcel_Frontend before running as that script has the same code.
+   * It checks for PostNL_Frontend before running as that script has the same code.
    */
-  if (!window.hasOwnProperty('MyParcel_Frontend')) {
+  if (!window.hasOwnProperty('PostNL_Frontend')) {
     setTimeout(function() {
       var event = document.createEvent('HTMLEvents');
       event.initEvent('change', true, false);
@@ -60,8 +60,8 @@ window.addEventListener('load', function() {
     document.querySelector('#' + type + '_house_number_suffix').value = address[2] || '';
 
     /* Update settings after filling if the frontend script is loaded and initialized and address is not empty */
-    if (address.length && window.hasOwnProperty('MyParcel_Frontend')) {
-      window.MyParcel_Frontend.updateAddress();
+    if (address.length && window.hasOwnProperty('PostNL_Frontend')) {
+      window.PostNL_Frontend.updateAddress();
     }
   }
 });
