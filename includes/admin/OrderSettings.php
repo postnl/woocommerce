@@ -219,7 +219,6 @@ class OrderSettings
         $this->setLabelDescription();
 
         $this->setAgeCheck();
-        $this->setLargeFormat();
         $this->setOnlyRecipient();
         $this->setReturnShipment();
         $this->setSignature();
@@ -338,17 +337,6 @@ class OrderSettings
         $valueFromOrder   = $this->shipmentOptions->getLabelDescription();
 
         $this->labelDescription = (string) ($valueFromOrder ?? $valueFromSetting ?? $defaultValue);
-    }
-
-    /**
-     * @return void
-     */
-    private function setLargeFormat(): void
-    {
-        $this->largeFormat = (bool) WCPN_Export::getChosenOrDefaultShipmentOption(
-            $this->shipmentOptions->hasLargeFormat(),
-            "{$this->carrier}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT
-        );
     }
 
     /**

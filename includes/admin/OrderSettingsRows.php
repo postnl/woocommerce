@@ -25,7 +25,6 @@ class OrderSettingsRows
     private const OPTION_CARRIER                            = "[carrier]";
     private const OPTION_DELIVERY_TYPE                      = "[delivery_type]";
     private const OPTION_EXTRA_OPTIONS_COLLO_AMOUNT         = "[extra_options][collo_amount]";
-    private const OPTION_EXTRA_OPTIONS_WEIGHT               = "[extra_options][weight]";
     private const OPTION_PACKAGE_TYPE                       = "[package_type]";
     private const OPTION_SHIPMENT_OPTIONS_INSURED           = "[shipment_options][insured]";
     private const OPTION_SHIPMENT_OPTIONS_INSURED_AMOUNT    = "[shipment_options][insured_amount]";
@@ -130,24 +129,6 @@ class OrderSettingsRows
             $rows = array_merge($rows, self::getAdditionalOptionsRows($orderSettings));
         }
 
-        if ($isHomeCountry || $isEuCountry) {
-            $rows[] = [
-                "name"      => self::OPTION_SHIPMENT_OPTIONS_LARGE_FORMAT,
-                "type"      => "toggle",
-                "label"     => __("Extra large size", "woocommerce-postnl"),
-                "help_text" => __(
-                    "Enable this option when your shipment is bigger than 100 x 70 x 50 cm, but smaller than 175 x 78 x 58 cm. An extra fee will be charged. Note! If the parcel is bigger than 175 x 78 x 58 of or heavier than 30 kg, the pallet rate will be charged.",
-                    "woocommerce-postnl"
-                ),
-                "value"     => $orderSettings->hasLargeFormat(),
-                "condition" => [
-                    self::CONDITION_PACKAGE_TYPE_PACKAGE,
-                    self::CONDITION_DELIVERY_TYPE_DELIVERY,
-                    self::CONDITION_CARRIER_DEFAULT,
-                ],
-            ];
-        }
-
         $rows[] = [
             "name"  => self::OPTION_SHIPMENT_OPTIONS_LABEL_DESCRIPTION,
             "type"  => "text",
@@ -188,31 +169,6 @@ class OrderSettingsRows
     private static function getAdditionalOptionsRows(OrderSettings $orderSettings): array
     {
         return [
-            [
-                "name"        => self::OPTION_EXTRA_OPTIONS_WEIGHT,
-                "type"        => "select",
-                "label"       => __("Weight", "woocommerce-postnl"),
-                "description" => $orderSettings->getWeight()
-                    ? sprintf(
-                        __("Calculated weight: %s", "woocommerce-postnl"),
-                        wc_format_weight($orderSettings->getWeight())
-                    )
-                    : null,
-                "options"     => WCPN_Export::getDigitalStampRangeOptions(),
-                "value"       => $orderSettings->getDigitalStampRangeWeight(),
-                "condition"   => [
-                    [
-                        "parent_name"  => self::OPTION_CARRIER,
-                        "type"         => "show",
-                        "parent_value" => WCPN_Data::DEFAULT_CARRIER,
-                    ],
-                    [
-                        "parent_name"  => self::OPTION_PACKAGE_TYPE,
-                        "type"         => "show",
-                        "parent_value" => AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME,
-                    ],
-                ],
-            ],
             [
                 "name"      => self::OPTION_SHIPMENT_OPTIONS_ONLY_RECIPIENT,
                 "type"      => "toggle",

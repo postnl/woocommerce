@@ -93,8 +93,6 @@ class WCPOST_Admin
         add_filter("manage_edit-shop_order_columns", [$this, "barcode_add_new_order_admin_list_column"], 10, 1);
         add_action("manage_shop_order_posts_custom_column", [$this, "addBarcodeToOrderColumn"], 10, 2);
 
-//        add_action('woocommerce_payment_complete', [$this, 'automaticExportOrder'], 1000);
-
         add_action("init", [$this, "registerDeliveredPostStatus"], 10, 1);
         add_filter("wc_order_statuses", [$this, "displayDeliveredPostStatus"], 10, 2);
 
@@ -462,7 +460,7 @@ class WCPOST_Admin
             $addShipments => [
                 "url" => admin_url("$baseUrl&request=$addShipments&order_ids=$order_id"),
                 "img" => WCPOST()->plugin_url() . "/assets/img/postnl-up.png",
-                "alt" => __("Export to PostNL", "woocommerce-postnl"),
+                "alt" => __("Prepare PostNL label", "woocommerce-postnl"),
             ],
             $getLabels    => [
                 "url" => admin_url("$baseUrl&request=$getLabels&order_ids=$order_id"),

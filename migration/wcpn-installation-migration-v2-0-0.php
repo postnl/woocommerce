@@ -47,7 +47,6 @@ class WCPN_Installation_Migration_v2_0_0
 
         // map old key => new_key
         $defaults_settings_keys = [
-            'email'           => 'connect_email',
             'telefoon'        => 'connect_phone',
             'handtekening'    => 'signature',
             'retourbgg'       => 'return',

@@ -79,14 +79,12 @@ class WCPN_Data
             AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME,
             AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME,
             AbstractConsignment::PACKAGE_TYPE_LETTER_NAME,
-            AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME,
         ];
 
         self::$packageTypesHuman = [
             AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME       => __("Package", "woocommerce-postnl"),
             AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME       => __("Mailbox", "woocommerce-postnl"),
             AbstractConsignment::PACKAGE_TYPE_LETTER_NAME        => __("Unpaid letter", "woocommerce-postnl"),
-            AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME => __("Digital stamp", "woocommerce-postnl"),
         ];
 
         self::$deliveryTypesHuman = [
