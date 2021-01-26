@@ -1,19 +1,19 @@
 <?php
 
-use migration\WCPN_Upgrade_Migration;
+use migration\WCMP_Upgrade_Migration;
 
 if (! defined('ABSPATH')) {
     exit;
 }
 
-if (class_exists('WCPN_Upgrade_Migration_v4_1_0')) {
-    return new WCPN_Upgrade_Migration_v4_1_0();
+if (class_exists('WCMP_Upgrade_Migration_v4_1_0')) {
+    return new WCMP_Upgrade_Migration_v4_1_0();
 }
 
 /**
  * Migrates pre v4.1.0 settings
  */
-class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
+class WCMP_Upgrade_Migration_v4_1_0 extends WCMP_Upgrade_Migration
 {
     /**
      * @var array
@@ -33,7 +33,7 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
     /**
      * @var array
      */
-    private $newPostNLSettings = [];
+    private $newPostNlSettings = [];
 
     /**
      * @var array
@@ -57,37 +57,37 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
 
     protected function import(): void
     {
-        require_once(WCPOST()->plugin_path() . '/includes/vendor/autoload.php');
-        require_once(WCPOST()->plugin_path() . '/includes/admin/settings/class-wcpost-settings.php');
-        require_once(WCPOST()->plugin_path() . '/includes/class-wcpn-data.php');
+        require_once(WCMYPA()->plugin_path() . '/includes/vendor/autoload.php');
+        require_once(WCMYPA()->plugin_path() . '/includes/admin/settings/class-wcpost-settings.php');
+        require_once(WCMYPA()->plugin_path() . '/includes/class-wcpn-data.php');
     }
 
     protected function migrate(): void
     {
-        $this->oldGeneralSettings        = $this->getSettings("woocommerce_postnl_general_settings");
-        $this->oldCheckoutSettings       = $this->getSettings("woocommerce_postnl_checkout_settings");
-        $this->oldExportDefaultsSettings = $this->getSettings("woocommerce_postnl_export_defaults_settings");
-        $oldPostNLSettings               = $this->getSettings("woocommerce_postnl_postnl_settings");
+        $this->oldGeneralSettings        = $this->getSettings("woocommerce_myparcel_general_settings");
+        $this->oldCheckoutSettings       = $this->getSettings("woocommerce_myparcel_checkout_settings");
+        $this->oldExportDefaultsSettings = $this->getSettings("woocommerce_myparcel_export_defaults_settings");
+        $oldPostNlSettings               = $this->getSettings("woocommerce_myparcel_postnl_settings");
 
         $this->newGeneralSettings        = $this->oldGeneralSettings;
         $this->newCheckoutSettings       = $this->oldCheckoutSettings;
         $this->newExportDefaultsSettings = $this->oldExportDefaultsSettings;
-        $this->newPostNLSettings         = $oldPostNLSettings;
+        $this->newPostNlSettings         = $oldPostNlSettings;
 
         $this->migrateGeneralSettings();
         $this->migrateCheckoutSettings();
         $this->migrateExportDefaultsSettings();
 
-        $this->correctPostNLInsurance();
+        $this->correctPostNlInsurance();
     }
 
     protected function setOptionSettingsMap(): void
     {
         $this->optionSettingsMap = [
-            "woocommerce_postnl_general_settings"         => $this->newGeneralSettings,
-            "woocommerce_postnl_checkout_settings"        => $this->newCheckoutSettings,
-            "woocommerce_postnl_export_defaults_settings" => $this->newExportDefaultsSettings,
-            "woocommerce_postnl_postnl_settings"          => $this->newPostNLSettings,
+            "woocommerce_myparcel_general_settings"         => $this->newGeneralSettings,
+            "woocommerce_myparcel_checkout_settings"        => $this->newCheckoutSettings,
+            "woocommerce_myparcel_export_defaults_settings" => $this->newExportDefaultsSettings,
+            "woocommerce_myparcel_postnl_settings"          => $this->newPostNlSettings,
         ];
     }
 
@@ -110,23 +110,23 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
         );
 
         // Migrate old checkout settings to PostNL
-        $this->newPostNLSettings = $this->migrateSettings(
+        $this->newPostNlSettings = $this->migrateSettings(
             self::getCheckoutPostnlMap(),
-            $this->newPostNLSettings,
+            $this->newPostNlSettings,
             $this->oldCheckoutSettings
         );
     }
 
     private function migrateExportDefaultsSettings(): void
     {
-        $this->newPostNLSettings = $this->migrateSettings(
-            self::getExportDefaultsPostNLMap(),
-            $this->newPostNLSettings,
+        $this->newPostNlSettings = $this->migrateSettings(
+            self::getExportDefaultsPostnlMap(),
+            $this->newPostNlSettings,
             $this->oldExportDefaultsSettings
         );
 
         $this->newExportDefaultsSettings = $this->removeOldSettings(
-            self::getExportDefaultsPostNLMap(),
+            self::getExportDefaultsPostnlMap(),
             $this->newExportDefaultsSettings
         );
     }
@@ -137,7 +137,7 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
     private static function getGeneralMap(): array
     {
         return [
-            'print_position_offset' => WCPOST_Settings::SETTING_ASK_FOR_PRINT_POSITION,
+            'print_position_offset' => WCMYPA_Settings::SETTING_ASK_FOR_PRINT_POSITION,
         ];
     }
 
@@ -146,18 +146,18 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
      */
     private static function getCheckoutPostnlMap(): array
     {
-        $postnl = WCPOST_Settings::SETTINGS_POSTNL;
+        $postnl = WCMYPA_Settings::SETTINGS_POSTNL;
 
         return [
-            "delivery_options_enabled" => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-            "evening_enabled"          => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED,
-            "evening_fee"              => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE,
-            "morning_enabled"          => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED,
-            "morning_fee"              => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE,
-            "postnl_checkout"        => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-            "only_recipient_enabled"   => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
-            "only_recipient_fee"       => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE,
-            "saturday_cutoff_enabled" =>  "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED,
+            "delivery_options_enabled" => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+            "evening_enabled"          => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DELIVERY_EVENING_ENABLED,
+            "evening_fee"              => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DELIVERY_EVENING_FEE,
+            "morning_enabled"          => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DELIVERY_MORNING_ENABLED,
+            "morning_fee"              => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DELIVERY_MORNING_FEE,
+            "myparcel_checkout"        => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
+            "only_recipient_enabled"   => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
+            "only_recipient_fee"       => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_ONLY_RECIPIENT_FEE,
+            "saturday_cutoff_enabled" =>  "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_MONDAY_DELIVERY_ENABLED,
         ];
     }
 
@@ -167,38 +167,39 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
     private static function getCheckoutMap(): array
     {
         return [
-            "at_home_delivery" => WCPOST_Settings::SETTING_DELIVERY_TITLE,
+            "at_home_delivery" => WCMYPA_Settings::SETTING_DELIVERY_TITLE,
         ];
     }
 
     /**
      * @return array
      */
-    private static function getExportDefaultsPostNLMap(): array
+    private static function getExportDefaultsPostnlMap(): array
     {
-        $postnl = WCPOST_Settings::SETTINGS_POSTNL;
+        $postnl = WCMYPA_Settings::SETTINGS_POSTNL;
 
         return [
-            "insured_amount" => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT,
-            "only_recipient" => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT,
-            "return"         => "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN,
+            "insured_amount" => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT,
+            "large_format"   => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT,
+            "only_recipient" => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT,
+            "return"         => "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN,
         ];
     }
 
     /**
      * In case the current amount is not valid, choose the closest value from the allowed values (rounded up).
      */
-    private function correctPostNLInsurance(): void
+    private function correctPostNlInsurance(): void
     {
-        $postnl           = WCPOST_Settings::SETTINGS_POSTNL;
-        $key              = "{$postnl}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT;
-        $availableAmounts = WCPN_Data::getInsuranceAmounts();
-        $insuranceAmount  = $this->newPostNLSettings[$key];
+        $postnl           = WCMYPA_Settings::SETTINGS_POSTNL;
+        $key              = "{$postnl}_" . WCMYPA_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT;
+        $availableAmounts = WCMP_Data::getInsuranceAmounts();
+        $insuranceAmount  = $this->newPostNlSettings[$key];
 
         if (! in_array($insuranceAmount, $availableAmounts)) {
             $closestValue = $this->roundUpToMatch($insuranceAmount, $availableAmounts);
 
-            $this->newPostNLSettings[$key] = $closestValue;
+            $this->newPostNlSettings[$key] = $closestValue;
         }
     }
 
@@ -225,4 +226,4 @@ class WCPN_Upgrade_Migration_v4_1_0 extends WCPN_Upgrade_Migration
     }
 }
 
-return new WCPN_Upgrade_Migration_v4_1_0();
+return new WCMP_Upgrade_Migration_v4_1_0();

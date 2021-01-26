@@ -2,7 +2,7 @@
 
 namespace migration;
 
-abstract class WCPN_Upgrade_Migration
+abstract class WCMP_Upgrade_Migration
 {
     /**
      * @var array

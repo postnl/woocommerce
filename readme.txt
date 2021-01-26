@@ -90,13 +90,52 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 == Changelog ==
 
-= 4.0.2 (--) =
-* Fix: Export letter for international shipments
+= 4.2.0 (2021-01-21) =
+* Fix: Rename `WCMP`, `WCMP()`, `WCMP_Admin` and `WCMP_Settings`
+* Fix: Weight calculation for all shipment types
+* Fix: Delivery options after woocommerce subtotal for solving conflicts with multiple themes
+* Fix: Error array_replace_recursive second parameter must be array
+* Fix: Show correct delivery type in orders grid
+* Fix: Package type from shipping method/class not shown in order grid
+* Fix: Unable to send return email
+* Fix: Send return email modal
+* Fix: Show delivery date in order grid for any order that has one
+* Fix: Don't load checkout scripts on order received page
+* Fix: Multicollo voor Dutch shipments and for international shipments can you create multiple labels
+* Fix: Missing barcode in emails of automatically processed orders
+* Fix: Properly add/remove cart fees when using delivery options
+* Fix: Error on checkout when using custom address fields
+* Fix: Maximum label description length of 45 characters
+* Fix: Multiple barcode in order note
+* Fix: Saving the correct days in the setting drop off days
+* Fix: Save the correct shipping class
+* Fix: Check if shipping address is selected on checkout page en use the correct address
+* Fix: Order confirmation on the thank you page, confirmation email and on the customer account
+* Fix: Do not save address in address book
+* Fix: Correct package type for international shipments
+* Fix: Only add empty parcel weight to packages
+* Fix: Export via actions at the bottom of the order-grid
+* Improvment: Set correct UserAgent
+* Improvment: More options for age verification at product level
+* Improvment: Better country of origin selection
+* Improvment: Improve shipment options dialog
+* Improvment: Spinner for order grid bulk actions
+* Improvment: Update icons
+* Improvment: Use base price for delivery options
+* Improvment: Error handling after exporting and printing a label
+* Improvment: Stabilizer code for opening a label in a new tab
+* Improvment: New status for letter and DPZ and show them on the barcode column
+* Improvment: Use gulp to allow es6 javascript and use sass.
+* Improvment: Use customer note for label description.
+* Improvment: Use the latest MyParcel SDK.
+* Improvment: Handle translations in gulp
 
-= 4.0.1 (2021-01-06) =
-* Fix: Auto export when order is paid
+= 4.1.5 (2020-12-15) =
+* Fix: select box for country of origin
+* Fix: delivery options for not logged in users
+* Improvement: prices from the shipping method inside the delivery options
 
-= 4.0.0 (2021-01-04) =
+= 4.1.4 (2020-11-24) =
 * Fix: Shipping classes not saving
 * Fix: Drop off days
 * Fix: WooCommerce PDF Invoices & Packing Slips placeholders compatibility
@@ -104,38 +143,20 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Error delivery_date is too early
 * Fix: Multiple barcode in order note
 * Fix: Maximum label description lenght of 45 characters
-* Fix: Error on checkout when using custom address fields
-* Fix: Crack down on invalid package types
-* Fix: 4.1.0 migration fatal errors
-* Fix: PHP Fatal error: Uncaught TypeError: Return value of WCPN_Export::getPackageTypeFromOrder()
-* Fix: Wrong label for "show delivery day" setting.
-* Fix: Error on sending return email.
-* Fix: Allow split address field for Belgium as well.
-* Fix: Add options that were missing in 4.0.0
-* Fix: Rename at_home_delivery to delivery_title
-* Fix: Monday delivery
-* Fix: Free_shipping linked to package then you should also see the delivery options
-* Fix: If you have a shipping method with flatrate: 181 and the method gives flatrate: 18 then you should not see the delivery options
-* Fix: Error CRITICAL Uncaught TypeError: Return value of WCPN_Export::getShippingMethod()
-* Fix: Disable order status delivered
-* Fix: Package type not being recognized
-* Fix: migrate all package types in export defaults settings
-* Fix: Failed opening class-wcpost-settings.php
-* Fix: Old settings non existent error
-* Fix: Class naming for theme compatibility
-* Fix:  Show delivery options with a shipping class and with tablerates
-* Fix: Wrong meta variable country of origin
-* Fix: Html layout of shipment summary settings and searching in WooCommerce orders overview
-* Fix: Translations
-* Fix: Export pickup locations
-* Fix: When deliveryType is empty use default package
-* Fix: Html layout of shipment summary and searching in WooCommerce orders overview
-* Fix: HS code
-* Fix: Delete options keep old shipments
-* Fix: Insurance possibilities
-* Fix: Barcode in orderview
-* Fix: Housenumber and suffix
 * Improvement: support WP-Multilang
+
+
+= 4.1.3 (2020-11-13) =
+* Fix: Error on checkout when using custom address fields
+
+= 4.1.2 (2020-11-12) =
+* Fix: Crack down on invalid package types
+
+= 4.1.1 (2020-11-11) =
+* Fix: 4.1.0 migration fatal errors
+* Fix: PHP Fatal error: Uncaught TypeError: Return value of WCMP_Export::getPackageTypeFromOrder()
+
+= 4.1.0 (2020-11-11) =
 * Improvement: All enabled/disabled dropdowns replaced with clickable toggles.
 * Improvement: Show package type and delivery date instead of "details".
 * Improvement: Add label description for individual shipments.
@@ -143,11 +164,54 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Improvement: Spinner for order grid bulk actions.
 * Improvement: make default export settings show up in shipment options.
 * Improvement: show delivery date in order grid for any order that has one (only when "show delivery day" setting is enabled).
+* Fix: Calculated weight is shown for digital stamps.
+* Fix: Wrong label for "show delivery day" setting.
+* Fix: Error on sending return email.
+* Fix: Allow split address field for Belgium as well.
+* Fix: Add options that were missing in 4.0.0
+* Fix: Rename at_home_delivery to delivery_title
+* Fix: Monday delivery
+
+= 4.0.6 (2020-10-14) =
+* Fix: Free_shipping linked to package then you should also see the delivery options
+* Fix: If you have a shipping method with flatrate: 181 and the method gives flatrate: 18 then you should not see the delivery options
+* Fix: Error CRITICAL Uncaught TypeError: Return value of WCMP_Export::getShippingMethod()
+
+= 4.0.5 (2020-10-05) =
+* Fix: Disable order status delivered
+* Fix: Package type not being recognized
+* Fix: migrate all package types in export defaults settings
+
+= 4.0.4 (2020-10-01) =
+* Fix: Failed opening class-wcmypa-settings.php
+
+= 4.0.3 (2020-10-01) =
+* Fix: Old settings non existent error
+* Fix: Class naming for theme compatibility
+
+= 4.0.2 (2020-08-21) =
+* Fix:  Show delivery options with a shipping class and with tablerates
 * Improvement: Automatic insurance
+
+= 4.0.1 (2020-07-29) =
+* Fix: Wrong meta variable country of origin
+* Fix: Html layout of shipment summary settings and searching in WooCommerce orders overview
+* Fix: Translations
+* Fix: Export pickup locations
+* Fix: When deliveryType is empty use default package
+* Fix: Html layout of shipment summary and searching in WooCommerce orders overview
 * Improvement: Add empty parcel weight option
 * Improvement: Add multicollo option
+
+= 4.0.0 (2020-06-24) =
+* Fix: HS code
+* Fix: Delete options keep old shipments
+* Fix: Insurance possibilities
+* Fix: Barcode in orderview
+* Fix: Housenumber and suffix
 * Improvement: Country of origin
 * Improvement: New checkout and SDK
+* Improvement: Automatic export after payment
 * Improvement: V2 shipment endpoint
 * Improvement: HS code for variable product
 
@@ -159,16 +223,17 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Warning: invalid argument supplied .... class-wc-shipping-flat-rate.php.
 
 = 3.1.8 (2019-11-12) =
-* Fix: Check if there is connection with PostNL
+* Fix: Check if there is connection with MyParcel
 
 = 3.1.7 (2019-07-16) =
-* Fix: Search in order grid PostNL shipment
+* Fix: Search in order grid MyParcel shipment
 * Fix: More than 5 products for World shipments
 
 = 3.1.6 (2019-07-04) =
 * Fix: Use constants for delivery_type
 * Fix: Saturday cutoff time
 * Fix: Shipping method issue with pickup
+* Fix: Digital stamp weight issue
 
 = 3.1.5 (2019-05-14) =
 * Improvement: Add the link for the personalized Track & Trace page (portal)
@@ -178,6 +243,7 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Translation house number again button
 * Fix: Set default to 0 if there's no tax rate set up
 * Fix: fix issue with shipping class term id
+* Fix: Correct amount on the digital stamp
 * Fix: trying to get property of non-object
 * Fix: Shipment validation error (PakjeGemak)
 
@@ -210,6 +276,7 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 = 3.1.0 (2018-12-12) =
 * Hotfix: Show delivery options when checkout form already filled in.
+* Improvement: Add Digital stamp
 
 = 3.0.10 (2018-12-05) =
 * Hotfix: Flashing of the order summary.
@@ -220,7 +287,7 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 = 3.0.8 (2018-12-04) =
 * Fix: The multiple calls that are made to retrieve the shipping data.
 * Fix: The option for Pick up extra early
-* Fix: Wrong house number / postcode message and the possibility to adjust the address in the PostNL checkout
+* Fix: Wrong house number / postcode message and the possibility to adjust the address in the MyParcel checkout
 * Fix: Woocommerce tabel rates
 * Improvement: Better support the default WooCommerce checkout address fields
 
@@ -249,8 +316,9 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: error about "Bewaar barcode in een notitie" size
 * Fix: Turn of the option allow Pickup Express
 * Fix: Save settings with a new update
-* Improvement: PostNL delivery header titel
+* Improvement: MyParcel delivery header titel
 * Improvement: Support WooCommerce 3.5.0
+* Improvement: add preliminary support for "digitale postzegel"
 
 = 3.0.2 (2018-10-09) =
 * Fix: Error a non-numeric value encountered in class-wcpn-frontend-settings.php
@@ -321,7 +389,7 @@ These are the biggest changes:
       ```des/class-wcpn-rest-api-integration.php): failed to open stream```
 
 = 2.4.3 (2018-01-05) =
-* Fix: Add PostNL fields to REST api to create order request
+* Fix: Add MyParcel fields to REST api to create order request
 * Fix: Hide days when the pickup delivery is selected
 
 = 2.4.2 (2017-10-29) =
@@ -409,7 +477,7 @@ These are the biggest changes:
 = 2.0.5 =
 * Fix default insurance selection
 * Tweak: Show shipping 'method title' instead of 'title' in settings (with fallback to title)
-* Tweak: added `$order` object to `wcpostnl_email_text` filter
+* Tweak: added `$order` object to `wcmyparcel_email_text` filter
 
 = 2.0.4 =
 * Improved theme compatibility
@@ -433,7 +501,7 @@ These are the biggest changes:
 	* PostNL Pickup & Early PostNL Pickup
 	* Possibility to assign cost to the above delivery options
 * Create return labels from the WooCommerce backend
-* Uses new PostNL API
+* Uses new MyParcel API
 
 = 1.5.6 =
 * Fix: Disable pakjegemak if 'ship to different address' is disabled after selecting Pakjegemak location
@@ -443,11 +511,11 @@ These are the biggest changes:
 * Fix: Foreign postcodes validation fix.
 
 = 1.5.4 =
-* Fix: Various Pakjegemak related issues (now saves & sends pakjegemak address separately to PostNL)
+* Fix: Various Pakjegemak related issues (now saves & sends pakjegemak address separately to MyParcel)
 * Fix: Postcode validation issues with Portugal
 
 = 1.5.3 =
-* Feature: Edit PostNL address fields on user profile page
+* Feature: Edit MyParcel address fields on user profile page
 * Fix: Bug with automatic order completion
 
 = 1.5.2 =
@@ -500,7 +568,7 @@ These are the biggest changes:
 = 1.4.0 =
 * Feature: Print order number on label
 * Feature: PakjeGemak integration
-* Feature: Option to autocomplete order after successful export to PostNL
+* Feature: Option to autocomplete order after successful export to MyParcel
 * Feature: Option to display Track & Trace link on my account page
 
 = 1.3.8 =
@@ -537,14 +605,14 @@ These are the biggest changes:
 * Fix: button image width
 
 = 1.3.0 =
-* New PostNL icons
+* New MyParcel icons
 * Export & PDF buttons compatible with WC2.1 / MP6 styles
 * Button styles are now in CSS instead of inline
 
 = 1.2.0 =
-* Feature: The PostNL checkout fields (street name / house number) can now also be modified on the my account page
+* Feature: The MyParcel checkout fields (street name / house number) can now also be modified on the my account page
 * Fix: WooCommerce 2.1 compatibility (checkout field localisation is now in WC core)
-* Updated PostNL tariffs
+* Updated MyParcel tariffs
 
 = 1.1.1 =
 * Fix: Labels for Custom id ('Eigen kenmerk') & Message ('Optioneel bericht') in the export window were reversed

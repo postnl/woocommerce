@@ -1,21 +1,23 @@
 <?php
 
-use WPO\WC\PostNL\Entity\SettingsFieldArguments;
+use WPO\WC\MyParcel\Entity\SettingsFieldArguments;
 
 if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-if (class_exists('WCPN_Settings_Callbacks_Enhanced_Select')) {
+if (class_exists('WCMP_Settings_Callbacks_Enhanced_Select')) {
     return;
 }
 
-class WCPN_Settings_Callbacks_Enhanced_Select
+class WCMP_Settings_Callbacks_Enhanced_Select
 {
     /**
-     * WCPN_Settings_Callbacks_Enhanced_Select constructor.
+     * WCMP_Settings_Callbacks_Enhanced_Select constructor.
      *
-     * @param \WPO\WC\PostNL\Entity\SettingsFieldArguments $class
+     * @param \WPO\WC\MyParcel\Entity\SettingsFieldArguments $class
+     *
+     * @throws Exception
      */
     public function __construct(SettingsFieldArguments $class)
     {
@@ -50,7 +52,7 @@ class WCPN_Settings_Callbacks_Enhanced_Select
             }
 
             $newClass->setId($optionId . '_' . $id);
-            $this->createSearchBox($class, $id, $value ?? []);
+            $this->createSearchBox($newClass, $id, $value ?? []);
         }
     }
 
