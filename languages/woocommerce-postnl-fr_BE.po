@@ -28,7 +28,7 @@ msgstr ""
 msgid "How to update your PHP version"
 msgstr ""
 
-#: includes/class-wcpn-assets.php:93, includes/admin/class-wcpn-export.php:251
+#: includes/class-wcpn-assets.php:93, includes/admin/class-wcpn-export.php:249
 msgid "You have not selected any orders!"
 msgstr ""
 
@@ -36,39 +36,35 @@ msgstr ""
 msgid "Export options"
 msgstr ""
 
-#: includes/class-wcpn-data.php:86
+#: includes/class-wcpn-data.php:85
 msgid "Package"
 msgstr ""
 
-#: includes/class-wcpn-data.php:87
+#: includes/class-wcpn-data.php:86
 msgid "Mailbox"
 msgstr ""
 
-#: includes/class-wcpn-data.php:88
+#: includes/class-wcpn-data.php:87
 msgid "Unpaid letter"
 msgstr ""
 
-#: includes/class-wcpn-data.php:89
-msgid "Digital stamp"
-msgstr ""
-
-#: includes/class-wcpn-data.php:93, includes/frontend/class-wcpn-cart-fees.php:228, includes/admin/settings/class-wcpn-settings-data.php:542, includes/admin/settings/class-wcpn-settings-data.php:903
+#: includes/class-wcpn-data.php:91, includes/frontend/class-wcpn-cart-fees.php:228, includes/admin/settings/class-wcpn-settings-data.php:533, includes/admin/settings/class-wcpn-settings-data.php:862
 msgid "Morning delivery"
 msgstr ""
 
-#: includes/class-wcpn-data.php:94, includes/admin/settings/class-wcpn-settings-data.php:913
+#: includes/class-wcpn-data.php:92, includes/admin/settings/class-wcpn-settings-data.php:872
 msgid "Standard delivery"
 msgstr ""
 
-#: includes/class-wcpn-data.php:95, includes/frontend/class-wcpn-cart-fees.php:227, includes/admin/settings/class-wcpn-settings-data.php:555, includes/admin/settings/class-wcpn-settings-data.php:919
+#: includes/class-wcpn-data.php:93, includes/frontend/class-wcpn-cart-fees.php:227, includes/admin/settings/class-wcpn-settings-data.php:546, includes/admin/settings/class-wcpn-settings-data.php:878
 msgid "Evening delivery"
 msgstr ""
 
-#: includes/class-wcpn-data.php:96, includes/admin/settings/class-wcpn-settings-data.php:937
+#: includes/class-wcpn-data.php:94, includes/admin/settings/class-wcpn-settings-data.php:896
 msgid "Pickup"
 msgstr ""
 
-#: includes/class-wcpn-data.php:229, includes/admin/class-wcpost-admin.php:592, includes/admin/settings/class-wcpn-settings-data.php:82, includes/admin/settings/class-wcpost-settings.php:157, includes/admin/settings/class-wcpost-settings.php:158
+#: includes/class-wcpn-data.php:227, includes/admin/class-wcpost-admin.php:590, includes/admin/settings/class-wcpn-settings-data.php:82, includes/admin/settings/class-wcpost-settings.php:153, includes/admin/settings/class-wcpost-settings.php:154
 msgid "PostNL"
 msgstr ""
 
@@ -112,197 +108,197 @@ msgstr ""
 msgid "No HS code found in PostNL settings"
 msgstr ""
 
-#: includes/admin/class-wcpn-export-consignments.php:338, includes/admin/class-wcpn-export.php:568
+#: includes/admin/class-wcpn-export-consignments.php:338, includes/admin/class-wcpn-export.php:566
 msgid "No API key found in PostNL settings"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:184
+#: includes/admin/class-wcpn-export.php:182
 msgid "You have to export the orders to PostNL before you can print the labels!"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:221, includes/admin/class-wcpn-export.php:231
+#: includes/admin/class-wcpn-export.php:219, includes/admin/class-wcpn-export.php:229
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:397
+#: includes/admin/class-wcpn-export.php:395
 msgid "%s shipments successfully prepare for PostNL"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:519
+#: includes/admin/class-wcpn-export.php:517
 msgid "The selected orders have not been exported to PostNL yet! "
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:599
+#: includes/admin/class-wcpn-export.php:597
 msgid "No e-mail address found in order."
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1009
+#: includes/admin/class-wcpn-export.php:1006
 msgid "Unknown"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1050, includes/admin/views/html-send-return-email-form.php:53
+#: includes/admin/class-wcpn-export.php:1047, includes/admin/views/html-send-return-email-form.php:53
 msgid "Order"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1074
+#: includes/admin/class-wcpn-export.php:1071
 msgid "pending - concept"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1075
+#: includes/admin/class-wcpn-export.php:1072
 msgid "pending - registered"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1076
+#: includes/admin/class-wcpn-export.php:1073
 msgid "enroute - handed to carrier"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1077
+#: includes/admin/class-wcpn-export.php:1074
 msgid "enroute - sorting"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1078
+#: includes/admin/class-wcpn-export.php:1075
 msgid "enroute - distribution"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1079
+#: includes/admin/class-wcpn-export.php:1076
 msgid "enroute - customs"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1080
+#: includes/admin/class-wcpn-export.php:1077
 msgid "delivered - at recipient"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1081
+#: includes/admin/class-wcpn-export.php:1078
 msgid "delivered - ready for pickup"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1082
+#: includes/admin/class-wcpn-export.php:1079
 msgid "delivered - package picked up"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1083
+#: includes/admin/class-wcpn-export.php:1080
 msgid "printed - letter"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1084
+#: includes/admin/class-wcpn-export.php:1081
 msgid "printed - digital stamp"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1085
+#: includes/admin/class-wcpn-export.php:1082
 msgid "inactive - concept"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1086
+#: includes/admin/class-wcpn-export.php:1083
 msgid "inactive - registered"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1087
+#: includes/admin/class-wcpn-export.php:1084
 msgid "inactive - enroute - handed to carrier"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1088
+#: includes/admin/class-wcpn-export.php:1085
 msgid "inactive - enroute - sorting"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1089
+#: includes/admin/class-wcpn-export.php:1086
 msgid "inactive - enroute - distribution"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1090
+#: includes/admin/class-wcpn-export.php:1087
 msgid "inactive - enroute - customs"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1091
+#: includes/admin/class-wcpn-export.php:1088
 msgid "inactive - delivered - at recipient"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1092
+#: includes/admin/class-wcpn-export.php:1089
 msgid "inactive - delivered - ready for pickup"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1093
+#: includes/admin/class-wcpn-export.php:1090
 msgid "inactive - delivered - package picked up"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1094
+#: includes/admin/class-wcpn-export.php:1091
 msgid "inactive - unknown"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1100
+#: includes/admin/class-wcpn-export.php:1097
 msgid "Unknown status"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1534
+#: includes/admin/class-wcpn-export.php:1531
 msgid "PostNL shipment created:"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1582
+#: includes/admin/class-wcpn-export.php:1579
 msgid "The order(s) you have selected have invalid shipping countries."
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:122
+#: includes/admin/class-wcpost-admin.php:120
 msgid "Pickup location"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:302, includes/admin/class-wcpost-admin.php:326
+#: includes/admin/class-wcpost-admin.php:300, includes/admin/class-wcpost-admin.php:324
 msgid "PostNL: Prepare shipment"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:303, includes/admin/class-wcpost-admin.php:327
+#: includes/admin/class-wcpost-admin.php:301, includes/admin/class-wcpost-admin.php:325
 msgid "PostNL: Print"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:304, includes/admin/class-wcpost-admin.php:328
+#: includes/admin/class-wcpost-admin.php:302, includes/admin/class-wcpost-admin.php:326
 msgid "PostNL: Prepare & print shipment"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:385
+#: includes/admin/class-wcpost-admin.php:383
 msgid "Labels to skip"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:401
+#: includes/admin/class-wcpost-admin.php:399
 msgid "Print"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:465, includes/admin/views/html-send-return-email-form.php:154
-msgid "Export to PostNL"
+#: includes/admin/class-wcpost-admin.php:463, includes/admin/views/html-send-return-email-form.php:154
+msgid "Prepare PostNL label"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:470, includes/admin/views/html-order-track-trace-table.php:66
+#: includes/admin/class-wcpost-admin.php:468, includes/admin/views/html-order-track-trace-table.php:66
 msgid "Print PostNL label"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:705
+#: includes/admin/class-wcpost-admin.php:703
 msgid "Default"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:706, includes/entities/settings-field-arguments.php:170
+#: includes/admin/class-wcpost-admin.php:704, includes/entities/settings-field-arguments.php:170
 msgid "Disabled"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:707, includes/entities/settings-field-arguments.php:169
+#: includes/admin/class-wcpost-admin.php:705, includes/entities/settings-field-arguments.php:169
 msgid "Enabled"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:791
+#: includes/admin/class-wcpost-admin.php:789
 msgid "HS Code"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:794
+#: includes/admin/class-wcpost-admin.php:792
 msgid ""
 "HS Codes are used for PostNL world shipments, you can find the appropriate "
 "code on the %ssite of the Dutch Customs%s"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:803
+#: includes/admin/class-wcpost-admin.php:801
 msgid "Country of origin"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:813
+#: includes/admin/class-wcpost-admin.php:811
 msgid "Age check"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:822, includes/admin/settings/class-wcpn-settings-data.php:438
+#: includes/admin/class-wcpost-admin.php:820, includes/admin/settings/class-wcpn-settings-data.php:429
 msgid ""
 "The age check is intended for parcel shipments for which the recipient must "
 "show they are 18+ years old by means of a proof of identity. With this "
@@ -310,108 +306,88 @@ msgid ""
 "included. This option can't be combined with morning or evening delivery."
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:869
+#: includes/admin/class-wcpost-admin.php:867
 msgid "No label has been created yet."
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:880
+#: includes/admin/class-wcpost-admin.php:878
 msgid "The label has been printed."
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:885
+#: includes/admin/class-wcpost-admin.php:883
 msgid "Concept created but not printed."
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:952
+#: includes/admin/class-wcpost-admin.php:950
 msgid "PostNL shipment:"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:979, includes/admin/class-wcpost-admin.php:992
+#: includes/admin/class-wcpost-admin.php:977, includes/admin/class-wcpost-admin.php:990
 msgid "Delivery type:"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:980
+#: includes/admin/class-wcpost-admin.php:978
 msgid "Pickup location:"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:994
+#: includes/admin/class-wcpost-admin.php:992
 msgid "Extra options:"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:1029, includes/admin/class-wcpost-admin.php:1051
+#: includes/admin/class-wcpost-admin.php:1027, includes/admin/class-wcpost-admin.php:1049
 msgid "Delivery information:"
 msgstr ""
 
-#: includes/admin/class-wcpost-admin.php:1157
+#: includes/admin/class-wcpost-admin.php:1155
 msgid "(Unknown)"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:95
+#: includes/admin/OrderSettingsRows.php:94
 msgid "Carrier"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:103
+#: includes/admin/OrderSettingsRows.php:102
 msgid "Delivery type"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:111, includes/admin/views/html-order-return-shipment-options.php:21, includes/admin/views/html-order-shipment-summary.php:42
+#: includes/admin/OrderSettingsRows.php:110, includes/admin/views/html-order-return-shipment-options.php:21, includes/admin/views/html-order-shipment-summary.php:42
 msgid "Shipment type"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:118
+#: includes/admin/OrderSettingsRows.php:117
 msgid "Number of labels"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:137, includes/admin/settings/class-wcpn-settings-data.php:427
-msgid "Extra large size"
-msgstr ""
-
-#: includes/admin/OrderSettingsRows.php:138, includes/admin/settings/class-wcpn-settings-data.php:429
-msgid ""
-"Enable this option when your shipment is bigger than 100 x 70 x 50 cm, but "
-"smaller than 175 x 78 x 58 cm. An extra fee will be charged. Note! If the "
-"parcel is bigger than 175 x 78 x 58 of or heavier than 30 kg, the pallet "
-"rate will be charged."
-msgstr ""
-
-#: includes/admin/OrderSettingsRows.php:154
+#: includes/admin/OrderSettingsRows.php:135
 msgid "Custom ID (top left on label)"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:194, includes/admin/views/html-send-return-email-form.php:66
-msgid "Weight"
-msgstr ""
-
-#: includes/admin/OrderSettingsRows.php:197, includes/admin/views/html-order-return-shipment-options.php:23
-msgid "Calculated weight: %s"
-msgstr ""
-
-#: includes/admin/OrderSettingsRows.php:219, includes/admin/settings/class-wcpn-settings-data.php:409, includes/admin/settings/class-wcpn-settings-data.php:568, includes/admin/settings/class-wcpn-settings-data.php:925
+#: includes/admin/OrderSettingsRows.php:175, includes/admin/settings/class-wcpn-settings-data.php:409, includes/admin/settings/class-wcpn-settings-data.php:559, includes/admin/settings/class-wcpn-settings-data.php:884
 msgid "Home address only"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:220, includes/admin/settings/class-wcpn-settings-data.php:411
+#: includes/admin/OrderSettingsRows.php:176, includes/admin/settings/class-wcpn-settings-data.php:411
 msgid ""
 "If you don't want the parcel to be delivered at the neighbours, choose this "
 "option."
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:235, includes/frontend/class-wcpn-cart-fees.php:231, includes/admin/settings/class-wcpn-settings-data.php:418, includes/admin/settings/class-wcpn-settings-data.php:581, includes/admin/settings/class-wcpn-settings-data.php:931, includes/admin/views/html-order-shipment-summary.php:23
+#: includes/admin/OrderSettingsRows.php:191, includes/frontend/class-wcpn-cart-fees.php:231, includes/admin/settings/class-wcpn-settings-data.php:418, includes/admin/settings/class-wcpn-settings-data.php:572, includes/admin/settings/class-wcpn-settings-data.php:890, includes/admin/views/html-order-shipment-summary.php:23
 msgid "Signature on delivery"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:237, includes/admin/settings/class-wcpn-settings-data.php:420
+#: includes/admin/OrderSettingsRows.php:193, includes/admin/settings/class-wcpn-settings-data.php:420
 msgid ""
 "The parcel will be offered at the delivery address. If the recipient is not "
 "at home, the parcel will be delivered to the neighbours. In both cases, a "
 "signature will be required."
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:251, includes/admin/settings/class-wcpn-settings-data.php:436
+#: includes/admin/OrderSettingsRows.php:207, includes/admin/settings/class-wcpn-settings-data.php:427
 msgid "Age check 18+"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:252
+#: includes/admin/OrderSettingsRows.php:208
 msgid ""
 "The age check is intended for parcel shipments for which the recipient must "
 "show 18+ by means of a proof of identity. With this shipping option "
@@ -420,11 +396,11 @@ msgid ""
 "delivery."
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:266, includes/admin/settings/class-wcpn-settings-data.php:445
+#: includes/admin/OrderSettingsRows.php:222, includes/admin/settings/class-wcpn-settings-data.php:436
 msgid "Return if no answer"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:268, includes/admin/settings/class-wcpn-settings-data.php:447
+#: includes/admin/OrderSettingsRows.php:224, includes/admin/settings/class-wcpn-settings-data.php:438
 msgid ""
 "By default, a parcel will be offered twice. After two unsuccessful delivery "
 "attempts, the parcel will be available at the nearest pickup point for two "
@@ -433,11 +409,11 @@ msgid ""
 "NOT forward it to the pickup point, enable this option."
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:281
+#: includes/admin/OrderSettingsRows.php:237
 msgid "Insured"
 msgstr ""
 
-#: includes/admin/OrderSettingsRows.php:297
+#: includes/admin/OrderSettingsRows.php:253
 msgid "Insurance amount"
 msgstr ""
 
@@ -653,11 +629,11 @@ msgstr ""
 msgid "View logs"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:454
+#: includes/admin/settings/class-wcpn-settings-data.php:445
 msgid "Insured shipment"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:456
+#: includes/admin/settings/class-wcpn-settings-data.php:447
 msgid ""
 "By default, there is no insurance on the shipments. If you still want to "
 "insure the shipment, you can do that. We insure the purchase value of the "
@@ -665,114 +641,103 @@ msgid ""
 "contain the options 'Home address only' en 'Signature for delivery'"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:464
+#: includes/admin/settings/class-wcpn-settings-data.php:455
 msgid "Insure from price"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:466
+#: includes/admin/settings/class-wcpn-settings-data.php:457
 msgid "Insure all orders that exceed this price point."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:474
+#: includes/admin/settings/class-wcpn-settings-data.php:465
 msgid "Max insured amount"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:477
+#: includes/admin/settings/class-wcpn-settings-data.php:468
 msgid "Insure all parcels up to the selected amount."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:497
+#: includes/admin/settings/class-wcpn-settings-data.php:488
 msgid "Enable PostNL delivery"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:503
+#: includes/admin/settings/class-wcpn-settings-data.php:494
 msgid "Drop-off days"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:507
+#: includes/admin/settings/class-wcpn-settings-data.php:498
 msgid "Days of the week on which you hand over parcels to PostNL"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:512
+#: includes/admin/settings/class-wcpn-settings-data.php:503
 msgid "Cut-off time"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:513, includes/admin/settings/class-wcpn-settings-data.php:611
+#: includes/admin/settings/class-wcpn-settings-data.php:504, includes/admin/settings/class-wcpn-settings-data.php:602
 msgid "Time at which you stop processing orders for the day (format: hh:mm)"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:522
+#: includes/admin/settings/class-wcpn-settings-data.php:513
 msgid "Drop-off delay"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:525
+#: includes/admin/settings/class-wcpn-settings-data.php:516
 msgid "Number of days you need to process an order."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:530
+#: includes/admin/settings/class-wcpn-settings-data.php:521
 msgid "Delivery days window"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:534
+#: includes/admin/settings/class-wcpn-settings-data.php:525
 msgid ""
 "Amount of days a customer can postpone a shipment. Default is 0 days with a "
 "maximum value of 14 days."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:583, includes/admin/settings/class-wcpn-settings-data.php:1005
+#: includes/admin/settings/class-wcpn-settings-data.php:574, includes/admin/settings/class-wcpn-settings-data.php:964
 msgid ""
 "Enter an amount that is either positive or negative. For example, do you "
 "want to give a discount for using this function or do you want to charge "
 "extra for this delivery option."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:598
+#: includes/admin/settings/class-wcpn-settings-data.php:589
 msgid "Monday delivery"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:608
+#: includes/admin/settings/class-wcpn-settings-data.php:599
 msgid "Cut-off time on Saturday"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:627
+#: includes/admin/settings/class-wcpn-settings-data.php:618
 msgid "Enable PostNL pickup"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:647
+#: includes/admin/settings/class-wcpn-settings-data.php:638
 msgid "Package types"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:652
+#: includes/admin/settings/class-wcpn-settings-data.php:643
 msgid "Select one or more shipping methods for each PostNL package type"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:659
-msgid "Connect customer email"
-msgstr ""
-
-#: includes/admin/settings/class-wcpn-settings-data.php:661
-msgid ""
-"When you connect the customer's email, PostNL can send a Track & Trace "
-"email to this address. In your PostNL backend you can enable or disable "
-"this email and format it in your own style."
-msgstr ""
-
-#: includes/admin/settings/class-wcpn-settings-data.php:668
+#: includes/admin/settings/class-wcpn-settings-data.php:650
 msgid "Connect customer phone"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:670
+#: includes/admin/settings/class-wcpn-settings-data.php:652
 msgid ""
 "When you connect the customer's phone number, the courier can use this for "
 "the delivery of the parcel. This greatly increases the delivery success "
 "rate for foreign shipments."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:677, includes/admin/views/html-order-shipment-summary.php:61
+#: includes/admin/settings/class-wcpn-settings-data.php:659, includes/admin/views/html-order-shipment-summary.php:61
 msgid "Label description"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:678
+#: includes/admin/settings/class-wcpn-settings-data.php:660
 msgid ""
 "With this option you can add a description to the shipment. This will be "
 "printed on the top left of the label, and you can use this to search or "
@@ -781,94 +746,84 @@ msgid ""
 "description as short as possible."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:688
+#: includes/admin/settings/class-wcpn-settings-data.php:670
 msgid "Empty parcel weight"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:691
+#: includes/admin/settings/class-wcpn-settings-data.php:673
 msgid "Default weight of your empty parcel."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:698
+#: includes/admin/settings/class-wcpn-settings-data.php:680
 msgid "Default HS Code"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:699
+#: includes/admin/settings/class-wcpn-settings-data.php:681
 msgid ""
 "HS Codes are used for PostNL world shipments, you can find the appropriate "
 "code on the site of the Dutch Customs."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:706
+#: includes/admin/settings/class-wcpn-settings-data.php:688
 msgid "Customs shipment type"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:709
+#: includes/admin/settings/class-wcpn-settings-data.php:691
 msgid "Commercial goods"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:710
+#: includes/admin/settings/class-wcpn-settings-data.php:692
 msgid "Commercial samples"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:711
+#: includes/admin/settings/class-wcpn-settings-data.php:693
 msgid "Documents"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:712
+#: includes/admin/settings/class-wcpn-settings-data.php:694
 msgid "Gifts"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:713
+#: includes/admin/settings/class-wcpn-settings-data.php:695
 msgid "Return shipment"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:718
+#: includes/admin/settings/class-wcpn-settings-data.php:700
 msgid "Default country of origin"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:721
+#: includes/admin/settings/class-wcpn-settings-data.php:703
 msgid ""
 "Country of origin is required for world shipments. Defaults to shop base or "
 "NL. Example: 'NL', 'BE', 'DE'"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:727
-msgid "Automatic export"
-msgstr ""
-
-#: includes/admin/settings/class-wcpn-settings-data.php:729
-msgid ""
-"With this setting enabled orders are exported to PostNL automatically after "
-"payment."
-msgstr ""
-
-#: includes/admin/settings/class-wcpn-settings-data.php:759
+#: includes/admin/settings/class-wcpn-settings-data.php:718
 msgid "PostNL address fields"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:761
+#: includes/admin/settings/class-wcpn-settings-data.php:720
 msgid ""
 "When enabled the checkout will use the PostNL address fields. This means "
 "there will be three separate fields for street name, number and suffix. "
 "Want to use the WooCommerce default fields? Leave this option unchecked."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:768
+#: includes/admin/settings/class-wcpn-settings-data.php:727
 msgid "Show delivery date"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:770
+#: includes/admin/settings/class-wcpn-settings-data.php:729
 msgid ""
 "Show delivery day options allow your customers to see the delivery day in "
 "order confirmation and My Account."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:777
+#: includes/admin/settings/class-wcpn-settings-data.php:736
 msgid "Enable PostNL delivery options"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:779
+#: includes/admin/settings/class-wcpn-settings-data.php:738
 msgid ""
 "The PostNL delivery options allow your customers to select whether they "
 "want their parcel delivered at home or to a pickup point. Depending on the "
@@ -876,171 +831,175 @@ msgid ""
 "requiring a signature on delivery."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:787
+#: includes/admin/settings/class-wcpn-settings-data.php:746
 msgid "Enable delivery options for backorders"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:789
+#: includes/admin/settings/class-wcpn-settings-data.php:748
 msgid ""
 "When this option is enabled, delivery options and delivery day will be also "
 "shown for backorders."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:797
+#: includes/admin/settings/class-wcpn-settings-data.php:756
 msgid "Display for"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:799
+#: includes/admin/settings/class-wcpn-settings-data.php:758
 msgid ""
 "You can link the delivery options to specific shipping methods by adding "
 "them to the package types under \"Standard export settings\". The delivery "
 "options are not visible at foreign addresses."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:804
+#: includes/admin/settings/class-wcpn-settings-data.php:763
 msgid "Shipping methods associated with Parcels"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:808
+#: includes/admin/settings/class-wcpn-settings-data.php:767
 msgid "All shipping methods"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:814
+#: includes/admin/settings/class-wcpn-settings-data.php:773
 msgid "Checkout position"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:818
+#: includes/admin/settings/class-wcpn-settings-data.php:777
 msgid "Show after billing details"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:822
+#: includes/admin/settings/class-wcpn-settings-data.php:781
 msgid "Show after shipping details"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:826
+#: includes/admin/settings/class-wcpn-settings-data.php:785
 msgid "Show after customer details"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:830
+#: includes/admin/settings/class-wcpn-settings-data.php:789
 msgid "Show after notes"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:834
+#: includes/admin/settings/class-wcpn-settings-data.php:793
 msgid "Show after subtotal"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:839
+#: includes/admin/settings/class-wcpn-settings-data.php:798
 msgid ""
 "You can change the place of the delivery options on the checkout page. By "
 "default it will be placed after shipping details."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:847
+#: includes/admin/settings/class-wcpn-settings-data.php:806
 msgid "Custom styles"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:886
+#: includes/admin/settings/class-wcpn-settings-data.php:845
 msgid "Delivery options title"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:888
+#: includes/admin/settings/class-wcpn-settings-data.php:847
 msgid ""
 "You can place a delivery title above the PostNL options. When there is no "
 "title, it will not be visible."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:896
+#: includes/admin/settings/class-wcpn-settings-data.php:855
 msgid "Delivery title"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:897
+#: includes/admin/settings/class-wcpn-settings-data.php:856
 msgid "Delivered at home or at work"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:902
+#: includes/admin/settings/class-wcpn-settings-data.php:861
 msgid "Morning delivery title"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:908
+#: includes/admin/settings/class-wcpn-settings-data.php:867
 msgid "Standard delivery title"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:909
+#: includes/admin/settings/class-wcpn-settings-data.php:868
 msgid "When there is no title, the delivery time will automatically be visible."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:918
+#: includes/admin/settings/class-wcpn-settings-data.php:877
 msgid "Evening delivery title"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:924
+#: includes/admin/settings/class-wcpn-settings-data.php:883
 msgid "Home address only title"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:930
+#: includes/admin/settings/class-wcpn-settings-data.php:889
 msgid "Signature on delivery title"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:936
+#: includes/admin/settings/class-wcpn-settings-data.php:895
 msgid "Pickup title"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:960
+#: includes/admin/settings/class-wcpn-settings-data.php:919
 msgid "Theme \"%s\" detected."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:962
+#: includes/admin/settings/class-wcpn-settings-data.php:921
 msgid "Apply preset."
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:975
+#: includes/admin/settings/class-wcpn-settings-data.php:934
 msgid "Delivery date"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:976
+#: includes/admin/settings/class-wcpn-settings-data.php:935
 msgid "Order number"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:977
+#: includes/admin/settings/class-wcpn-settings-data.php:936
 msgid "Product id"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:978, includes/admin/views/html-send-return-email-form.php:65
+#: includes/admin/settings/class-wcpn-settings-data.php:937, includes/admin/views/html-send-return-email-form.php:65
 msgid "Product name"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:979
+#: includes/admin/settings/class-wcpn-settings-data.php:938
 msgid "Product quantity"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:980
+#: includes/admin/settings/class-wcpn-settings-data.php:939
 msgid "Product SKU"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:981
+#: includes/admin/settings/class-wcpn-settings-data.php:940
 msgid "Customer note"
 msgstr ""
 
-#: includes/admin/settings/class-wcpn-settings-data.php:1003
+#: includes/admin/settings/class-wcpn-settings-data.php:962
 msgid "Fee (optional)"
 msgstr ""
 
-#: includes/admin/settings/class-wcpost-settings.php:181
+#: includes/admin/settings/class-wcpost-settings.php:177
 msgid "Settings"
 msgstr ""
 
-#: includes/admin/settings/class-wcpost-settings.php:201
+#: includes/admin/settings/class-wcpost-settings.php:197
 msgid "WooCommerce PostNL Settings"
 msgstr ""
 
-#: includes/admin/settings/class-wcpost-settings.php:255
+#: includes/admin/settings/class-wcpost-settings.php:251
 msgid ""
 "It looks like your shop is based in Netherlands. This plugin is for PostNL. "
 "If you are using PostNL Netherlands, download the %s plugin instead!"
 msgstr ""
 
-#: includes/admin/settings/class-wcpost-settings.php:264
+#: includes/admin/settings/class-wcpost-settings.php:260
 msgid "Hide this message"
+msgstr ""
+
+#: includes/admin/views/html-order-return-shipment-options.php:23
+msgid "Calculated weight: %s"
 msgstr ""
 
 #: includes/admin/views/html-order-return-shipment-options.php:58, includes/admin/views/html-order-shipment-options.php:63
@@ -1053,6 +1012,10 @@ msgstr ""
 
 #: includes/admin/views/html-order-shipment-summary.php:84, includes/admin/views/html-order-track-trace-table.php:38
 msgid "Status"
+msgstr ""
+
+#: includes/admin/views/html-send-return-email-form.php:66
+msgid "Weight"
 msgstr ""
 
 #: includes/admin/views/html-send-return-email-form.php:93

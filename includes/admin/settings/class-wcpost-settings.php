@@ -43,15 +43,12 @@ class WCPOST_Settings
      * Export defaults
      */
     public const SETTING_SHIPPING_METHODS_PACKAGE_TYPES = "shipping_methods_package_types";
-    public const SETTING_CONNECT_EMAIL                  = "connect_email";
     public const SETTING_CONNECT_PHONE                  = "connect_phone";
     public const SETTING_LABEL_DESCRIPTION              = "label_description";
     public const SETTING_EMPTY_PARCEL_WEIGHT            = "empty_parcel_weight";
     public const SETTING_HS_CODE                        = "hs_code";
     public const SETTING_PACKAGE_CONTENT                = "package_contents";
     public const SETTING_COUNTRY_OF_ORIGIN              = "country_of_origin";
-    public const SETTING_AUTOMATIC_EXPORT               = "export_automatic";
-    public const SETTING_RETURN_IN_THE_BOX              = "return_in_the_box";
 
     /**
      * Checkout
@@ -80,7 +77,6 @@ class WCPOST_Settings
     // Defaults
     public const SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE          = "export_signature";
     public const SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT     = "export_only_recipient";
-    public const SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT       = "export_large_format";
     public const SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK          = "export_age_check";
     public const SETTING_CARRIER_DEFAULT_EXPORT_RETURN             = "export_return_shipments";
     public const SETTING_CARRIER_DEFAULT_EXPORT_INSURED            = "export_insured";

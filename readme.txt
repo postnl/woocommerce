@@ -211,7 +211,6 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Housenumber and suffix
 * Improvement: Country of origin
 * Improvement: New checkout and SDK
-* Improvement: Automatic export after payment
 * Improvement: V2 shipment endpoint
 * Improvement: HS code for variable product
 

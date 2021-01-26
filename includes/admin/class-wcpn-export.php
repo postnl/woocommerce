@@ -77,9 +77,7 @@ class WCPN_Export
      */
     public function exportByOrderId(int $orderId): void
     {
-        $automaticExport = WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_AUTOMATIC_EXPORT);
-
-        if ($orderId && $automaticExport) {
+        if ($orderId) {
             $export = new self();
             $export->addShipments([(string) $orderId], 0, false);
         }
@@ -663,7 +661,6 @@ class WCPN_Export
                 : trim($order->get_shipping_first_name() . " " . $order->get_shipping_last_name());
 
 
-        $connectEmail = WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_CONNECT_EMAIL);
         $connectPhone = WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_CONNECT_PHONE);
 
         $address = [
@@ -671,7 +668,7 @@ class WCPN_Export
             "city"                   => (string) WCX_Order::get_prop($order, "shipping_city"),
             "person"                 => $shipping_name,
             "company"                => (string) WCX_Order::get_prop($order, "shipping_company"),
-            "email"                  => $connectEmail ? WCX_Order::get_prop($order, "billing_email") : "",
+            "email"                  => WCX_Order::get_prop($order, "billing_email") ?? "",
             "phone"                  => $connectPhone ? WCX_Order::get_prop($order, "billing_phone") : "",
             "street_additional_info" => WCX_Order::get_prop($order, "shipping_address_2"),
         ];

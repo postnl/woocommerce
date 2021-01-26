@@ -151,7 +151,7 @@ $target_url = wp_nonce_url(
         <div>
             <?php
             if (isset($dialog) && $dialog === 'shipment') {
-                $button_text = __("Export to PostNL", "woocommerce-postnl");
+                $button_text = __("Prepare PostNL label", "woocommerce-postnl");
             } else {
                 $button_text = __("Send email", "woocommerce-postnl");
             }
