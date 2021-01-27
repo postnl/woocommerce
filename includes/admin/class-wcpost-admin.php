@@ -202,9 +202,9 @@ class WCPOST_Admin
         foreach ($order_statuses as $key => $status) {
             $new_order_statuses[$key] = $status;
 
-            if ('wc-processing' === $key) {
-                $new_order_statuses['wc-custom-delivered'] = 'Delivered';
-            }
+//            if ('wc-processing' === $key) {
+//                $new_order_statuses['wc-custom-delivered'] = 'Delivered';
+//            }
         }
 
         return $new_order_statuses;

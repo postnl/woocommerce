@@ -186,7 +186,7 @@ class WCPN_API extends WCPN_Rest
     {
         foreach ($orderIds as $orderId) {
             $order           = WC_Core::get_order($orderId);
-            $lastShipmentIds = unserialize($order->get_meta('_myparcel_last_shipment_ids'));
+            $lastShipmentIds = unserialize($order->get_meta('_postnl_last_shipment_ids'));
 
             if (is_bool($lastShipmentIds)) {
                 continue;
