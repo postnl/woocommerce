@@ -247,9 +247,9 @@ class WCPOST_Settings
         if (! $hide_notice && $base_country === "BE") {
             $postnl_nl_link =
                 '<a href="https://wordpress.org/plugins/woocommerce-postnl/" target="blank">WC PostNL Netherlands</a>';
-            $text             = sprintf(
+            $text = sprintf(
                 __(
-                    "It looks like your shop is based in Netherlands. This plugin is for PostNL. If you are using PostNL Netherlands, download the %s plugin instead!",
+                    "It looks like your shop is based in Belgium. This plugin is for PostNL. If you are using PostNL Netherlands, download the %s plugin instead!",
                     "woocommerce-postnl"
                 ),
                 $postnl_nl_link

@@ -990,8 +990,8 @@ msgstr ""
 
 #: includes/admin/settings/class-wcpost-settings.php:251
 msgid ""
-"It looks like your shop is based in Netherlands. This plugin is for PostNL. "
-"If you are using PostNL Netherlands, download the %s plugin instead!"
+"It looks like your shop is based in Belgium. This plugin is for PostNL. If "
+"you are using PostNL Netherlands, download the %s plugin instead!"
 msgstr ""
 
 #: includes/admin/settings/class-wcpost-settings.php:260
