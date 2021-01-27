@@ -1201,10 +1201,6 @@ class WCPOST_Admin
         $isHomeCountry        = WCPN_Data::isHomeCountry($country);
         $isEuCountry          = WCPN_Country_Codes::isEuCountry($country);
 
-        if (! $isHomeCountry) {
-            $data['package_type'] = AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
-        }
-
         $isPackage      = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME === $data['package_type'];
         $isDigitalStamp = AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME === $data['package_type'];
 
