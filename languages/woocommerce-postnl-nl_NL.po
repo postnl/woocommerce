@@ -18,7 +18,9 @@ msgstr ""
 
 #: woocommerce-postnl.php:213
 msgid "WooCommerce PostNL requires %sWooCommerce%s to be installed & activated!"
-msgstr "WooCommerce PostNL vereist dat %sWooCommerce%s geïnstalleerd en geactiveerd is!"
+msgstr ""
+"WooCommerce PostNL vereist dat %sWooCommerce%s geïnstalleerd en geactiveerd "
+"is!"
 
 #: woocommerce-postnl.php:231
 msgid "WooCommerce PostNL requires PHP {PHP_VERSION} or higher."
@@ -114,7 +116,9 @@ msgstr "Geen API-sleutel gevonden in PostNL-instellingen"
 
 #: includes/admin/class-wcpn-export.php:182
 msgid "You have to export the orders to PostNL before you can print the labels!"
-msgstr "Je moet de bestellingen exporteren naar PostNL voordat je de etiketten kunt printen!"
+msgstr ""
+"Je moet de bestellingen exporteren naar PostNL voordat je de etiketten kunt "
+"printen!"
 
 #: includes/admin/class-wcpn-export.php:219, includes/admin/class-wcpn-export.php:229
 msgid "You do not have sufficient permissions to access this page."
@@ -1075,8 +1079,9 @@ msgid ""
 "It looks like your shop is based in Belgium. This plugin is for PostNL. If "
 "you are using PostNL Netherlands, download the %s plugin instead!"
 msgstr ""
-"Het lijkt erop dat uw winkel in België is gevestigd. Deze plug-in is voor PostNL. Als"
-"je PostNL Nederland gebruikt, download in plaats daarvan de %s plugin!"
+"Het lijkt erop dat uw winkel in België is gevestigd. Deze plug-in is voor "
+"PostNL. Alsje PostNL Nederland gebruikt, download in plaats daarvan de %s "
+"plugin!"
 
 #: includes/admin/settings/class-wcpost-settings.php:260
 msgid "Hide this message"
@@ -1113,10 +1118,10 @@ msgid ""
 "PostNL plugin was activated. The address data can still be manually entered "
 "in the order screen."
 msgstr ""
-"Deze bestelling bevat geen geldige straat- en huisnummergegevens en kan niet"
-"worden hierdoor geëxporteerd! Deze bestelling is waarschijnlijk geplaatst vóór de"
-"PostNL-plug-in is geactiveerd. De adresgegevens kunnen nog handmatig worden ingevoerd"
-"in het bestelscherm."
+"Deze bestelling bevat geen geldige straat- en huisnummergegevens en kan "
+"nietworden hierdoor geëxporteerd! Deze bestelling is waarschijnlijk "
+"geplaatst vóór dePostNL-plug-in is geactiveerd. De adresgegevens kunnen nog "
+"handmatig worden ingevoerdin het bestelscherm."
 
 #: includes/admin/views/html-send-return-email-form.php:156
 msgid "Send email"
