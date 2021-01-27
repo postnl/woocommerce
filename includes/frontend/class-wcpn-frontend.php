@@ -29,7 +29,7 @@ class WCPN_Frontend
 
         // Shipment information on the thank you page
         add_action("woocommerce_thankyou", [$this, "confirmationOrderReceived"], 10, 1);
-        add_filter("wpo_wcpdf_templates_replace_myparcel_delivery_options", [$this, "wpo_wcpdf_delivery_options"], 10, 2);
+        add_filter("wpo_wcpdf_templates_replace_postnl_delivery_options", [$this, "wpo_wcpdf_delivery_options"], 10, 2);
 
         // Initialize delivery options fees
         new WCPN_Cart_Fees();
