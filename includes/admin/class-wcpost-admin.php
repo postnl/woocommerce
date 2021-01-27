@@ -761,7 +761,7 @@ class WCPOST_Admin
             }
 
             $trackTraceUrl = sprintf(
-                'https://jouw.postnl.nl/track-trace/%s/%s/%s',
+                'https://jouw.postnl.nl/track-and-trace/%s/%s/%s',
                 $track_trace,
                 $country,
                 $postcode
