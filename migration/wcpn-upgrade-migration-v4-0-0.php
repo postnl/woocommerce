@@ -63,7 +63,7 @@ class WCPN_Upgrade_Migration_v4_0_0 extends WCPN_Upgrade_Migration
 
     protected function import(): void
     {
-        require_once(WCPOST()->plugin_path() . "/includes/vendor/autoload.php");
+        require_once(WCPOST()->plugin_path() . "/vendor/autoload.php");
         require_once(WCPOST()->plugin_path() . '/includes/admin/settings/class-wcpost-settings.php');
     }
 
