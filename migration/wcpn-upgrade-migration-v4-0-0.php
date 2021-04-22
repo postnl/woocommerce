@@ -34,7 +34,7 @@ class WCPN_Upgrade_Migration_v4_0_0 extends WCPN_Upgrade_Migration
     /**
      * @var array
      */
-    private $newPostNLSettings = [];
+    private $newPostnlSettings = [];
 
     /**
      * @var array
@@ -88,7 +88,7 @@ class WCPN_Upgrade_Migration_v4_0_0 extends WCPN_Upgrade_Migration
             "woocommerce_postnl_checkout_settings"        => $this->newCheckoutSettings,
             "woocommerce_postnl_export_defaults_settings" => $this->newExportDefaultsSettings,
             "woocommerce_postnl_general_settings"         => $this->newGeneralSettings,
-            "woocommerce_postnl_postnl_settings"          => $this->newPostNLSettings,
+            "woocommerce_postnl_postnl_settings"          => $this->newPostnlSettings,
         ];
     }
 
@@ -101,9 +101,9 @@ class WCPN_Upgrade_Migration_v4_0_0 extends WCPN_Upgrade_Migration
         );
 
         // Migrate old checkout settings to PostNL
-        $this->newPostNLSettings = $this->migrateSettings(
+        $this->newPostnlSettings = $this->migrateSettings(
             self::getCheckoutPostnlMap(),
-            $this->newPostNLSettings,
+            $this->newPostnlSettings,
             $this->oldCheckoutSettings
         );
 
@@ -123,14 +123,14 @@ class WCPN_Upgrade_Migration_v4_0_0 extends WCPN_Upgrade_Migration
                 $this->newExportDefaultsSettings[WCPOST_Settings::SETTING_SHIPPING_METHODS_PACKAGE_TYPES]
             );
 
-        $this->newPostNLSettings = $this->migrateSettings(
-            self::getExportDefaultsPostNLMap(),
-            $this->newPostNLSettings,
+        $this->newPostnlSettings = $this->migrateSettings(
+            self::getExportDefaultsPostnlMap(),
+            $this->newPostnlSettings,
             $this->oldExportDefaultsSettings
         );
 
         $this->newExportDefaultsSettings = $this->removeOldSettings(
-            self::getExportDefaultsPostNLMap(),
+            self::getExportDefaultsPostnlMap(),
             $this->newExportDefaultsSettings
         );
     }
@@ -194,7 +194,7 @@ class WCPN_Upgrade_Migration_v4_0_0 extends WCPN_Upgrade_Migration
      *
      * @return array
      */
-    private static function getExportDefaultsPostNLMap(): array
+    private static function getExportDefaultsPostnlMap(): array
     {
         $postnl = WCPOST_Settings::SETTINGS_POSTNL;
 

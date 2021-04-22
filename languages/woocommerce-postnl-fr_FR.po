@@ -9,7 +9,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
-"Language: fr_BE\n"
+"Language: fr_FR\n"
 
 msgid "setting_automatic_order_status"
 msgstr "Statut de commande automatique"

@@ -20,8 +20,8 @@ $shipments       = WCPOST()->export->getShipmentData([$shipment_id], $order);
 $deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
 
 $option_strings = [
-    "signature"      => __("Signature on delivery", "woocommerce-postnl"),
-    "only_recipient" => __("Only recipient", "woocommerce-postnl"),
+    "signature"      => __("shipment_options_signature", "woocommerce-postnl"),
+    "only_recipient" => __("shipment_options_only_recipient", "woocommerce-postnl"),
 ];
 
 $firstShipment = $shipments[$shipment_id];
@@ -52,7 +52,7 @@ foreach ($option_strings as $key => $label) {
 
 if ($insurance) {
     $price = number_format(Arr::get($insurance, "amount") / 100, 2);
-    printf('<li>%s: € %s</li>', __("Insured for", "woocommerce-postnl"), $price);
+    printf('<li>%s: € %s</li>', __("insured_for", "woocommerce-postnl"), $price);
 }
 
 if ($labelDescription) {

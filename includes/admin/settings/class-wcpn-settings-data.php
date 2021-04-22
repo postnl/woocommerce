@@ -22,6 +22,15 @@ class WCPN_Settings_Data
     public const DISPLAY_FOR_SELECTED_METHODS = "selected_methods";
     public const DISPLAY_FOR_ALL_METHODS      = "all_methods";
 
+    public const DISPLAY_TOTAL_PRICE     = "total_price";
+    public const DISPLAY_SURCHARGE_PRICE = "surcharge";
+
+    public const PICKUP_LOCATIONS_VIEW_MAP  = "map";
+    public const PICKUP_LOCATIONS_VIEW_LIST = "list";
+
+    public const CHANGE_STATUS_AFTER_PRINTING = "after_printing";
+    public const CHANGE_STATUS_AFTER_EXPORT   = "after_export";
+
     public const NOT_ACTIVE        = "notActive";
     public const NO_OPTIONS        = "noOptions";
     public const EQUAL_TO_SHIPMENT = "equalToShipment";
@@ -352,10 +361,26 @@ class WCPN_Settings_Data
                 ),
             ],
             [
+                "name"      => WCPOST_Settings::SETTING_CHANGE_ORDER_STATUS_AFTER,
+                "condition" => WCPOST_Settings::SETTING_ORDER_STATUS_AUTOMATION,
+                "class"     => ["wcpn__child"],
+                "label"     => __("setting_change_order_status_after", "woocommerce-postnl"),
+                "type"      => "select",
+                "default"   => self::CHANGE_STATUS_AFTER_PRINTING,
+                "options"   => [
+                    self::CHANGE_STATUS_AFTER_PRINTING => __("setting_change_status_after_printing", "woocommerce-postnl"),
+                    self::CHANGE_STATUS_AFTER_EXPORT   => __("setting_change_status_after_export", "woocommerce-postnl"),
+                ],
+                "help_text" => __(
+                    "setting_change_status_after_help_text",
+                    "woocommerce-postnl"
+                ),
+            ],
+            [
                 "name"      => WCPOST_Settings::SETTING_AUTOMATIC_ORDER_STATUS,
                 "condition" => WCPOST_Settings::SETTING_ORDER_STATUS_AUTOMATION,
                 "class"     => ["wcpn__child"],
-                "label"     => __("Automatic order status", "woocommerce-postnl"),
+                "label"     => __("setting_automatic_order_status", "woocommerce-postnl"),
                 "type"      => "select",
                 "options"   => WCPN_Settings_Callbacks::get_order_status_options(),
             ],
@@ -406,69 +431,54 @@ class WCPN_Settings_Data
         return [
             [
                 "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT,
-                "label"     => __("Home address only", "woocommerce-postnl"),
+                "label"     => __("shipment_options_only_recipient", "woocommerce-postnl"),
+                "help_text" => __("shipment_options_only_recipient_help_text", "woocommerce-postnl"),
                 "type"      => "toggle",
-                "help_text" => __(
-                    "If you don't want the parcel to be delivered at the neighbours, choose this option.",
-                    "woocommerce-postnl"
-                ),
             ],
             [
                 "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE,
-                "label"     => __("Signature on delivery", "woocommerce-postnl"),
+                "label"     => __("shipment_options_signature", "woocommerce-postnl"),
+                "help_text" => __("shipment_options_signature_help_text", "woocommerce-postnl"),
                 "type"      => "toggle",
-                "help_text" => __(
-                    "The parcel will be offered at the delivery address. If the recipient is not at home, the parcel will be delivered to the neighbours. In both cases, a signature will be required.",
-                    "woocommerce-postnl"
-                ),
             ],
+//            [
+//                "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT,
+//                "label"     => __("shipment_options_large_format", "woocommerce-postnl"),
+//                "help_text" => __("shipment_options_large_format_help_text", "woocommerce-postnl"),
+//                "type"      => "toggle",
+//            ],
             [
                 "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK,
-                "label"     => __("Age check 18+", "woocommerce-postnl"),
+                "label"     => __("shipment_options_age_check", "woocommerce-postnl"),
                 "type"      => "toggle",
-                "help_text" => __(
-                    "The age check is intended for parcel shipments for which the recipient must show they are 18+ years old by means of a proof of identity. With this option 'signature for receipt' and 'delivery only at recipient' are included. This option can't be combined with morning or evening delivery.",
-                    "woocommerce-postnl"
-                ),
+                "help_text" => __("shipment_options_age_check_help_text", "woocommerce-postnl"),
             ],
             [
                 "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_RETURN,
-                "label"     => __("Return if no answer", "woocommerce-postnl"),
+                "label"     => __("shipment_options_return", "woocommerce-postnl"),
+                "help_text" => __("shipment_options_return_help_text", "woocommerce-postnl"),
                 "type"      => "toggle",
-                "help_text" => __(
-                    "By default, a parcel will be offered twice. After two unsuccessful delivery attempts, the parcel will be available at the nearest pickup point for two weeks. There it can be picked up by the recipient with the note that was left by the courier. If you want to receive the parcel back directly and NOT forward it to the pickup point, enable this option.",
-                    "woocommerce-postnl"
-                ),
             ],
             [
                 "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
-                "label"     => __("Insured shipment", "woocommerce-postnl"),
+                "label"     => __("shipment_options_insured", "woocommerce-postnl"),
+                "help_text" => __("shipment_options_insured_help_text", "woocommerce-postnl"),
                 "type"      => "toggle",
-                "help_text" => __(
-                    "By default, there is no insurance on the shipments. If you still want to insure the shipment, you can do that. We insure the purchase value of the shipment, with a maximum insured value of € 5.000. Insured parcels always contain the options 'Home address only' en 'Signature for delivery'",
-                    "woocommerce-postnl"
-                ),
             ],
             [
                 "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FROM_PRICE,
                 "condition" => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
-                "label"     => __("Insure from price", "woocommerce-postnl"),
+                "label"     => __("shipment_options_insured_from_price", "woocommerce-postnl"),
+                "help_text" => __("shipment_options_insured_from_price_help_text", "woocommerce-postnl"),
                 "type"      => "number",
-                "help_text" => __(
-                    "Insure all orders that exceed this price point.",
-                    "woocommerce-postnl"
-                ),
             ],
             [
                 "name"      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT,
                 "condition" => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
-                "label"     => __("Max insured amount", "woocommerce-postnl"),
+                "label"     => __("shipment_options_insured_amount", "woocommerce-postnl"),
+                "help_text" => __("shipment_options_insured_amount_help_text", "woocommerce-postnl"),
                 "type"      => "select",
                 "options"   => WCPN_Data::getInsuranceAmounts(),
-                "help_text" => __(
-                    "Insure all parcels up to the selected amount.",
-                    "woocommerce-postnl"
-                ),
             ],
         ];
     }
@@ -556,7 +566,7 @@ class WCPN_Settings_Data
             [
                 "name"      => WCPOST_Settings::SETTING_CARRIER_ONLY_RECIPIENT_ENABLED,
                 "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Home address only", "woocommerce-postnl"),
+                "label"     => __("shipment_options_only_recipient", "woocommerce-postnl"),
                 "type"      => "toggle",
             ],
             self::getFeeField(
@@ -569,7 +579,7 @@ class WCPN_Settings_Data
             [
                 "name"      => WCPOST_Settings::SETTING_CARRIER_SIGNATURE_ENABLED,
                 "condition" => WCPOST_Settings::SETTING_CARRIER_DELIVERY_ENABLED,
-                "label"     => __("Signature on delivery", "woocommerce-postnl"),
+                "label"     => __("shipment_options_signature", "woocommerce-postnl"),
                 "type"      => "toggle",
                 "help_text" => __(
                     "Enter an amount that is either positive or negative. For example, do you want to give a discount for using this function or do you want to charge extra for this delivery option.",
@@ -630,7 +640,7 @@ class WCPN_Settings_Data
     /**
      * @return array
      */
-    private function get_section_export_defaults_main()
+    private function get_section_export_defaults_main(): array
     {
         return [
             [
@@ -665,6 +675,8 @@ class WCPN_Settings_Data
             ],
             [
                 "name"      => WCPOST_Settings::SETTING_EMPTY_PARCEL_WEIGHT,
+                "type"      => "number",
+                "default"   => 0,
                 "label"     => sprintf(
                     "%s (%s)",
                     __("Empty parcel weight", "woocommerce-postnl"),
@@ -696,14 +708,25 @@ class WCPN_Settings_Data
                 ],
             ],
             [
-                "name"      => WCPOST_Settings::SETTING_COUNTRY_OF_ORIGIN,
-                "label"     => __("Default country of origin", "woocommerce-postnl"),
-                "type"      => "select",
-                "options"   => (new WC_Countries())->get_countries(),
-                "help-text" => __(
-                  "Country of origin is required for world shipments. Defaults to shop base or NL. Example: 'NL', 'BE', 'DE'", "woocommerce-postnl"
-              ),
+                'name'      => WCPOST_Settings::SETTING_COUNTRY_OF_ORIGIN,
+                'label'     => __('setting_country_of_origin', 'woocommerce-postnl'),
+                'type'      => 'select',
+                'options'   => (new WC_Countries())->get_countries(),
+                'default'   => (new WC_Countries())->get_base_country(),
+                'help-text' => __(
+                    'setting_country_of_origin_help_text',
+                    'woocommerce-postnl'
+                ),
             ],
+//            [
+//                "name"      => WCPOST_Settings::SETTING_AUTOMATIC_EXPORT,
+//                "label"     => __("Automatic export", "woocommerce-postnl"),
+//                "type"      => "toggle",
+//                "help_text" => __(
+//                    "With this setting enabled orders are exported to PostNL automatically after payment.",
+//                    "woocommerce-postnl"
+//                ),
+//            ],
         ];
     }
 
@@ -753,18 +776,12 @@ class WCPN_Settings_Data
             [
                 "name"      => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_DISPLAY,
                 "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
-                "label"     => __("Display for", "woocommerce-postnl"),
+                "label"     => __("settings_checkout_display_for", "woocommerce-postnl"),
                 "type"      => "select",
-                "help_text" => __(
-                    "You can link the delivery options to specific shipping methods by adding them to the package types under \"Standard export settings\". The delivery options are not visible at foreign addresses.",
-                    "woocommerce-postnl"
-                ),
+                "help_text" => __("settings_checkout_display_for_help_text", "woocommerce-postnl"),
                 "options"   => [
-                    self::DISPLAY_FOR_SELECTED_METHODS => __(
-                        "Shipping methods associated with Parcels",
-                        "woocommerce-postnl"
-                    ),
-                    self::DISPLAY_FOR_ALL_METHODS      => __("All shipping methods", "woocommerce-postnl"),
+                    self::DISPLAY_FOR_SELECTED_METHODS => __("settings_checkout_display_for_selected_methods", "woocommerce-postnl"),
+                    self::DISPLAY_FOR_ALL_METHODS      => __("settings_checkout_display_for_all_methods", "woocommerce-postnl"),
                 ],
             ],
             [
@@ -799,6 +816,40 @@ class WCPN_Settings_Data
                     "You can change the place of the delivery options on the checkout page. By default it will be placed after shipping details.",
                     "woocommerce-postnl"
                 ),
+            ],
+            [
+                "name"      => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_PRICE_FORMAT,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("settings_checkout_price_format", "woocommerce-postnl"),
+                "type"      => "select",
+                "default"   => self::DISPLAY_TOTAL_PRICE,
+                "options"   => [
+                    self::DISPLAY_TOTAL_PRICE     => __(
+                        "settings_checkout_total_price",
+                        "woocommerce-postnl"
+                    ),
+                    self::DISPLAY_SURCHARGE_PRICE => __(
+                        "settings_checkout_surcharge",
+                        "woocommerce-postnl"
+                    ),
+                ],
+            ],
+            [
+                "name"      => WCPOST_Settings::SETTING_PICKUP_LOCATIONS_DEFAULT_VIEW,
+                "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
+                "label"     => __("settings_pickup_locations_default_view", "woocommerce-postnl"),
+                "type"      => "select",
+                "default"   => self::PICKUP_LOCATIONS_VIEW_MAP,
+                "options"   => [
+                    self::PICKUP_LOCATIONS_VIEW_MAP  => __(
+                        "settings_pickup_locations_default_view_map",
+                        "woocommerce-postnl"
+                    ),
+                    self::PICKUP_LOCATIONS_VIEW_LIST => __(
+                        "settings_pickup_locations_default_view_list",
+                        "woocommerce-postnl"
+                    ),
+                ],
             ],
             [
                 "name"              => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_CUSTOM_CSS,
@@ -881,13 +932,13 @@ class WCPN_Settings_Data
                 "name"      => WCPOST_Settings::SETTING_ONLY_RECIPIENT_TITLE,
                 "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Home address only title", "woocommerce-postnl"),
-                "default"   => __("Home address only", "woocommerce-postnl"),
+                "default"   => __("shipment_options_only_recipient", "woocommerce-postnl"),
             ],
             [
                 "name"      => WCPOST_Settings::SETTING_SIGNATURE_TITLE,
                 "condition" => WCPOST_Settings::SETTING_DELIVERY_OPTIONS_ENABLED,
                 "label"     => __("Signature on delivery title", "woocommerce-postnl"),
-                "default"   => __("Signature on delivery", "woocommerce-postnl"),
+                "default"   => __("shipment_options_signature", "woocommerce-postnl"),
             ],
             [
                 "name"      => WCPOST_Settings::SETTING_PICKUP_TITLE,
@@ -916,7 +967,7 @@ class WCPN_Settings_Data
 
         return sprintf(
             '<p>%s <a class="" href="#" onclick="document.querySelector(`#delivery_options_custom_css`).value = `%s`">%s</a></p>',
-            sprintf(__("Theme \"%s\" detected.", "woocommerce-postnl"), $currentTheme),
+            sprintf(__('Theme "%s" detected.', "woocommerce-postnl"), $currentTheme),
             file_get_contents($cssPath),
             __("Apply preset.", "woocommerce-postnl")
         );

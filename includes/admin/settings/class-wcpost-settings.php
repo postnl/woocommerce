@@ -1,5 +1,6 @@
 <?php
 
+use MyParcelNL\Sdk\src\Model\Consignment\DPDConsignment;
 use MyParcelNL\Sdk\src\Model\Consignment\PostNLConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 
@@ -26,18 +27,19 @@ class WCPOST_Settings
     /**
      * General
      */
-    public const SETTING_API_KEY                 = "api_key";
-    public const SETTING_AUTOMATIC_ORDER_STATUS  = "automatic_order_status";
-    public const SETTING_BARCODE_IN_NOTE         = "barcode_in_note";
-    public const SETTING_BARCODE_IN_NOTE_TITLE   = "barcode_in_note_title";
-    public const SETTING_DOWNLOAD_DISPLAY        = "download_display";
-    public const SETTING_ERROR_LOGGING           = "error_logging";
-    public const SETTING_LABEL_FORMAT            = "label_format";
-    public const SETTING_ORDER_STATUS_AUTOMATION = "order_status_automation";
-    public const SETTING_ASK_FOR_PRINT_POSITION  = "ask_for_print_position";
-    public const SETTING_PROCESS_DIRECTLY        = "process_directly";
-    public const SETTING_TRACK_TRACE_EMAIL       = "track_trace_email";
-    public const SETTING_TRACK_TRACE_MY_ACCOUNT  = "track_trace_my_account";
+    public const SETTING_API_KEY                   = "api_key";
+    public const SETTING_AUTOMATIC_ORDER_STATUS    = "automatic_order_status";
+    public const SETTING_BARCODE_IN_NOTE           = "barcode_in_note";
+    public const SETTING_BARCODE_IN_NOTE_TITLE     = "barcode_in_note_title";
+    public const SETTING_DOWNLOAD_DISPLAY          = "download_display";
+    public const SETTING_ERROR_LOGGING             = "error_logging";
+    public const SETTING_LABEL_FORMAT              = "label_format";
+    public const SETTING_ORDER_STATUS_AUTOMATION   = "order_status_automation";
+    public const SETTING_CHANGE_ORDER_STATUS_AFTER = "change_order_status_after";
+    public const SETTING_ASK_FOR_PRINT_POSITION    = "ask_for_print_position";
+    public const SETTING_PROCESS_DIRECTLY          = "process_directly";
+    public const SETTING_TRACK_TRACE_EMAIL         = "track_trace_email";
+    public const SETTING_TRACK_TRACE_MY_ACCOUNT    = "track_trace_my_account";
 
     /**
      * Export defaults
@@ -49,6 +51,7 @@ class WCPOST_Settings
     public const SETTING_HS_CODE                        = "hs_code";
     public const SETTING_PACKAGE_CONTENT                = "package_contents";
     public const SETTING_COUNTRY_OF_ORIGIN              = "country_of_origin";
+    public const SETTING_RETURN_IN_THE_BOX              = "return_in_the_box";
 
     /**
      * Checkout
@@ -57,11 +60,13 @@ class WCPOST_Settings
     public const SETTING_DELIVERY_OPTIONS_DISPLAY              = "delivery_options_display";
     public const SETTING_DELIVERY_OPTIONS_ENABLED              = "delivery_options_enabled";
     public const SETTING_DELIVERY_OPTIONS_POSITION             = "delivery_options_position";
+    public const SETTING_DELIVERY_OPTIONS_PRICE_FORMAT         = "delivery_options_price_format";
     public const SETTINGS_SHOW_DELIVERY_OPTIONS_FOR_BACKORDERS = "delivery_options_enabled_for_backorders";
     public const SETTING_SHOW_DELIVERY_DAY                     = "show_delivery_day";
     public const SETTING_DELIVERY_TITLE                        = "delivery_title";
     public const SETTING_HEADER_DELIVERY_OPTIONS_TITLE         = "header_delivery_options_title";
     public const SETTING_PICKUP_TITLE                          = "pickup_title";
+    public const SETTING_PICKUP_LOCATIONS_DEFAULT_VIEW         = "pickup_locations_default_view";
     public const SETTING_MORNING_DELIVERY_TITLE                = "morning_title";
     public const SETTING_EVENING_DELIVERY_TITLE                = "evening_title";
     public const SETTING_ONLY_RECIPIENT_TITLE                  = "only_recipient_title";
@@ -77,6 +82,7 @@ class WCPOST_Settings
     // Defaults
     public const SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE          = "export_signature";
     public const SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT     = "export_only_recipient";
+//    public const SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT       = "export_large_format";
     public const SETTING_CARRIER_DEFAULT_EXPORT_AGE_CHECK          = "export_age_check";
     public const SETTING_CARRIER_DEFAULT_EXPORT_RETURN             = "export_return_shipments";
     public const SETTING_CARRIER_DEFAULT_EXPORT_INSURED            = "export_insured";
@@ -247,7 +253,7 @@ class WCPOST_Settings
         if (! $hide_notice && $base_country === "BE") {
             $postnl_nl_link =
                 '<a href="https://wordpress.org/plugins/woocommerce-postnl/" target="blank">WC PostNL Netherlands</a>';
-            $text = sprintf(
+            $text             = sprintf(
                 __(
                     "It looks like your shop is based in Belgium. This plugin is for PostNL. If you are using PostNL Netherlands, download the %s plugin instead!",
                     "woocommerce-postnl"

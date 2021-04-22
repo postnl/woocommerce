@@ -5,7 +5,7 @@ Plugin URI: https://postnl.nl/
 Description: Export your WooCommerce orders to PostNL (https://postnl.nl/) and print labels directly from the WooCommerce admin
 Author: PostNL
 Author URI: https://postnl.nl
-Version: 4.2.0
+Version: 4.3.2
 Text Domain: woocommerce-postnl
 
 License: GPLv3 or later
@@ -28,7 +28,7 @@ if (! class_exists('WCPOST')) :
         const PHP_VERSION_7_1      = '7.1';
         const PHP_VERSION_REQUIRED = self::PHP_VERSION_7_1;
 
-        public $version = '4.2.0';
+        public $version = '4.3.2';
 
         public $plugin_basename;
 
@@ -308,6 +308,10 @@ if (! class_exists('WCPOST')) :
                 if (version_compare($installed_version, '4.1.0', '<=')) {
                     require_once('migration/wcpn-upgrade-migration-v4-1-0.php');
                 }
+
+                if (version_compare($installed_version, '4.2.1', '<=')) {
+                    require_once('migration/wcpn-upgrade-migration-v4-2-1.php');
+                }
             }
         }
 
@@ -337,6 +341,14 @@ if (! class_exists('WCPOST')) :
          */
         public function initSettings()
         {
+            if (! $this->phpVersionMeets(\WCPOST::PHP_VERSION_7_1)) {
+                $this->general_settings  = get_option('woocommerce_postnl_general_settings');
+                $this->export_defaults   = get_option('woocommerce_postnl_export_defaults_settings');
+                $this->checkout_settings = get_option('woocommerce_postnl_checkout_settings');
+
+                return;
+            }
+
             // Create the settings collection by importing this function, because we can't use the sdk
             // imports in the legacy version.
             require_once('includes/wcpn-initialize-settings-collection.php');

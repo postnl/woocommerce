@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "myparcelnl/sdk",
-            "version": "v5.2.6",
+            "version": "v5.2.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myparcelnl/sdk.git",
-                "reference": "41cc4fc8562ffd6f6b1c4b6965c79ea37ffbbb34"
+                "reference": "b1cd4185a49e1ab2b1c4f06c608d3ab5c97a4f11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/41cc4fc8562ffd6f6b1c4b6965c79ea37ffbbb34",
-                "reference": "41cc4fc8562ffd6f6b1c4b6965c79ea37ffbbb34",
+                "url": "https://api.github.com/repos/myparcelnl/sdk/zipball/b1cd4185a49e1ab2b1c4f06c608d3ab5c97a4f11",
+                "reference": "b1cd4185a49e1ab2b1c4f06c608d3ab5c97a4f11",
                 "shasum": ""
             },
             "require": {
@@ -65,7 +65,7 @@
                 "myparcel",
                 "postnl"
             ],
-            "time": "2021-01-25T15:47:37+00:00"
+            "time": "2021-04-19T13:48:03+00:00"
         }
     ],
     "packages-dev": [],

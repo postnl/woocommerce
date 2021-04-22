@@ -8,7 +8,7 @@ Requires PHP: 7.1
 License: GPLv3 or later
 License URI: http://www.opensource.org/licenses/gpl-license.php
 
-EExport your WooCommerce orders to PostNL (www.postnl.nl) and print labels directly from the WooCommerce admin
+Export your WooCommerce orders to PostNL (www.postnl.nl) and print labels directly from the WooCommerce admin
 
 == Description ==
 
@@ -90,6 +90,24 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 == Changelog ==
 
+= 4.3.2 (2021-03-30) =
+* Improvement: wpm-config.json included (support WP-Multilang plugin)
+* Improvement: add translation files fr_FR
+* Improvement: Deactivate delivery date
+* Improvement: Option for automatic order status after exporting or printing
+* Fix: Saving options in the order grid model
+* Fix: Validation for sending to other address on checkout page
+
+= 4.3.1 (2021-03-19) =
+* Improvement: Export bulk order shipments although there is a wrong shipment
+* Improvement: Add option to show prices as surcharge
+* Improvement: Support WP Desk Flexible Shipping plugin
+* Fix: Calculate weight from grams to kilos during the migration
+* Fix: Set PostNL response cookie with 20 sec expire
+* Fix: Use saturday cutoff time
+* Fix: Use country codes from the PostNL SDK
+* Fix: Translation files not being generated properly
+
 = 4.2.0 (2021-01-21) =
 * Fix: Rename `WCPN`, `WCPN()`, `WCPN_Admin` and `WCPN_Settings`
 * Fix: Weight calculation for all shipment types
@@ -115,20 +133,20 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Correct package type for international shipments
 * Fix: Only add empty parcel weight to packages
 * Fix: Export via actions at the bottom of the order-grid
-* Improvment: Set correct UserAgent
-* Improvment: More options for age verification at product level
-* Improvment: Better country of origin selection
-* Improvment: Improve shipment options dialog
-* Improvment: Spinner for order grid bulk actions
-* Improvment: Update icons
-* Improvment: Use base price for delivery options
-* Improvment: Error handling after exporting and printing a label
-* Improvment: Stabilizer code for opening a label in a new tab
-* Improvment: New status for letter and DPZ and show them on the barcode column
-* Improvment: Use gulp to allow es6 javascript and use sass.
-* Improvment: Use customer note for label description.
-* Improvment: Use the latest MyParcel SDK.
-* Improvment: Handle translations in gulp
+* Improvement: Set correct UserAgent
+* Improvement: More options for age verification at product level
+* Improvement: Better country of origin selection
+* Improvement: Improve shipment options dialog
+* Improvement: Spinner for order grid bulk actions
+* Improvement: Update icons
+* Improvement: Use base price for delivery options
+* Improvement: Error handling after exporting and printing a label
+* Improvement: Stabilizer code for opening a label in a new tab
+* Improvement: New status for letter and DPZ and show them on the barcode column
+* Improvement: Use gulp to allow es6 javascript and use sass.
+* Improvement: Use customer note for label description.
+* Improvement: Use the latest PostNL SDK.
+* Improvement: Handle translations in gulp
 
 = 4.1.5 (2020-12-15) =
 * Fix: select box for country of origin
@@ -164,7 +182,6 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Improvement: Spinner for order grid bulk actions.
 * Improvement: make default export settings show up in shipment options.
 * Improvement: show delivery date in order grid for any order that has one (only when "show delivery day" setting is enabled).
-* Fix: Calculated weight is shown for digital stamps.
 * Fix: Wrong label for "show delivery day" setting.
 * Fix: Error on sending return email.
 * Fix: Allow split address field for Belgium as well.
@@ -211,6 +228,7 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Housenumber and suffix
 * Improvement: Country of origin
 * Improvement: New checkout and SDK
+* Improvement: Automatic export after payment
 * Improvement: V2 shipment endpoint
 * Improvement: HS code for variable product
 
@@ -232,7 +250,6 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Use constants for delivery_type
 * Fix: Saturday cutoff time
 * Fix: Shipping method issue with pickup
-* Fix: Digital stamp weight issue
 
 = 3.1.5 (2019-05-14) =
 * Improvement: Add the link for the personalized Track & Trace page (portal)
@@ -242,7 +259,6 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 * Fix: Translation house number again button
 * Fix: Set default to 0 if there's no tax rate set up
 * Fix: fix issue with shipping class term id
-* Fix: Correct amount on the digital stamp
 * Fix: trying to get property of non-object
 * Fix: Shipment validation error (PakjeGemak)
 
@@ -275,7 +291,6 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 = 3.1.0 (2018-12-12) =
 * Hotfix: Show delivery options when checkout form already filled in.
-* Improvement: Add Digital stamp
 
 = 3.0.10 (2018-12-05) =
 * Hotfix: Flashing of the order summary.

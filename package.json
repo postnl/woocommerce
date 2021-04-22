@@ -19,28 +19,31 @@
   },
   "homepage": "https://github.com/postnl/woocommerce#readme",
   "dependencies": {
-    "@myparcel/delivery-options": "^3.4.2"
+    "@myparcel/delivery-options": "^3.6.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@myparcel/eslint-config": "^3.0.1",
-    "autoprefixer": "^10.2.3",
+    "@babel/core": "^7.13.10",
+    "@babel/preset-env": "^7.13.10",
+    "@myparcel/eslint-config": "^3.0.2",
+    "@types/papaparse": "^5.2.5",
+    "autoprefixer": "^10.2.5",
     "babelify": "^10.0.0",
     "browserify": "^17.0.0",
-    "core-js": "^3.8.3",
+    "core-js": "^3.9.1",
+    "gettext-parser": "^4.0.4",
+    "glob": "^7.1.6",
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
     "gulp-po-sync": "^0.1.0",
-    "gulp-po2mo": "^1.0.3",
     "gulp-postcss": "^9.0.0",
     "gulp-sass": "^4.1.0",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-tap": "^2.0.0",
     "gulp-uglify": "^3.0.2",
     "gulp-wp-pot": "^2.5.0",
-    "gulp-zip": "^5.0.2",
-    "postcss": "^8.2.4",
+    "gulp-zip": "^5.1.0",
+    "papaparse": "^5.3.0",
+    "postcss": "^8.2.8",
     "vinyl-buffer": "^1.0.1"
   }
 }

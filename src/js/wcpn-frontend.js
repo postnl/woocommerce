@@ -72,7 +72,7 @@ jQuery(($) => {
     previousCountry: {},
 
     /**
-     * @type {String}
+     * @type {?String}
      */
     selectedShippingMethod: null,
 
@@ -125,6 +125,7 @@ jQuery(($) => {
 
     showDeliveryOptionsEvent: 'myparcel_show_delivery_options',
     hideDeliveryOptionsEvent: 'myparcel_hide_delivery_options',
+    updateConfigEvent: 'myparcel_update_config',
 
     /**
      * WooCommerce checkout events.
@@ -309,8 +310,8 @@ jQuery(($) => {
      * @returns {Boolean}
      */
     countryHasChanged() {
-      if (window.PostNLConfig.address && window.PostNLConfig.address.hasOwnProperty('cc')) {
-        return window.PostNLConfig.address.cc !== PostNLFrontend.getField(PostNLFrontend.countryField).value;
+      if (window.MyParcelConfig.address && window.MyParcelConfig.address.hasOwnProperty('cc')) {
+        return window.MyParcelConfig.address.cc !== PostNLFrontend.getField(PostNLFrontend.countryField).value;
       }
 
       return true;
@@ -320,15 +321,9 @@ jQuery(($) => {
      * Get data from form fields, put it in the global PostNLConfig, then trigger updating the delivery options.
      */
     updateAddress() {
-      if (!window.hasOwnProperty('PostNLConfig')) {
-        throw 'window.PostNLConfig not found!';
-      }
+      PostNLFrontend.validateMyParcelConfig();
 
-      if (typeof window.PostNLConfig === 'string') {
-        window.PostNLConfig = JSON.parse(window.PostNLConfig);
-      }
-
-      window.PostNLConfig.address = {
+      window.MyParcelConfig.address = {
         cc: PostNLFrontend.getField(PostNLFrontend.countryField).value,
         postalCode: PostNLFrontend.getField(PostNLFrontend.postcodeField).value,
         number: PostNLFrontend.getHouseNumber(),
@@ -416,7 +411,7 @@ jQuery(($) => {
      */
     injectHiddenInput() {
       PostNLFrontend.hiddenDataInput = document.createElement('input');
-      PostNLFrontend.hiddenDataInput.setAttribute('hidden', 'hidden');
+      PostNLFrontend.hiddenDataInput.setAttribute('type', 'hidden');
       PostNLFrontend.hiddenDataInput.setAttribute('name', PostNLDeliveryOptions.hiddenInputName);
 
       document.querySelector('form[name="checkout"]').appendChild(PostNLFrontend.hiddenDataInput);
@@ -461,44 +456,49 @@ jQuery(($) => {
             shippingMethod = `flat_rate:${shippingClass}`;
           }
         }
-
-        PostNLFrontend.selectedShippingMethod = shippingMethod;
       } else {
-        PostNLFrontend.selectedShippingMethod = null;
+        shippingMethod = null;
       }
 
-      PostNLFrontend.toggleDeliveryOptions();
+      if (shippingMethod !== PostNLFrontend.selectedShippingMethod) {
+        PostNLFrontend.onChangeShippingMethod(PostNLFrontend.selectedShippingMethod, shippingMethod);
+        PostNLFrontend.selectedShippingMethod = shippingMethod;
+      }
     },
 
     /**
      * Hides/shows the delivery options based on the current shipping method. Makes sure to not update the checkout
      *  unless necessary by checking if hasDeliveryOptions is true or false.
      */
-    toggleDeliveryOptions() {
-      if (PostNLFrontend.currentShippingMethodHasDeliveryOptions()) {
+    toggleDeliveryOptions(shippingMethod) {
+      if (PostNLFrontend.shippingMethodHasDeliveryOptions(shippingMethod)) {
         PostNLFrontend.hasDeliveryOptions = true;
         PostNLFrontend.triggerEvent(PostNLFrontend.showDeliveryOptionsEvent, document);
-        PostNLFrontend.updateAddress();
+        PostNLFrontend.updateDeliveryOptionsConfig();
       } else {
         PostNLFrontend.hasDeliveryOptions = false;
         PostNLFrontend.triggerEvent(PostNLFrontend.hideDeliveryOptionsEvent, document);
       }
     },
 
+    sendUpdateConfigEvent() {
+      PostNLFrontend.triggerEvent(PostNLFrontend.updateConfigEvent);
+    },
+
     /**
-     * Check if the currently selected shipping method is allowed to have delivery options by checking if the name
-     *  starts with any value in a list of shipping methods.
+     * Check if the given shipping method is allowed to have delivery options by checking if the name starts with any
+     * value in a list of shipping methods.
      *
      * Most of the values in this list will be full shipping method names, with an instance id, but some can't have one.
-     *  That's the reason we're checking if it starts with this value instead of whether it's equal.
+     * That's the reason we're checking if it starts with this value instead of whether it's equal.
      *
+     * @param {?String} shippingMethod
      * @returns {Boolean}
      */
-    currentShippingMethodHasDeliveryOptions() {
+    shippingMethodHasDeliveryOptions(shippingMethod = PostNLFrontend.getSelectedShippingMethod()) {
       let display = false;
       let invert = false;
       let list = PostNLFrontend.allowedShippingMethods;
-      let shippingMethod = PostNLFrontend.getSelectedShippingMethod();
 
       if (!shippingMethod) {
         return false;
@@ -599,7 +599,28 @@ jQuery(($) => {
     },
 
     /**
-     * @returns {String}
+     * Fetch and update the delivery options config. For use with changing shipping methods, for example, as doing so
+     *  changes the prices of delivery and any extra options.
+     */
+    updateDeliveryOptionsConfig() {
+      PostNLFrontend.validateMyParcelConfig();
+      $.ajax({
+        type: 'GET',
+        url: wcpn.ajax_url,
+        async: false,
+        data: {
+          action: 'wcpn_get_delivery_options_config',
+        },
+        success(data) {
+          const {config} = JSON.parse(data);
+          window.MyParcelConfig.config = config;
+          PostNLFrontend.sendUpdateConfigEvent();
+        },
+      });
+    },
+
+    /**
+     * @returns {?String}
      */
     getSelectedShippingMethod() {
       let shippingMethod = PostNLFrontend.selectedShippingMethod;
@@ -617,7 +638,7 @@ jQuery(($) => {
      * @param {Event} event
      * @param {String} newCountry
      */
-    synchronizeAddress: function(event, newCountry) {
+    synchronizeAddress(event, newCountry) {
       if (!PostNLFrontend.isUsingSplitAddressFields) {
         return;
       }
@@ -625,6 +646,10 @@ jQuery(($) => {
       const data = $('form').serializeArray();
 
       ['shipping', 'billing'].forEach((addressType) => {
+        if (!PostNLFrontend.hasAddressType(addressType)) {
+          return;
+        }
+
         const typeCountry = data.find((item) => item.name === `${addressType}_country`);
         const hasAddressTypeCountry = PostNLFrontend.previousCountry.hasOwnProperty(addressType);
         const countryChanged = PostNLFrontend.previousCountry[addressType] !== newCountry;
@@ -680,6 +705,42 @@ jQuery(($) => {
       }
 
       return PostNLFrontend.splitAddressFieldsCountries.includes(country.toUpperCase());
+    },
+
+    /**
+     * Checks if the inner wrapper of an address type form exists to determine if the address type is available.
+     *
+     * Does not check the outer div (.woocommerce-shipping-fields) because when the shipping form does not exist, it's
+     *  still rendered on the page.
+     *
+     * @param {String} addressType
+     * @returns {Boolean}
+     */
+    hasAddressType(addressType) {
+      const formWrapper = document.querySelector(`.woocommerce-${addressType}-fields__field-wrapper`);
+
+      return Boolean(formWrapper);
+    },
+
+    /**
+     * @param {?String} oldShippingMethod
+     * @param {?String} newShippingMethod
+     */
+    onChangeShippingMethod(oldShippingMethod, newShippingMethod) {
+      PostNLFrontend.toggleDeliveryOptions(newShippingMethod);
+      // if (PostNLFrontend.shippingMethodHasDeliveryOptions(newShippingMethod)) {
+      //   PostNLFrontend.updateDeliveryOptionsConfig();
+      // }
+    },
+
+    validateMyParcelConfig() {
+      if (!window.hasOwnProperty('MyParcelConfig')) {
+        throw 'window.MyParcelConfig not found!';
+      }
+
+      if (typeof window.MyParcelConfig === 'string') {
+        window.MyParcelConfig = JSON.parse(window.MyParcelConfig);
+      }
     },
   };
 

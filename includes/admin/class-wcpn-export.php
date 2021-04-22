@@ -32,8 +32,10 @@ class WCPN_Export
     /**
      * Maximum characters length of item description.
      */
-    public const ITEM_DESCRIPTION_MAX_LENGTH = 50;
+    public const ITEM_DESCRIPTION_MAX_LENGTH  = 50;
     public const ORDER_DESCRIPTION_MAX_LENGTH = 45;
+
+    public const COOKIE_EXPIRE_TIME = 20;
 
     public const DEFAULT_POSITIONS = [2, 4, 1, 3];
     public const SUFFIX_CHECK_REG  = "~^([a-z]{1}\d{1,3}|-\d{1,4}\d{2}\w{1,2}|[a-z]{1}[a-z\s]{0,3})(?:\W|$)~i";
@@ -77,7 +79,9 @@ class WCPN_Export
      */
     public function exportByOrderId(int $orderId): void
     {
-        if ($orderId) {
+//        $automaticExport = WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_AUTOMATIC_EXPORT);
+
+        if ($orderId && $automaticExport) {
             $export = new self();
             $export->addShipments([(string) $orderId], 0, false);
         }
@@ -160,11 +164,6 @@ class WCPN_Export
             }
         }
 
-        if (! isset($_GET['postnl_done'])) {
-            unset($_COOKIE['response']);
-            setcookie('response', null, -1, '/');
-        }
-
         if (! empty($error_notice)) {
             printf(
                 '<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p>%s</div>',
@@ -177,7 +176,7 @@ class WCPN_Export
         }
 
         if (isset($_GET["postnl"])) {
-            switch ($_GET["myparcel"]) {
+            switch ($_GET["postnl"]) {
                 case "no_consignments":
                     $message = __(
                         "You have to export the orders to PostNL before you can print the labels!",
@@ -190,8 +189,8 @@ class WCPN_Export
             }
         }
 
-        if (isset($_COOKIE['response']) && $_COOKIE['response'] !== 'undefined') {
-            $response = $_COOKIE['response'];
+        if (isset($_COOKIE['postnl_response'])) {
+            $response = $_COOKIE['postnl_response'];
             printf(
                 '<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p></div>',
                 $response
@@ -236,7 +235,7 @@ class WCPN_Export
 
         $dialog  = $_REQUEST["dialog"] ?? null;
         $print   = $_REQUEST["print"] ?? null;
-        $offset  = $_REQUEST["offset"] ?? 0;
+        $offset  = (int) ($_REQUEST["offset"] ?? 0);
         $request = $_REQUEST["request"];
 
         /**
@@ -257,7 +256,7 @@ class WCPN_Export
 
                     // Creating a return shipment.
                     case self::ADD_RETURN:
-                        $return = $this->addReturn($order_ids, $_REQUEST['myparcel_options']);
+                        $return = $this->addReturn($order_ids, $_REQUEST['postnl_options']);
                         break;
 
                     // Downloading labels.
@@ -342,22 +341,19 @@ class WCPN_Export
             $order = WCX::get_order($order_id);
 
             try {
-                $consignment = (new WCPN_Export_Consignments($order))->getConsignment();
+                $exportConsignments = new WCPN_Export_Consignments($order);
+                $consignment        = $exportConsignments->getConsignment();
             } catch (Exception $ex) {
-                $errorMessage            = "The order could not be exported to PostNL because: {$ex->getMessage()}";
+                $errorMessage            = "Order {$order_id} could not be exported to MyParcel because: {$ex->getMessage()}";
                 $this->errors[$order_id] = $errorMessage;
+
+                setcookie('postnl_response', $this->errors[$order_id], time() + self::COOKIE_EXPIRE_TIME, "/");
+                WCPN_Log::add($this->errors[$order_id]);
+
                 continue;
             }
 
-            $extraOptions = WCX_Order::get_meta($order, WCPOST_Admin::META_SHIPMENT_OPTIONS_EXTRA);
-            $colloAmount  = (int) ($extraOptions["collo_amount"] ?? 1);
-
-            if ($colloAmount > 1) {
-                $this->addMultiCollo($order, $collection, $consignment, $colloAmount);
-            } else {
-                $collection->addConsignment($consignment);
-            }
-
+            $this->addConsignments($exportConsignments->getOrderSettings(), $collection, $consignment);
             WCPN_Log::add("Shipment data for order {$order_id}.");
         }
 
@@ -368,6 +364,10 @@ class WCPN_Export
         }
 
         foreach ($order_ids as $order_id) {
+            if (isset($this->errors[$order_id])) {
+                continue;
+            }
+
             $order          = WCX::get_order($order_id);
             $consignmentIds = ($collection->getConsignmentsByReferenceIdGroup($order_id))->getConsignmentIds();
 
@@ -381,18 +381,19 @@ class WCPN_Export
                 $this->getShipmentData($consignmentIds, $order);
             }
 
+            $api = $this->init_api();
+            $api->updateOrderStatus($order, WCPN_Settings_Data::CHANGE_STATUS_AFTER_EXPORT);
+
             WCX_Order::update_meta_data(
                 $order,
                 WCPOST_Admin::META_LAST_SHIPMENT_IDS,
                 $consignmentIds
             );
-
-            $this->updateOrderStatus($order);
         }
 
         if (! empty($this->success)) {
             $return["success"]     = sprintf(
-                __("%s shipments successfully prepare for PostNL", "woocommerce-postnl"),
+                __("%s shipments successfully exported to PostNL", "woocommerce-postnl"),
                 count($collection->getConsignmentIds())
             );
             $return["success_ids"] = $collection->getConsignmentIds();
@@ -668,7 +669,6 @@ class WCPN_Export
             "city"                   => (string) WCX_Order::get_prop($order, "shipping_city"),
             "person"                 => $shipping_name,
             "company"                => (string) WCX_Order::get_prop($order, "shipping_company"),
-            "email"                  => WCX_Order::get_prop($order, "billing_email") ?? "",
             "phone"                  => $connectPhone ? WCX_Order::get_prop($order, "billing_phone") : "",
             "street_additional_info" => WCX_Order::get_prop($order, "shipping_address_2"),
         ];
@@ -889,11 +889,7 @@ class WCPN_Export
             return null;
         }
 
-        // get shipping classes from order
-        $foundShippingClasses = $this->find_order_shipping_classes($order);
-        $highest_class = $this->getShippingClass($shippingMethod, $foundShippingClasses);
-
-        return $highest_class;
+        return $shippingMethodId;
     }
 
     /**
@@ -942,7 +938,7 @@ class WCPN_Export
             );
         }
 
-        return $packageType;
+        return $this->getAllowedPackageType($order, $packageType);
     }
 
     /**
@@ -1028,6 +1024,28 @@ class WCPN_Export
         }
 
         return $packageType ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
+    }
+
+    /**
+     * @param WC_Order $order
+     * @param string   $packageType
+     *
+     * @return string
+     *
+     * @throws Exception
+     */
+    public function getAllowedPackageType(WC_Order $order, string $packageType): string
+    {
+        $shippingCountry      = WCX_Order::get_prop($order, "shipping_country");
+        $isMailbox            = AbstractConsignment::PACKAGE_TYPE_MAILBOX_NAME === $packageType;
+        $isDigitalStamp       = AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME === $packageType;
+        $isDefaultPackageType = AbstractConsignment::CC_NL !== $shippingCountry && ($isMailbox || $isDigitalStamp);
+
+        if ($isDefaultPackageType) {
+            $packageType = AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
+        }
+
+        return $packageType;
     }
 
     /**
@@ -1144,23 +1162,29 @@ class WCPN_Export
      *
      * @param int|float $weight
      *
-     * @return float
+     * @return int
      */
-    public static function convertWeightToGrams($weight): float
+    public static function convertWeightToGrams($weight): int
     {
         $weightUnit  = get_option('woocommerce_weight_unit');
         $floatWeight = (float) $weight;
 
         switch ($weightUnit) {
             case 'kg':
-                return $floatWeight * 1000;
+                $weight = $floatWeight * 1000;
+                break;
             case 'lbs':
-                return $floatWeight / 0.45359237;
+                $weight = $floatWeight / 0.45359237;
+                break;
             case 'oz':
-                return $floatWeight / 0.0283495231;
+                $weight = $floatWeight / 0.0283495231;
+                break;
             default:
-                return $floatWeight;
+                $weight = $floatWeight;
+                break;
         }
+
+        return (int) ceil($weight);
     }
 
     /**
@@ -1175,29 +1199,6 @@ class WCPN_Export
         }
 
         return $options;
-    }
-
-    /**
-     * @param float $weight
-     *
-     * @return int
-     */
-    public static function getDigitalStampRangeFromWeight(float $weight): int
-    {
-        $intWeight = WCPN_Export::convertWeightToGrams($weight);
-
-        $results = Arr::where(
-            WCPN_Data::getDigitalStampRanges(),
-            function ($range) use ($intWeight) {
-                return $intWeight > $range['min'];
-            }
-        );
-
-        if (empty($results)) {
-            return Arr::first(WCPN_Data::getDigitalStampRanges())['average'];
-        }
-
-        return Arr::last($results)['average'];
     }
 
     /**
@@ -1425,30 +1426,30 @@ class WCPN_Export
     }
 
     /**
-     * @param WC_Order            $order
+     * @param \OrderSettings      $orderSettings
      * @param MyParcelCollection  $collection
      * @param AbstractConsignment $consignment
-     * @param int               $colloAmount
      *
-     * @throws MissingFieldException
-     * @throws \Exception
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
      */
-    public function addMultiCollo(WC_Order $order, MyParcelCollection $collection, AbstractConsignment $consignment, int $colloAmount): void
+    public function addMultiCollo(
+        OrderSettings $orderSettings,
+        MyParcelCollection $collection,
+        AbstractConsignment $consignment
+    ): void
     {
-        $deliveryOptions     = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
-        $packageType         = $this->getPackageTypeFromOrder($order, $deliveryOptions);
-        $isPackage           = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME === $packageType;
-        $isMultiColloCountry = in_array($order->get_shipping_country(),
+        $isPackage           = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME === $orderSettings->getPackageType();
+        $isMultiColloCountry = in_array(
+            $orderSettings->getShippingCountry(),
             [self::COUNTRY_CODE_NL, self::COUNTRY_CODE_BE]
         );
 
         if ($isMultiColloCountry && $isPackage) {
-            $collection->addMultiCollo($consignment, $colloAmount);
-
+            $collection->addMultiCollo($consignment, $orderSettings->getColloAmount());
             return;
         }
 
-        $this->addFakeMultiCollo($colloAmount, $collection, $consignment);
+        $this->addFakeMultiCollo($orderSettings->getColloAmount(), $collection, $consignment);
     }
 
     /**
@@ -1515,24 +1516,6 @@ class WCPN_Export
         }
 
         return false;
-    }
-
-    /**
-     * Update the status of given order based on the automatic order status settings.
-     *
-     * @param WC_Order $order
-     */
-    private function updateOrderStatus(WC_Order $order): void
-    {
-        if (WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_ORDER_STATUS_AUTOMATION)) {
-            $newStatus = $this->getSetting(WCPOST_Settings::SETTING_AUTOMATIC_ORDER_STATUS);
-            $order->update_status(
-                $newStatus,
-                __("PostNL shipment created:", "woocommerce-postnl")
-            );
-
-            WCPN_Log::add("Status of order {$order->get_id()} updated to \"$newStatus\"");
-        }
     }
 
     /**
@@ -1625,6 +1608,30 @@ class WCPN_Export
 
             WCPN_Export::addTrackTraceNoteToOrder($order_id, $trackTraces);
         }
+    }
+
+    /**
+     * Adds one or more consignments to the collection, depending on the collo amount.
+     *
+     * @param \OrderSettings                                            $orderSettings
+     * @param \MyParcelNL\Sdk\src\Helper\MyParcelCollection             $collection
+     * @param \MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment $consignment
+     *
+     * @throws \MyParcelNL\Sdk\src\Exception\MissingFieldException
+     */
+    private function addConsignments(
+        OrderSettings $orderSettings,
+        MyParcelCollection $collection,
+        AbstractConsignment $consignment
+    ): void {
+        $colloAmount = $orderSettings->getColloAmount();
+
+        if ($colloAmount > 1) {
+            $this->addMultiCollo($orderSettings, $collection, $consignment);
+            return;
+        }
+
+        $collection->addConsignment($consignment);
     }
 }
 

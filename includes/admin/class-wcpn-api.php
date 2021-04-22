@@ -1,6 +1,7 @@
 <?php
 
 use MyParcelNL\Sdk\src\Helper\MyParcelCollection;
+use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
 use WPO\WC\PostNL\Compatibility\WC_Core;
 use WPO\WC\PostNL\Compatibility\WCPN_ChannelEngine_Compatibility as ChannelEngine;
 
@@ -53,7 +54,7 @@ class WCPN_API extends WCPN_Rest
      *
      * @return array
      * @throws Exception
-     * @deprecated Use PostNL SDK instead
+     * @deprecated Use MyParcel SDK instead
      */
     public function add_shipments(array $shipments, string $type = "standard"): array
     {
@@ -177,6 +178,28 @@ class WCPN_API extends WCPN_Rest
     }
 
     /**
+     * Update the status of given order based on the automatic order status settings.
+     *
+     * @param WC_Order $order
+     * @param string   $changeStatusAtExportOrPrint
+     */
+    public function updateOrderStatus(WC_Order $order, string $changeStatusAtExportOrPrint): void
+    {
+        $statusAutomation     = WCPOST()->setting_collection->isEnabled(WCPOST_Settings::SETTING_ORDER_STATUS_AUTOMATION);
+        $momentOfStatusChange = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_CHANGE_ORDER_STATUS_AFTER);
+        $newStatus            = WCPOST()->setting_collection->getByName(WCPOST_Settings::SETTING_AUTOMATIC_ORDER_STATUS);
+
+        if ($statusAutomation && $changeStatusAtExportOrPrint === $momentOfStatusChange) {
+            $order->update_status(
+                $newStatus,
+                __("postnl_shipment_created", "woocommerce-postnl")
+            );
+
+            WCPN_Log::add("Status of order {$order->get_id()} updated to \"$newStatus\"");
+        }
+    }
+
+    /**
      * @param array              $orderIds
      * @param MyParcelCollection $collection
      *
@@ -186,14 +209,17 @@ class WCPN_API extends WCPN_Rest
     {
         foreach ($orderIds as $orderId) {
             $order           = WC_Core::get_order($orderId);
-            $lastShipmentIds = unserialize($order->get_meta('_postnl_last_shipment_ids'));
+            $lastShipmentIds = WCX_Order::get_meta($order, WCPOST_Admin::META_LAST_SHIPMENT_IDS);
 
-            if (is_bool($lastShipmentIds)) {
+            if (empty($lastShipmentIds)) {
                 continue;
             }
 
             $shipmentData = (new WCPN_Export())->getShipmentData($lastShipmentIds, $order);
             $trackTrace   = $shipmentData["track_trace"] ?? null;
+
+            $this->updateOrderStatus($order, WCPN_Settings_Data::CHANGE_STATUS_AFTER_PRINTING);
+
             ChannelEngine::updateMetaOnExport($order, $trackTrace);
         }
 

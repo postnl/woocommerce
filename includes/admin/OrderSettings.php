@@ -3,11 +3,16 @@
 declare(strict_types=1);
 
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
+use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
+use MyParcelNL\Sdk\src\Support\Arr;
 use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
 use WPO\WC\PostNL\Compatibility\Product as WCX_Product;
 
 class OrderSettings
 {
+    private const DEFAULT_COLLO_AMOUNT = 1;
+    private const FIRST_INSURANCE      = 1;
+
     /**
      * @var \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
      */
@@ -91,34 +96,45 @@ class OrderSettings
     /**
      * @var array
      */
-    private $extraOptionsMeta;
+    private $extraOptions;
 
     /**
-     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter $deliveryOptions
-     * @param WC_Order                                                                   $order
+     * @var string
+     */
+    private $shippingCountry;
+
+    /**
+     * @param WC_Order                                                                              $order
+     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter|array|null $deliveryOptions
      *
+     * @throws \JsonException
      * @throws \Exception
      */
     public function __construct(
-        AbstractDeliveryOptionsAdapter $deliveryOptions,
-        WC_Order $order
+        WC_Order $order,
+        $deliveryOptions = null
     ) {
-        $this->order           = $order;
-        $this->deliveryOptions = $deliveryOptions;
-        $this->carrier         = $deliveryOptions->getCarrier() ?? WCPN_Data::DEFAULT_CARRIER;
-        $this->shipmentOptions = $deliveryOptions->getShipmentOptions();
+        $this->order = $order;
 
-        $this->extraOptionsMeta = WCX_Order::get_meta($this->order, WCPOST_Admin::META_SHIPMENT_OPTIONS_EXTRA);
+        $this->setDeliveryOptions($deliveryOptions);
+        $this->carrier         = $this->deliveryOptions->getCarrier() ?? WCPN_Data::DEFAULT_CARRIER;
+        $this->shipmentOptions = $this->deliveryOptions->getShipmentOptions();
+        $this->shippingCountry = WCX_Order::get_prop($order, 'shipping_country');
+        $this->extraOptions    = WCX_Order::get_meta($order, WCPOST_Admin::META_SHIPMENT_OPTIONS_EXTRA);
 
         $this->setAllData();
     }
 
     /**
+     * @param bool $inGrams
+     *
      * @return float
      */
-    public function getWeight(): float
+    public function getWeight($inGrams = false): float
     {
-        return $this->weight;
+        return $inGrams
+            ? WCPN_Export::convertWeightToGrams($this->weight)
+            : $this->weight;
     }
 
     /**
@@ -219,6 +235,7 @@ class OrderSettings
         $this->setLabelDescription();
 
         $this->setAgeCheck();
+//        $this->setLargeFormat();
         $this->setOnlyRecipient();
         $this->setReturnShipment();
         $this->setSignature();
@@ -234,9 +251,13 @@ class OrderSettings
      */
     private function setWeight(): void
     {
-        $orderWeight = $this->order->get_meta(WCPOST_Admin::META_ORDER_WEIGHT);
+        $weight = $this->extraOptions['weight'] ?? null;
 
-        $this->weight = (float) $orderWeight;
+        if (null === $weight && $this->order->meta_exists(WCPOST_Admin::META_ORDER_WEIGHT)) {
+            $weight = $this->order->get_meta(WCPOST_Admin::META_ORDER_WEIGHT);
+        }
+
+        $this->weight = (float) $weight;
     }
 
     /**
@@ -262,14 +283,19 @@ class OrderSettings
         $hasAgeCheck = null;
 
         foreach ($this->order->get_items() as $item) {
-            $product         = $item->get_product();
+            $product = $item->get_product();
+
+            if (! $product) {
+                continue;
+            }
+
             $productAgeCheck = WCX_Product::get_meta($product, WCPOST_Admin::META_AGE_CHECK, true);
 
-            if ($productAgeCheck === 1) {
+            if ($productAgeCheck === WCPOST_Admin::PRODUCT_OPTIONS_ENABLED) {
                 return true;
             }
 
-            if ($productAgeCheck === 0) {
+            if ($productAgeCheck === WCPOST_Admin::PRODUCT_OPTIONS_DISABLED) {
                 $hasAgeCheck = false;
             }
         }
@@ -282,7 +308,7 @@ class OrderSettings
      */
     private function setColloAmount(): void
     {
-        $this->colloAmount = (int) ($this->extraOptionsMeta['collo_amount'] ?? 1);
+        $this->colloAmount = (int) ($this->extraOptions['collo_amount'] ?? self::DEFAULT_COLLO_AMOUNT);
     }
 
     /**
@@ -290,10 +316,23 @@ class OrderSettings
      */
     private function setDigitalStampRangeWeight(): void
     {
-        $orderWeight = $this->getWeight();
-        $metaWeight  = ((float) $this->extraOptionsMeta["weight"]) ?? null;
+        $savedWeight = $this->extraOptions["digital_stamp_weight"] ?? null;
+        $orderWeight = $this->getWeight(true);
+        $weight      = (float) ($savedWeight ?? $orderWeight);
+        $results     = Arr::where(
+            WCPN_Data::getDigitalStampRanges(),
+            static function ($range) use ($weight) {
+                return $weight > $range['min'];
+            }
+        );
 
-        $this->digitalStampRangeWeight = WCPN_Export::getDigitalStampRangeFromWeight($metaWeight ?? $orderWeight);
+        if (empty($results)) {
+            $digitalStampRangeWeight = Arr::first(WCPN_Data::getDigitalStampRanges())['average'];
+        } else {
+            $digitalStampRangeWeight = Arr::last($results)['average'];
+        }
+
+        $this->digitalStampRangeWeight = $digitalStampRangeWeight;
     }
 
     /**
@@ -306,19 +345,18 @@ class OrderSettings
         $isInsured       = false;
         $insuranceAmount = 0;
 
-        $isDefaultInsured                  = $this->getCarrierSetting(
-            WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED
-        );
-        $isDefaultInsuredFromPrice         = $this->getCarrierSetting(
-            WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FROM_PRICE
-        );
-        $orderTotalExceedsInsuredFromPrice = $this->order->get_total() >= $isDefaultInsuredFromPrice;
+        $isDefaultInsured                  = (bool) $this->getCarrierSetting(WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED);
+        $isDefaultInsuredFromPrice         = $this->getCarrierSetting(WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FROM_PRICE);
+        $orderTotalExceedsInsuredFromPrice = (float) $this->order->get_total() >= (float) $isDefaultInsuredFromPrice;
         $insuranceFromDeliveryOptions      = $this->shipmentOptions->getInsurance();
 
-        if ($insuranceFromDeliveryOptions) {
+        $carrier             = ConsignmentFactory::createByCarrierName($this->carrier);
+        $amountPossibilities = $carrier::INSURANCE_POSSIBILITIES_LOCAL;
+
+        if ($insuranceFromDeliveryOptions && $insuranceFromDeliveryOptions >= $amountPossibilities[self::FIRST_INSURANCE]) {
             $isInsured       = (bool) $insuranceFromDeliveryOptions;
             $insuranceAmount = $insuranceFromDeliveryOptions;
-        } elseif ($isDefaultInsured && $orderTotalExceedsInsuredFromPrice) {
+        } elseif ($isDefaultInsured && $orderTotalExceedsInsuredFromPrice && $insuranceFromDeliveryOptions !== 0) {
             $isInsured       = true;
             $insuranceAmount = $this->getCarrierSetting(WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT);
         }
@@ -342,11 +380,33 @@ class OrderSettings
     /**
      * @return void
      */
+    private function setLargeFormat(): void
+    {
+        $this->largeFormat = (bool) WCPN_Export::getChosenOrDefaultShipmentOption(
+            $this->shipmentOptions->hasLargeFormat(),
+            "{$this->carrier}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_LARGE_FORMAT
+        );
+    }
+
+    /**
+     * @return void
+     */
     private function setOnlyRecipient(): void
     {
         $this->onlyRecipient = (bool) WCPN_Export::getChosenOrDefaultShipmentOption(
             $this->shipmentOptions->hasOnlyRecipient(),
             "{$this->carrier}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_ONLY_RECIPIENT
+        );
+    }
+
+    /**
+     * @return void
+     */
+    private function setSignature(): void
+    {
+        $this->signature = (bool) WCPN_Export::getChosenOrDefaultShipmentOption(
+            $this->shipmentOptions->hasSignature(),
+            "{$this->carrier}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE
         );
     }
 
@@ -372,17 +432,6 @@ class OrderSettings
     }
 
     /**
-     * @return void
-     */
-    private function setSignature(): void
-    {
-        $this->signature = (bool) WCPN_Export::getChosenOrDefaultShipmentOption(
-            $this->shipmentOptions->hasSignature(),
-            "{$this->carrier}_" . WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_SIGNATURE
-        );
-    }
-
-    /**
      * @param string $settingName
      *
      * @return mixed
@@ -390,5 +439,44 @@ class OrderSettings
     private function getCarrierSetting(string $settingName)
     {
         return WCPOST()->setting_collection->getByName("{$this->carrier}_" . $settingName);
+    }
+
+    /**
+     * @return string
+     */
+    public function getShippingCountry(): string
+    {
+        return $this->shippingCountry;
+    }
+
+    /**
+     * @return \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
+     */
+    public function getDeliveryOptions(): AbstractDeliveryOptionsAdapter
+    {
+        return $this->deliveryOptions;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExtraOptions(): array
+    {
+        return $this->extraOptions;
+    }
+
+    /**
+     * @param \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter|array|null
+
+     *
+     * @throws \Exception
+     */
+    private function setDeliveryOptions($deliveryOptions = null): void
+    {
+        if (is_a($deliveryOptions, AbstractDeliveryOptionsAdapter::class)) {
+            $this->deliveryOptions = $deliveryOptions;
+        } else {
+            $this->deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($this->order, (array) $deliveryOptions);
+        }
     }
 }

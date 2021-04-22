@@ -21,14 +21,14 @@ class WCPN_Frontend
     {
         new WCPN_Frontend_Track_Trace();
 
-        // Shipment information in confirmation mail
-        add_action("woocommerce_email_customer_details", [$this, "confirmationEmail"], 19, 3);
+		// Shipment information in confirmation mail
+	    add_action("woocommerce_email_customer_details", [$this, "confirmationEmail"], 19, 3);
 
-        // Shipment information in my account
-        add_action('woocommerce_view_order', [$this, "confirmationOrderReceived"]);
+	    // Shipment information in my account
+	    add_action('woocommerce_view_order', [$this, "confirmationOrderReceived"]);
 
-        // Shipment information on the thank you page
-        add_action("woocommerce_thankyou", [$this, "confirmationOrderReceived"], 10, 1);
+	    // Shipment information on the thank you page
+	    add_action("woocommerce_thankyou", [$this, "confirmationOrderReceived"], 10, 1);
         add_filter("wpo_wcpdf_templates_replace_postnl_delivery_options", [$this, "wpo_wcpdf_delivery_options"], 10, 2);
 
         // Initialize delivery options fees
@@ -50,7 +50,7 @@ class WCPN_Frontend
      */
     public function confirmationEmail(WC_Order $order): void
     {
-        WCPOST()->admin->showShipmentConfirmation($order, true);
+	    WCPOST()->admin->showShipmentConfirmation($order, true);
     }
 
     /**
@@ -65,7 +65,7 @@ class WCPN_Frontend
     }
 
     /**
-     * @param string $replacement
+     * @param string   $replacement
      * @param WC_Order $order
      *
      * @return string
@@ -74,13 +74,13 @@ class WCPN_Frontend
     public function wpo_wcpdf_delivery_options(string $replacement, WC_Order $order): string
     {
         ob_start();
-        WCPOST()->admin->showDeliveryDateForOrder($order);
+        WCPOST()->admin->showShipmentConfirmation($order, false);
 
         return ob_get_clean();
     }
 
     /**
-     * @param string $replacement
+     * @param string   $replacement
      * @param WC_Order $order
      *
      * @return string

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 
 if (! defined('ABSPATH')) {
@@ -12,7 +14,7 @@ if (! defined('ABSPATH')) {
  */
 
 /** @noinspection PhpUnhandledExceptionInspection */
-$deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
+$orderSettings = new OrderSettings($order);
 
 ?>
 <table class="wcpn__settings-table" style="width: auto">
@@ -20,8 +22,8 @@ $deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
         <td>
             <?php _e("Shipment type", "woocommerce-postnl") ?>:<br/> <small class="calculated_weight">
                 <?php printf(
-                    __("Calculated weight: %s", "woocommerce-postnl"),
-                    wc_format_weight($order->get_meta(WCPOST_Admin::META_ORDER_WEIGHT))
+                    __("calculated_order_weight", "woocommerce-postnl"),
+                    wc_format_weight($orderSettings->getWeight())
                 ) ?>
             </small>
         </td>
@@ -56,7 +58,7 @@ $deliveryOptions = WCPOST_Admin::getDeliveryOptionsFromOrder($order);
 <?php if (! isset($skip_save)): ?>
     <div class="wcpn__d--flex">
         <a class="button save" data-order="<?php echo $order_id; ?>"><?php _e("Save", "woocommerce-postnl") ?>
-            <?php WCPOST_Admin::renderSpinner() ?>
+            <?php WCMYPA_Admin::renderSpinner() ?>
         </a>
     </div>
 <?php endif ?>

@@ -221,14 +221,12 @@ class WCPN_Cart_Fees
      */
     private function getFeeTitles(): array
     {
-        $carrierName = WCPN_Data::getCarriersHuman()[$this->deliveryOptions->getCarrier()];
-
         return [
-            "delivery_evening" => __("Evening delivery", "woocommerce-postnl"),
-            "delivery_morning" => __("Morning delivery", "woocommerce-postnl"),
-            "delivery_pickup"  => __("Pick up at", "woocommerce-postnl") . " $carrierName",
-            "only_recipient"   => __("Only recipient", "woocommerce-postnl"),
-            "signature"        => __("Signature on delivery", "woocommerce-postnl"),
+            "delivery_evening" => WCPN_Checkout::getDeliveryOptionsTitle(WCPOST_Settings::SETTING_EVENING_DELIVERY_TITLE),
+            "delivery_morning" => WCPN_Checkout::getDeliveryOptionsTitle(WCPOST_Settings::SETTING_MORNING_DELIVERY_TITLE),
+            "delivery_pickup"  => WCPN_Checkout::getDeliveryOptionsTitle(WCPOST_Settings::SETTING_PICKUP_TITLE),
+            "only_recipient"   => WCPN_Checkout::getDeliveryOptionsTitle(WCPOST_Settings::SETTING_ONLY_RECIPIENT_TITLE),
+            "signature"        => WCPN_Checkout::getDeliveryOptionsTitle(WCPOST_Settings::SETTING_SIGNATURE_TITLE),
         ];
     }
 

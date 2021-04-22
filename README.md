@@ -16,7 +16,7 @@ This WooCommerce extension allows you to export your orders to PostNL. Single or
 - Export your WooCommerce orders to PostNL with a simple click, single orders or in batch
 - Print shipping labels directly (PDF)
 - Create multiple shipments for the same order
-- Choose your package type (Parcel, digital stamp, mailbox package)
+- Choose your package type (Parcel, mailbox package)
 - Define default PostNL shipping options (signature, only recipient, insurance, etc.)
 - Modify the PostNL shipping options per order before exporting
 - Optional separate street name and house number in checkout for more precise address data
