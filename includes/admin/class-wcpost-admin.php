@@ -467,12 +467,12 @@ class WCPOST_Admin
         $listing_actions = [
             $addShipments => [
                 "url" => admin_url("$baseUrl&request=$addShipments&order_ids=$order_id"),
-                "img" => WCPOST()->plugin_url() . "/assets/img/postnl-export.svg",
+                "img" => WCPOST()->plugin_url() . "/assets/img/postnl-export.png",
                 "alt" => __("Export to PostNL", "woocommerce-postnl"),
             ],
             $getLabels    => [
                 "url" => admin_url("$baseUrl&request=$getLabels&order_ids=$order_id"),
-                "img" => WCPOST()->plugin_url() . "/assets/img/postnl-print.svg",
+                "img" => WCPOST()->plugin_url() . "/assets/img/postnl-print.png",
                 "alt" => __("Print PostNL label", "woocommerce-postnl"),
             ],
 //            $addReturn    => [
