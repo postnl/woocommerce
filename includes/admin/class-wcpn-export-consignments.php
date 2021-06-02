@@ -330,7 +330,7 @@ class WCPN_Export_Consignments
             ->setStreetAdditionalInfo($recipient['street_additional_info'] ?? null)
             ->setPostalCode($recipient['postal_code'])
             ->setCity($recipient['city'])
-//            ->setEmail($recipient['email'])
+            ->setEmail($recipient['email'])
             ->setPhone($recipient['phone'])
             ->setSaveRecipientAddress(false);
     }
