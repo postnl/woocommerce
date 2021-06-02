@@ -90,6 +90,9 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 == Changelog ==
 
+= 4.3.3 (2021-06-02) =
+* Fix: email for printing evening delivery
+
 = 4.3.2 (2021-03-30) =
 * Improvement: wpm-config.json included (support WP-Multilang plugin)
 * Improvement: add translation files fr_FR

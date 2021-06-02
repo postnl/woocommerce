@@ -135,103 +135,103 @@ msgstr ""
 msgid "No e-mail address found in order."
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1002
+#: includes/admin/class-wcpn-export.php:1003
 msgid "Unknown"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1065, includes/admin/views/html-send-return-email-form.php:55
+#: includes/admin/class-wcpn-export.php:1066, includes/admin/views/html-send-return-email-form.php:55
 msgid "Order"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1089
+#: includes/admin/class-wcpn-export.php:1090
 msgid "pending - concept"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1090
+#: includes/admin/class-wcpn-export.php:1091
 msgid "pending - registered"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1091
+#: includes/admin/class-wcpn-export.php:1092
 msgid "enroute - handed to carrier"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1092
+#: includes/admin/class-wcpn-export.php:1093
 msgid "enroute - sorting"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1093
+#: includes/admin/class-wcpn-export.php:1094
 msgid "enroute - distribution"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1094
+#: includes/admin/class-wcpn-export.php:1095
 msgid "enroute - customs"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1095
+#: includes/admin/class-wcpn-export.php:1096
 msgid "delivered - at recipient"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1096
+#: includes/admin/class-wcpn-export.php:1097
 msgid "delivered - ready for pickup"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1097
+#: includes/admin/class-wcpn-export.php:1098
 msgid "delivered - package picked up"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1098
+#: includes/admin/class-wcpn-export.php:1099
 msgid "printed - letter"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1099
+#: includes/admin/class-wcpn-export.php:1100
 msgid "printed - digital stamp"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1100
+#: includes/admin/class-wcpn-export.php:1101
 msgid "inactive - concept"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1101
+#: includes/admin/class-wcpn-export.php:1102
 msgid "inactive - registered"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1102
+#: includes/admin/class-wcpn-export.php:1103
 msgid "inactive - enroute - handed to carrier"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1103
+#: includes/admin/class-wcpn-export.php:1104
 msgid "inactive - enroute - sorting"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1104
+#: includes/admin/class-wcpn-export.php:1105
 msgid "inactive - enroute - distribution"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1105
+#: includes/admin/class-wcpn-export.php:1106
 msgid "inactive - enroute - customs"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1106
+#: includes/admin/class-wcpn-export.php:1107
 msgid "inactive - delivered - at recipient"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1107
+#: includes/admin/class-wcpn-export.php:1108
 msgid "inactive - delivered - ready for pickup"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1108
+#: includes/admin/class-wcpn-export.php:1109
 msgid "inactive - delivered - package picked up"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1109
+#: includes/admin/class-wcpn-export.php:1110
 msgid "inactive - unknown"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1115
+#: includes/admin/class-wcpn-export.php:1116
 msgid "Unknown status"
 msgstr ""
 
-#: includes/admin/class-wcpn-export.php:1562
+#: includes/admin/class-wcpn-export.php:1563
 msgid "The order(s) you have selected have invalid shipping countries."
 msgstr ""
 
