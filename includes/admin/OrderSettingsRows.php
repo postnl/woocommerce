@@ -81,6 +81,7 @@ class OrderSettingsRows
         $orderSettings      = new OrderSettings($order, $deliveryOptions);
         $shippingCountry    = $orderSettings->getShippingCountry();
         $isEuCountry        = WCPN_Country_Codes::isEuCountry($shippingCountry);
+        $isBelgium          = AbstractConsignment::CC_BE === $shippingCountry;
         $isHomeCountry      = WCPN_Data::isHomeCountry($shippingCountry);
         $packageTypeOptions = array_combine(WCPN_Data::getPackageTypes(), WCPN_Data::getPackageTypesHuman());
 
@@ -128,6 +129,25 @@ class OrderSettingsRows
         // Only add extra options and shipment options to home country shipments.
         if ($isHomeCountry) {
             $rows = array_merge($rows, self::getAdditionalOptionsRows($orderSettings));
+        }
+
+        if ($isBelgium) {
+            $rows[] = [
+                "name"      => self::OPTION_SHIPMENT_OPTIONS_INSURED,
+                "type"      => "toggle",
+                "label"     => __("insured", "woocommerce-postnl"),
+                "value"     => $orderSettings->isInsured(),
+                "condition" => [
+                    self::CONDITION_PACKAGE_TYPE_PACKAGE,
+                    self::CONDITION_DELIVERY_TYPE_DELIVERY,
+                    [
+                        "parent_name"  => self::OPTION_CARRIER,
+                        "type"         => "disable",
+                        "parent_value" => WCPN_Data::DEFAULT_CARRIER,
+                        "set_value"    => WCPN_Settings_Data::DISABLED,
+                    ],
+                ],
+            ];
         }
 
 //        if ($isEuCountry) {
