@@ -11,9 +11,9 @@ use WPO\WC\PostNL\Compatibility\Product as WCX_Product;
 
 class OrderSettings
 {
-    private const DEFAULT_COLLO_AMOUNT = 1;
-    private const FIRST_INSURANCE      = 1;
-    public const DEFAULT_BELGIAN_INSURANCE = 500;
+    private const DEFAULT_COLLO_AMOUNT      = 1;
+    private const FIRST_INSURANCE           = 1;
+    public const  DEFAULT_BELGIAN_INSURANCE = 500;
 
     /**
      * @var \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
@@ -366,7 +366,7 @@ class OrderSettings
         }
 
         if ($isDefaultInsured && $isBelgium) {
-            $isInsured = $isDefaultInsuredForBE;
+            $isInsured       = $isDefaultInsuredForBE;
             $insuranceAmount = $isDefaultInsuredForBE ? self::DEFAULT_BELGIAN_INSURANCE : 0;
         }
 

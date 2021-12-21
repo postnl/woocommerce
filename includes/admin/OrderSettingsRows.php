@@ -133,18 +133,18 @@ class OrderSettingsRows
 
         if ($isBelgium) {
             $rows[] = [
-                "name"      => self::OPTION_SHIPMENT_OPTIONS_INSURED,
-                "type"      => "toggle",
-                "label"     => __("insured", "woocommerce-postnl"),
-                "value"     => $orderSettings->isInsured(),
-                "condition" => [
+                'name'      => self::OPTION_SHIPMENT_OPTIONS_INSURED,
+                'type'      => 'toggle',
+                'label'     => __('insured', 'woocommerce-postnl'),
+                'value'     => $orderSettings->isInsured(),
+                'condition' => [
                     self::CONDITION_PACKAGE_TYPE_PACKAGE,
                     self::CONDITION_DELIVERY_TYPE_DELIVERY,
                     [
-                        "parent_name"  => self::OPTION_CARRIER,
-                        "type"         => "disable",
-                        "parent_value" => WCPN_Data::DEFAULT_CARRIER,
-                        "set_value"    => WCPN_Settings_Data::DISABLED,
+                        'parent_name'  => self::OPTION_CARRIER,
+                        'type'         => 'disable',
+                        'parent_value' => WCPN_Data::DEFAULT_CARRIER,
+                        'set_value'    => WCPN_Settings_Data::DISABLED,
                     ],
                 ],
             ];
