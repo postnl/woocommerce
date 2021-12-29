@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 use MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter;
 use MyParcelNL\Sdk\src\Factory\ConsignmentFactory;
+use MyParcelNL\Sdk\src\Model\Consignment\AbstractConsignment;
 use MyParcelNL\Sdk\src\Support\Arr;
 use WPO\WC\PostNL\Compatibility\Order as WCX_Order;
 use WPO\WC\PostNL\Compatibility\Product as WCX_Product;
 
 class OrderSettings
 {
-    private const DEFAULT_COLLO_AMOUNT = 1;
-    private const FIRST_INSURANCE      = 1;
+    private const DEFAULT_COLLO_AMOUNT      = 1;
+    private const FIRST_INSURANCE           = 1;
+    public const  DEFAULT_BELGIAN_INSURANCE = 500;
 
     /**
      * @var \MyParcelNL\Sdk\src\Adapter\DeliveryOptions\AbstractDeliveryOptionsAdapter
@@ -347,8 +349,10 @@ class OrderSettings
 
         $isDefaultInsured                  = (bool) $this->getCarrierSetting(WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED);
         $isDefaultInsuredFromPrice         = $this->getCarrierSetting(WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FROM_PRICE);
+        $isDefaultInsuredForBE             = (bool) $this->getCarrierSetting(WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FOR_BE);
         $orderTotalExceedsInsuredFromPrice = (float) $this->order->get_total() >= (float) $isDefaultInsuredFromPrice;
         $insuranceFromDeliveryOptions      = $this->shipmentOptions->getInsurance();
+        $isBelgium                         = AbstractConsignment::CC_BE === $this->getShippingCountry();
 
         $carrier             = ConsignmentFactory::createByCarrierName($this->carrier);
         $amountPossibilities = $carrier::INSURANCE_POSSIBILITIES_LOCAL;
@@ -356,6 +360,9 @@ class OrderSettings
         if ($insuranceFromDeliveryOptions && $insuranceFromDeliveryOptions >= $amountPossibilities[self::FIRST_INSURANCE]) {
             $isInsured       = (bool) $insuranceFromDeliveryOptions;
             $insuranceAmount = $insuranceFromDeliveryOptions;
+        } elseif ($isDefaultInsured && $isBelgium) {
+            $isInsured       = $insuranceFromDeliveryOptions === 0 ? false : $isDefaultInsuredForBE;
+            $insuranceAmount = $isInsured ? self::DEFAULT_BELGIAN_INSURANCE : 0;
         } elseif ($isDefaultInsured && $orderTotalExceedsInsuredFromPrice && $insuranceFromDeliveryOptions !== 0) {
             $isInsured       = true;
             $insuranceAmount = $this->getCarrierSetting(WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT);

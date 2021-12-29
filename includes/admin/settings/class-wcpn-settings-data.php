@@ -480,6 +480,14 @@ class WCPN_Settings_Data
                 "type"      => "select",
                 "options"   => WCPN_Data::getInsuranceAmounts(),
             ],
+            [
+                'name'      => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_FOR_BE,
+                'condition' => WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED,
+                'label'     => __('shipment_options_insured_for_be', 'woocommerce-postnl'),
+                'default'   => self::ENABLED,
+                'help_text' => __('shipment_options_insured_for_be_help_text', 'woocommerce-postnl'),
+                'type'      => 'toggle',
+            ]
         ];
     }
 

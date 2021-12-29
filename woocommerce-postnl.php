@@ -186,6 +186,14 @@ if (! class_exists('WCPOST')) :
             // php 7.1
             $this->includes();
             $this->initSettings();
+
+            // Show message concerning insurances for shipments to Belgium
+            if ('/wp-admin/plugins.php' === $_SERVER['REQUEST_URI']) {
+                printf(
+                    '<div class="notice myparcel-dismiss-notice notice-warning is-dismissible"><p>%s</p></div>',
+                    __('message_insurance_belgium_2022', 'woocommerce-postnl')
+                );
+            }
         }
 
         /**

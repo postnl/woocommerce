@@ -1224,15 +1224,18 @@ class WCPOST_Admin
         $data['package_type'] = $data['package_type'] ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
         $isHomeCountry        = WCPN_Data::isHomeCountry($country);
         $isEuCountry          = WCPN_Country_Codes::isEuCountry($country);
-
-        $isPackage      = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME === $data['package_type'];
-        $isDigitalStamp = AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME === $data['package_type'];
+        $isBelgium            = AbstractConsignment::CC_BE === $country;
+        $isPackage            = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME === $data['package_type'];
+        $isDigitalStamp       = AbstractConsignment::PACKAGE_TYPE_DIGITAL_STAMP_NAME === $data['package_type'];
 
         if (! $isHomeCountry || ! $isPackage) {
             $data['shipment_options']['age_check']       = false;
             $data['shipment_options']['return_shipment'] = false;
-            $data['shipment_options']['insured']         = false;
-            $data['shipment_options']['insured_amount']  = 0;
+
+            if (! $isBelgium || ! $isPackage) {
+                $data['shipment_options']['insured']        = false;
+                $data['shipment_options']['insured_amount'] = 0;
+            }
         }
 
         if (! $isPackage || (! $isHomeCountry && ! $isEuCountry)) {

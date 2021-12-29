@@ -32,6 +32,24 @@ msgstr "Calculated weight: %s"
 msgid "delivery_type"
 msgstr "Delivery type:"
 
+msgid "error_woocommerce_not_activated"
+msgstr "%s requires WooCommerce be activated!"
+
+msgid "error_woocommerce_not_installed"
+msgstr "%s requires WooCommerce be installed"
+
+msgid "error_woocommerce_minimum_version"
+msgstr "%s requires a minimum WooCommerce {woocommerce_version} version!"
+
+msgid "error_button_install_woocommerce"
+msgstr "Install WooCommerce"
+
+msgid "error_button_woocommerce_activate"
+msgstr "Activate WooCommerce"
+
+msgid "error_button_turn_off_postnl_plugin"
+msgstr "Turn off PostNL plugin"
+
 msgid "extra_options"
 msgstr "Extra options:"
 
@@ -92,6 +110,14 @@ msgstr "Max insured amount"
 
 msgid "shipment_options_insured_amount_help_text"
 msgstr "Insure all parcels up to the selected amount."
+
+msgid "shipment_options_insured_for_be"
+msgstr "Insured shipment to Belgium"
+
+msgid "shipment_options_insured_for_be_help_text"
+msgstr ""
+"You can insure a shipment to Belgium for a maximum of €500 of the purchase "
+"value."
 
 msgid "shipment_options_insured_from_price"
 msgstr "Insure from price"
