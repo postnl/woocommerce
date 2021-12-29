@@ -360,14 +360,12 @@ class OrderSettings
         if ($insuranceFromDeliveryOptions && $insuranceFromDeliveryOptions >= $amountPossibilities[self::FIRST_INSURANCE]) {
             $isInsured       = (bool) $insuranceFromDeliveryOptions;
             $insuranceAmount = $insuranceFromDeliveryOptions;
+        } elseif ($isDefaultInsured && $isBelgium) {
+            $isInsured       = $insuranceFromDeliveryOptions === 0 ? false : $isDefaultInsuredForBE;
+            $insuranceAmount = $isInsured ? self::DEFAULT_BELGIAN_INSURANCE : 0;
         } elseif ($isDefaultInsured && $orderTotalExceedsInsuredFromPrice && $insuranceFromDeliveryOptions !== 0) {
             $isInsured       = true;
             $insuranceAmount = $this->getCarrierSetting(WCPOST_Settings::SETTING_CARRIER_DEFAULT_EXPORT_INSURED_AMOUNT);
-        }
-
-        if ($isDefaultInsured && $isBelgium) {
-            $isInsured       = $isDefaultInsuredForBE;
-            $insuranceAmount = $isDefaultInsuredForBE ? self::DEFAULT_BELGIAN_INSURANCE : 0;
         }
 
         $this->insured         = $isInsured;

@@ -1232,7 +1232,7 @@ class WCPOST_Admin
             $data['shipment_options']['age_check']       = false;
             $data['shipment_options']['return_shipment'] = false;
 
-            if (! $isBelgium) {
+            if (! $isBelgium || ! $isPackage) {
                 $data['shipment_options']['insured']        = false;
                 $data['shipment_options']['insured_amount'] = 0;
             }
