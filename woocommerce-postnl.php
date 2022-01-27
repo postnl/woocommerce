@@ -187,8 +187,13 @@ if (! class_exists('WCPOST')) :
             $this->includes();
             $this->initSettings();
 
+            add_action('admin_notices', [$this, 'insuranceBelgium2022Notice']);
+        }
+
+        public function insuranceBelgium2022Notice(): void
+        {
             // Show message concerning insurances for shipments to Belgium
-            if ('/wp-admin/plugins.php' === $_SERVER['REQUEST_URI']) {
+            if (false !== strpos($_SERVER['REQUEST_URI'], '/wp-admin/plugins.php')) {
                 printf(
                     '<div class="notice myparcel-dismiss-notice notice-warning is-dismissible"><p>%s</p></div>',
                     __('message_insurance_belgium_2022', 'woocommerce-postnl')
