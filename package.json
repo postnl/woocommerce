@@ -1,7 +1,7 @@
 {
   "name": "@postnl/woocommerce",
   "private": true,
-  "version": "4.4.1",
+  "version": "4.4.2",
   "description": "Welcome to the WooCommerce PostNL repository on GitHub. Here you can browse the source, look at open issues and keep track of development.",
   "scripts": {
     "build": "gulp",
