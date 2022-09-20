@@ -2,8 +2,7 @@
 assets
 node_modules
 vendor
+languages
 
 *.zip
 .DS_Store
-languages/*-backup-*
-languages/*.mo

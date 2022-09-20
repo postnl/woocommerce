@@ -5,7 +5,7 @@ const clean = require('gulp-clean');
 const gulp = require('gulp');
 const gulpPoSync = require('gulp-po-sync');
 const postcss = require('gulp-postcss');
-const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('sass'));
 const sourcemaps = require('gulp-sourcemaps');
 const tap = require('gulp-tap');
 const uglify = require('gulp-uglify');
@@ -119,8 +119,8 @@ gulp.task('translations:pot', () => gulp.src(PHP_FILES, {read: false})
 /**
  * Download translations as csv and convert them to .po files.
  */
-gulp.task('translations:import', (callback) => {
-  downloadTranslations();
+gulp.task('translations:import', async(callback) => {
+  await downloadTranslations();
   callback();
 });
 
@@ -151,10 +151,6 @@ gulp.task('update:composer', (callback) => {
   exec('composer update', (...params) => execCallback(callback, ...params));
 });
 
-gulp.task('update:npm', (callback) => {
-  exec('npm update @myparcel/delivery-options', (...params) => execCallback(callback, ...params));
-});
-
 /**
  * The default task.
  */
@@ -168,7 +164,6 @@ const build = gulp.series(
     'translations:pot',
     'update:composer',
     gulp.series(
-      'update:npm',
       'copy:delivery-options',
     ),
   ),
@@ -184,7 +179,6 @@ const watch = () => {
   gulp.watch(['node_modules/@myparcel/delivery-options/**/*'], null, gulp.series('copy:delivery-options'));
   gulp.watch(['src/scss/**/*'], null, gulp.series('build:scss'));
   gulp.watch(['composer.json'], null, gulp.series('update:composer'));
-  gulp.watch(['package.json'], null, gulp.series('update:npm'));
 };
 
 gulp.task('watch', gulp.series(

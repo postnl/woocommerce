@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: WooCommerce PostNL
+Plugin Name: PostNL WooCommerce
 Plugin URI: https://postnl.nl/
 Description: Export your WooCommerce orders to PostNL (https://postnl.nl/) and print labels directly from the WooCommerce admin
 Author: PostNL
 Author URI: https://postnl.nl
-Version: 4.4.1
+Version: 4.4.2
 Text Domain: woocommerce-postnl
 
 License: GPLv3 or later
@@ -28,7 +28,7 @@ if (! class_exists('WCPOST')) :
         const PHP_VERSION_7_1      = '7.1';
         const PHP_VERSION_REQUIRED = self::PHP_VERSION_7_1;
 
-        public $version = '4.4.1';
+        public $version = '4.4.2';
 
         public $plugin_basename;
 
@@ -223,7 +223,7 @@ if (! class_exists('WCPOST')) :
         public function need_woocommerce()
         {
             $error = sprintf(
-                __("WooCommerce PostNL requires %sWooCommerce%s to be installed & activated!",
+                __("PostNL WooCommerce requires %sWooCommerce%s to be installed & activated!",
                     "woocommerce-postnl"
                 ),
                 '<a href="http://wordpress.org/extend/plugins/woocommerce/">',
@@ -241,7 +241,7 @@ if (! class_exists('WCPOST')) :
 
         public function required_php_version()
         {
-            $error = __("WooCommerce PostNL requires PHP {PHP_VERSION} or higher.", "woocommerce-postnl");
+            $error = __("PostNL WooCommerce requires PHP {PHP_VERSION} or higher.", "woocommerce-postnl");
             $error = str_replace('{PHP_VERSION}', self::PHP_VERSION_REQUIRED, $error);
 
             $how_to_update = __("How to update your PHP version", "woocommerce-postnl");

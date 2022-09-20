@@ -145,7 +145,7 @@ class WCPOST_Settings
         // Create the admin settings
         require_once("class-wcpn-settings-data.php");
 
-        // notice for WooCommerce PostNL plugin
+        // notice for PostNL WooCommerce plugin
         add_action("woocommerce_postnl_before_settings_page", [$this, "postnl_country_notice"], 10, 1);
     }
 
@@ -200,7 +200,7 @@ class WCPOST_Settings
         $active_tab = isset($_GET["tab"]) ? $_GET["tab"] : self::SETTINGS_GENERAL;
         ?>
         <div class="wrap woocommerce">
-            <h1><?php _e("WooCommerce PostNL Settings", "woocommerce-postnl"); ?></h1>
+            <h1><?php _e("PostNL WooCommerce Settings", "woocommerce-postnl"); ?></h1>
             <h2 class="nav-tab-wrapper">
                 <?php
                 foreach ($settings_tabs as $tab_slug => $tab_title) :

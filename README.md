@@ -1,5 +1,5 @@
-# WooCommerce PostNL
-Welcome to the WooCommerce PostNL repository on GitHub. Here you can browse the source, look at open issues and keep track of development.
+# PostNL WooCommerce
+Welcome to the PostNL WooCommerce repository on GitHub. Here you can browse the source, look at open issues and keep track of development.
 
 This WooCommerce extension allows you to export your orders to PostNL. Single orders exports as well as batch exports are possible.
 
