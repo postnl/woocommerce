@@ -948,6 +948,10 @@ class WCPN_Export
      */
     public static function getPackageTypeFromShippingMethod($shippingMethod, $shippingClass): string
     {
+        if (null === $shippingMethod) {
+            return AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
+        }
+
         $packageType           = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME;
         $shippingMethodIdClass = $shippingMethod;
 
