@@ -22,15 +22,15 @@ $orderSettings = new OrderSettings($order);
         <td>
             <?php _e("Shipment type", "woocommerce-postnl") ?>:<br/> <small class="calculated_weight">
                 <?php printf(
-                    __("calculated_order_weight", "woocommerce-postnl"),
-                    wc_format_weight($orderSettings->getWeight())
+                    esc_html__("calculated_order_weight", "woocommerce-postnl"),
+                    esc_html(wc_format_weight($orderSettings->getWeight()))
                 ) ?>
             </small>
         </td>
         <td>
             <?php
             $name = "postnl_options[{$order_id}][package_type]";
-            printf('<select name="%s" class="package_type">', $name);
+            printf('<select name="%s" class="package_type">', esc_attr($name));
             foreach (WCPN_Data::getPackageTypesHuman() as $key => $label) {
                 $isReturnPackageType = in_array(
                     $key,
@@ -46,8 +46,8 @@ $orderSettings = new OrderSettings($order);
 
                 printf(
                     '<option value="%s">%s</option>',
-                    WCPN_Data::getPackageTypeId($key),
-                    $label
+                    esc_attr(WCPN_Data::getPackageTypeId($key)),
+                    esc_html($label)
                 );
             }
             echo '</select>';
@@ -57,7 +57,7 @@ $orderSettings = new OrderSettings($order);
 </table><br>
 <?php if (! isset($skip_save)): ?>
     <div class="wcpn__d--flex">
-        <a class="button save" data-order="<?php echo $order_id; ?>"><?php _e("Save", "woocommerce-postnl") ?>
+        <a class="button save" data-order="<?php echo esc_html($order_id); ?>"><?php esc_html_e("Save", "woocommerce-postnl") ?>
             <?php WCMYPA_Admin::renderSpinner() ?>
         </a>
     </div>

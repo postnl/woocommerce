@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: PostNL WooCommerce
+Plugin Name: PostNL for WooCommerce
 Plugin URI: https://postnl.nl/
 Description: Export your WooCommerce orders to PostNL (https://postnl.nl/) and print labels directly from the WooCommerce admin
 Author: PostNL
 Author URI: https://postnl.nl
-Version: 4.4.2
+Version: 4.4.3
 Text Domain: woocommerce-postnl
 
 License: GPLv3 or later
@@ -15,7 +15,6 @@ License URI: http://www.opensource.org/licenses/gpl-license.php
 if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
-
 if (! class_exists('WCPOST')) :
 
     class WCPOST
@@ -28,7 +27,7 @@ if (! class_exists('WCPOST')) :
         const PHP_VERSION_7_1      = '7.1';
         const PHP_VERSION_REQUIRED = self::PHP_VERSION_7_1;
 
-        public $version = '4.4.2';
+        public $version = '4.4.3';
 
         public $plugin_basename;
 
@@ -196,7 +195,7 @@ if (! class_exists('WCPOST')) :
             if (false !== strpos($_SERVER['REQUEST_URI'], '/wp-admin/plugins.php')) {
                 printf(
                     '<div class="notice myparcel-dismiss-notice notice-warning is-dismissible"><p>%s</p></div>',
-                    __('message_insurance_belgium_2022', 'woocommerce-postnl')
+                    esc_html__('message_insurance_belgium_2022', 'woocommerce-postnl')
                 );
             }
         }
@@ -223,7 +222,7 @@ if (! class_exists('WCPOST')) :
         public function need_woocommerce()
         {
             $error = sprintf(
-                __("PostNL WooCommerce requires %sWooCommerce%s to be installed & activated!",
+                __("PostNL for WooCommerce requires %sWooCommerce%s to be installed & activated!",
                     "woocommerce-postnl"
                 ),
                 '<a href="http://wordpress.org/extend/plugins/woocommerce/">',
@@ -232,7 +231,7 @@ if (! class_exists('WCPOST')) :
 
             $message = '<div class="error"><p>' . $error . '</p></div>';
 
-            echo $message;
+            echo wp_kses_post($message);
         }
 
         /**
@@ -241,7 +240,7 @@ if (! class_exists('WCPOST')) :
 
         public function required_php_version()
         {
-            $error = __("PostNL WooCommerce requires PHP {PHP_VERSION} or higher.", "woocommerce-postnl");
+            $error = __("PostNL for WooCommerce requires PHP {PHP_VERSION} or higher.", "woocommerce-postnl");
             $error = str_replace('{PHP_VERSION}', self::PHP_VERSION_REQUIRED, $error);
 
             $how_to_update = __("How to update your PHP version", "woocommerce-postnl");
@@ -252,7 +251,7 @@ if (! class_exists('WCPOST')) :
                 $how_to_update
             );
 
-            echo $message;
+            echo wp_kses_post($message);
         }
 
         /** Lifecycle methods *******************************************************

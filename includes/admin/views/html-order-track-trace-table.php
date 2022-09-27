@@ -19,7 +19,7 @@ try {
 }
 
 if (isset($message)) {
-    echo "<p>$message</p>";
+    echo '<p>', wp_kses_post($message), '</p>';
 }
 
 /**

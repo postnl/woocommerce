@@ -23,7 +23,7 @@ $target_url = wp_nonce_url(
 
 ?>
     <form
-        method="post" class="page-form wcpn__bulk-options wcpn__return-dialog" action="<?php echo $target_url; ?>">
+        method="post" class="page-form wcpn__bulk-options wcpn__return-dialog" action="<?php echo esc_attr($target_url); ?>">
         <table style="width: 100%">
             <tbody>
             <?php
@@ -52,8 +52,8 @@ $target_url = wp_nonce_url(
                                     <strong>
                                         <?php echo sprintf(
                                             "%s %s",
-                                            __("Order", "woocommerce-postnl"),
-                                            $order->get_order_number()
+                                            esc_html__("Order", "woocommerce-postnl"),
+                                            esc_html($order->get_order_number())
                                         ); ?>
                                     </strong>
                                 </td>
@@ -71,17 +71,17 @@ $target_url = wp_nonce_url(
                                         <tbody>
                                         <?php foreach ($order->get_items() as $item_id => $item) : ?>
                                             <tr>
-                                                <td><?php echo $item['qty'] . 'x'; ?></td>
-                                                <td><?php echo WCPN_Export::get_item_display_name($item, $order) ?></td>
+                                                <td><?php echo esc_html($item['qty']) . 'x'; ?></td>
+                                                <td><?php echo esc_html(WCPN_Export::get_item_display_name($item, $order)) ?></td>
                                                 <td class="wcpn__text--right">
                                                     <?php
 
                                                     $weight = $item->get_product()->weight;
 
                                                     if ($weight) {
-                                                        echo wc_format_weight($weight * $item['qty']);
+                                                        echo esc_html(wc_format_weight($weight * $item['qty']));
                                                     } else {
-                                                        echo esc_html__('N/A', 'woocommerce');
+                                                        esc_html_e('N/A', 'woocommerce');
                                                     }
                                                     ?>
                                                 </td>
@@ -97,9 +97,9 @@ $target_url = wp_nonce_url(
                                                 $weight = $orderSettings->getWeight();
 
                                                 if ($weight) {
-                                                    echo wc_format_weight($weight);
+                                                    echo esc_html(wc_format_weight($weight));
                                                 } else {
-                                                    echo esc_html__('N/A', 'woocommerce');
+                                                    esc_html_e('N/A', 'woocommerce');
                                                 }
                                                 ?>
                                             </th>
@@ -123,10 +123,10 @@ $target_url = wp_nonce_url(
                             </tr> <!-- last row -->
                             <?php else: // required address data is available
                                 // print address
-                                echo '<p>' . $order->get_formatted_shipping_address() . '<br/>' . WCX_Order::get_prop(
+                                echo '<p>', wp_kses_post($order->get_formatted_shipping_address()), '<br/>', esc_html(WCX_Order::get_prop(
                                         $order,
                                         'billing_phone'
-                                    ) . '<br/>' . WCX_Order::get_prop($order, 'billing_email') . '</p>';
+                                    )), '<br/>', esc_html(WCX_Order::get_prop($order, 'billing_email')), '</p>';
                                 ?>
                                 </td></tr>
                                 <tr>
@@ -158,7 +158,7 @@ $target_url = wp_nonce_url(
             }
             ?>
             <div class="wcpn__d--flex">
-                <input type="submit" value="<?php echo $button_text; ?>" class="button wcpn__return-dialog__save">
+                <input type="submit" value="<?php echo esc_attr($button_text); ?>" class="button wcpn__return-dialog__save">
                 <?php WCPOST_Admin::renderSpinner() ?>
             </div>
         </div>

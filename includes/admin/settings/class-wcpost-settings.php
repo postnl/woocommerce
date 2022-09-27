@@ -145,7 +145,7 @@ class WCPOST_Settings
         // Create the admin settings
         require_once("class-wcpn-settings-data.php");
 
-        // notice for PostNL WooCommerce plugin
+        // notice for PostNL for WooCommerce plugin
         add_action("woocommerce_postnl_before_settings_page", [$this, "postnl_country_notice"], 10, 1);
     }
 
@@ -197,10 +197,10 @@ class WCPOST_Settings
             WCPN_Settings_Data::getTabs()
         );
 
-        $active_tab = isset($_GET["tab"]) ? $_GET["tab"] : self::SETTINGS_GENERAL;
+        $active_tab = filter_input(INPUT_GET, 'tab') ?? self::SETTINGS_GENERAL;
         ?>
         <div class="wrap woocommerce">
-            <h1><?php _e("PostNL WooCommerce Settings", "woocommerce-postnl"); ?></h1>
+            <h1><?php _e("PostNL for WooCommerce Settings", "woocommerce-postnl"); ?></h1>
             <h2 class="nav-tab-wrapper">
                 <?php
                 foreach ($settings_tabs as $tab_slug => $tab_title) :
@@ -208,9 +208,9 @@ class WCPOST_Settings
                         '<a href="?page='
                         . self::SETTINGS_MENU_SLUG
                         . '&tab=%1$s" class="nav-tab nav-tab-%1$s %2$s">%3$s</a>',
-                        $tab_slug,
+                        esc_attr($tab_slug),
                         (($active_tab === $tab_slug) ? "nav-tab-active" : ""),
-                        $tab_title
+                        esc_html($tab_title)
                     );
                 endforeach;
                 ?>
@@ -219,7 +219,7 @@ class WCPOST_Settings
             <form
                     method="post"
                     action="options.php"
-                    id="<?php echo self::SETTINGS_MENU_SLUG; ?>">
+                    id="<?php echo esc_html(self::SETTINGS_MENU_SLUG); ?>">
                 <?php
                 do_action("woocommerce_postnl_before_settings", $active_tab);
                 settings_fields(self::getOptionId($active_tab));
@@ -242,11 +242,11 @@ class WCPOST_Settings
         $base_country = WC()->countries->get_base_country();
 
         // save or check option to hide notice
-        if (Arr::get($_GET, "postnl_hide_be_notice")) {
-            update_option("postnl_hide_be_notice", true);
+        if (filter_input(INPUT_GET, 'postnl_hide_be_notice')) {
+            update_option('postnl_hide_be_notice', true);
             $hide_notice = true;
         } else {
-            $hide_notice = get_option("postnl_hide_be_notice");
+            $hide_notice = get_option('postnl_hide_be_notice');
         }
 
         // link to hide message when one of the premium extensions is installed
@@ -263,7 +263,7 @@ class WCPOST_Settings
             $dismiss_button   = sprintf(
                 '<a href="%s" style="display:inline-block; margin-top: 10px;">%s</a>',
                 add_query_arg('postnl_hide_be_notice', 'true'),
-                __("Hide this message", "woocommerce-postnl")
+                esc_html__("Hide this message", "woocommerce-postnl")
             );
             printf('<div class="notice notice-warning"><p>%s %s</p></div>', $text, $dismiss_button);
         }
@@ -302,7 +302,7 @@ class WCPOST_Settings
             $callback = Arr::get($section, "callback");
 
             if ($title) {
-                printf('<h2 id="%s">%s</h2>', $id, $title);
+                printf('<h2 id="%s">%s</h2>', esc_attr($id), esc_html($title));
             }
 
             if ($callback) {
@@ -345,14 +345,14 @@ class WCPOST_Settings
                 $class = wc_implode_html_attributes(["class" => esc_attr($class)]);
             }
 
-            echo "<tr {$class}>";
+            echo '<tr ', esc_attr($class), '>';
 
             $helpText = Arr::get($field, "args.help_text");
             $label    = Arr::get($field, "args.label_for");
 
             printf('<th scope="row""><label class="wcpn__ws--nowrap" %s>%s%s</label></th>',
                 $label ? "for=\"" . esc_attr($label) . "\"" : "",
-                Arr::get($field, "title"),
+                esc_html(Arr::get($field, "title")),
                 $helpText ? wc_help_tip($helpText) : ""
             );
 

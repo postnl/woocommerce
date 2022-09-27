@@ -124,7 +124,7 @@ class WCPN_Export
     public function admin_notices()
     {
         // only do this when the user that initiated this
-        if (isset($_GET["postnl_done"])) {
+        if (filter_input(INPUT_GET, 'postnl_done')) {
             $action_return = get_option("wcpostnl_admin_notices");
             $print_queue   = get_option("wcpostnl_print_queue", []);
             $error_notice  = get_option("wcpostnl_admin_error_notices");
@@ -153,9 +153,9 @@ class WCPN_Export
 
                     printf(
                         '<div class="wcpn__notice is-dismissible notice notice-%s"><p>%s</p>%s</div>',
-                        $type,
-                        $message,
-                        $print_queue_store ?? ""
+                        esc_html($type),
+                        esc_html($message),
+                        wp_kses_post($print_queue_store ?? "")
                     );
                 }
                 // destroy after reading
@@ -167,33 +167,31 @@ class WCPN_Export
         if (! empty($error_notice)) {
             printf(
                 '<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p>%s</div>',
-                $error_notice,
-                $print_queue_store ?? ""
+                wp_kses_post($error_notice),
+                esc_attr($print_queue_store ?? "")
             );
             // destroy after reading
             delete_option("wcpostnl_admin_error_notices");
             wp_cache_delete("wcpostnl_admin_error_notices", "options");
         }
 
-        if (isset($_GET["postnl"])) {
-            switch ($_GET["postnl"]) {
-                case "no_consignments":
-                    $message = __(
-                        "You have to export the orders to PostNL before you can print the labels!",
-                        "woocommerce-postnl"
-                    );
-                    printf('<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p></div>', $message);
-                    break;
-                default:
-                    break;
-            }
+        switch (filter_input(INPUT_GET, 'postnl')) {
+            case "no_consignments":
+                $message = esc_html__(
+                    "You have to export the orders to PostNL before you can print the labels!",
+                    "woocommerce-postnl"
+                );
+                printf('<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p></div>', $message);
+                break;
+            default:
+                break;
         }
 
-        if (isset($_COOKIE['postnl_response'])) {
-            $response = $_COOKIE['postnl_response'];
+        if (filter_input(INPUT_COOKIE, 'postnl_response')) {
+            $response = sanitize_text_field(filter_input(INPUT_COOKIE, 'postnl_response'));
             printf(
                 '<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p></div>',
-                $response
+                wp_kses_post($response)
             );
         }
     }
@@ -229,7 +227,7 @@ class WCPN_Export
                 "You do not have sufficient permissions to access this page.",
                 "woocommerce-postnl"
             );
-            echo json_encode($return);
+            echo filter_var(json_encode($return), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             die();
         }
 
@@ -278,7 +276,7 @@ class WCPN_Export
 
         // display errors directly if PDF requested or modal
         if (! empty($this->errors) && in_array($request, [self::ADD_RETURN, self::GET_LABELS, self::MODAL_DIALOG])) {
-            echo $this->parse_errors($this->errors);
+            echo wp_kses_post($this->parse_errors($this->errors));
             die();
         }
 
@@ -292,7 +290,7 @@ class WCPN_Export
             $this->modal_success_page($request, $return);
         } else {
             // return JSON response
-            echo json_encode($return);
+            echo filter_var(json_encode($return), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             die();
         }
     }

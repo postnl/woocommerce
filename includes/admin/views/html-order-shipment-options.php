@@ -40,8 +40,8 @@ try {
 
         <tr>
             <td>
-                <label for="<?php echo $class->getName() ?>">
-                    <?php echo $class->getArgument('label'); ?>
+                <label for="<?php echo esc_attr($class->getName()) ?>">
+                    <?php echo esc_attr($class->getArgument('label')); ?>
                 </label>
             </td>
             <td>

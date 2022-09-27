@@ -3,7 +3,7 @@ Contributors: richardperdaan, edielemoine
 Tags: woocommerce, export, delivery, packages, postnl
 Requires at least: 3.5.1 & WooCommerce 2.0+
 Tested up to: 6.0
-Stable tag: trunk
+Stable tag: 4.4.3
 Requires PHP: 7.1
 License: GPLv3 or later
 License URI: http://www.opensource.org/licenses/gpl-license.php
@@ -90,9 +90,13 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 == Changelog ==
 
+= 4.4.3 (2022-09-27) =
+
+* Fix: escape output
+
 = 4.4.2 (2022-09-20) =
 
-* Feat: change name
+* Fix: change name
 
 = 4.4.1 (2022-02-01) =
 * Fix: fix warning cannot modify header information #83

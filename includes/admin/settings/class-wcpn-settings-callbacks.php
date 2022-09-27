@@ -67,7 +67,7 @@ class WCPN_Settings_Callbacks
     public static function renderSection(array $args): void
     {
         if (isset($args["description"])) {
-            echo "<p>{$args["description"]}</p>";
+            echo '<p>', wp_kses_post($args["description"]), '</p>';
         }
     }
 
@@ -97,7 +97,7 @@ class WCPN_Settings_Callbacks
         }
 
         if (isset($arguments["append"])) {
-            echo $arguments["append"];
+            echo wp_kses_post($arguments["append"]);
         }
 
         // Render the description here instead of inside the above function.
@@ -137,7 +137,7 @@ class WCPN_Settings_Callbacks
      */
     private static function renderDescription($description): void
     {
-        echo "<p class=\"description\">$description</p>";
+        echo '<p class="description">', wp_kses_post($description), '</p>';
     }
 
     /**
@@ -156,9 +156,9 @@ class WCPN_Settings_Callbacks
 
         printf(
             '<input type="hidden" name="%s" value="%s" %s>',
-            $class->getName(),
-            $class->getValue(),
-            $class->getCustomAttributesAsString()
+            esc_html($class->getName()),
+            esc_html($class->getValue()),
+            esc_attr($class->getCustomAttributesAsString())
         );
 
         if (wc_string_to_bool($class->getValue())) {
