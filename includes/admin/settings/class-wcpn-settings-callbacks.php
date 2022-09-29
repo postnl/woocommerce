@@ -158,7 +158,7 @@ class WCPN_Settings_Callbacks
             '<input type="hidden" name="%s" value="%s" %s>',
             esc_html($class->getName()),
             esc_html($class->getValue()),
-            esc_attr($class->getCustomAttributesAsString())
+            $class->getCustomAttributesAsString()
         );
 
         if (wc_string_to_bool($class->getValue())) {

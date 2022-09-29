@@ -261,9 +261,8 @@ class WCPN_Checkout
      */
     public function getDeliveryOptionsConfigAjax(): void
     {
-        $json = json_encode($this->getDeliveryOptionsConfig(), JSON_UNESCAPED_SLASHES);
-        echo filter_var(json_encode($json), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        die();
+        echo json_encode($this->getDeliveryOptionsConfig(), JSON_UNESCAPED_SLASHES);
+        wp_die();
     }
 
     /**

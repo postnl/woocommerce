@@ -77,7 +77,7 @@ class WCPN_Settings_Callbacks_Enhanced_Select
             esc_html($class->getId()),
             esc_attr($class->getName() . ($id ? "[$id][]" : "[]")),
             esc_html($args["placeholder"] ?? ""),
-            esc_attr($class->getCustomAttributesAsString())
+            $class->getCustomAttributesAsString()
         );
 
         foreach ($args["options"] as $key => $label) {
