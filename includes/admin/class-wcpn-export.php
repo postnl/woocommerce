@@ -231,16 +231,17 @@ class WCPN_Export
             die();
         }
 
-        $dialog  = $_REQUEST["dialog"] ?? null;
-        $print   = $_REQUEST["print"] ?? null;
+        $dialog  = null;
+        $print   = sanitize_text_field($_REQUEST["print"] ?? null);
         $offset  = (int) ($_REQUEST["offset"] ?? 0);
-        $request = $_REQUEST["request"];
+        $request = sanitize_text_field($_REQUEST["request"]);
 
         /**
          * @var $order_ids
          */
-        $order_ids    = $this->sanitize_posted_array($_REQUEST["order_ids"] ?? []);
-        $shipment_ids = $this->sanitize_posted_array($_REQUEST["shipment_ids"] ?? []);
+        $order_ids     = $this->sanitize_posted_array($_REQUEST["order_ids"] ?? []);
+        $shipment_ids  = $this->sanitize_posted_array($_REQUEST["shipment_ids"] ?? []);
+        $postnlOptions = $this->sanitize_posted_array($_REQUEST['postnl_options'] ?? []);
 
         if (empty($shipment_ids) && empty($order_ids)) {
             $this->errors[] = __("You have not selected any orders!", "woocommerce-postnl");
@@ -254,7 +255,7 @@ class WCPN_Export
 
                     // Creating a return shipment.
                     case self::ADD_RETURN:
-                        $return = $this->addReturn($order_ids, $_REQUEST['postnl_options']);
+                        $return = $this->addReturn($order_ids, $postnlOptions);
                         break;
 
                     // Downloading labels.
