@@ -90,6 +90,10 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 
 == Changelog ==
 
+= 4.4.6 (2022-10-06) =
+
+* Fix: sanitize posted array
+
 = 4.4.5 (2022-09-29) =
 
 * Fix: sanitize request variables
