@@ -297,22 +297,21 @@ class WCPN_Export
     }
 
     /**
-     * @param string|array $array
+     * @param  string|array $array
      *
      * @return array
      */
     public function sanitize_posted_array($array): array
     {
         if (is_array($array)) {
-            return $array;
+            return array_map('esc_attr', $array);
         }
 
-        // check for JSON
-        if (is_string($array) && strpos($array, "[") !== false) {
-            $array = json_decode(stripslashes($array));
+        if (is_string($array) && false !== strpos($array, '[')) {
+            $array = json_decode(stripslashes($array), false);
         }
 
-        return (array) $array;
+        return array_map('esc_attr', (array) $array);
     }
 
     /**
