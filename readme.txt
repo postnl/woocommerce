@@ -3,7 +3,7 @@ Contributors: richardperdaan, edielemoine
 Tags: woocommerce, export, delivery, packages, postnl
 Requires at least: 3.5.1 & WooCommerce 2.0+
 Tested up to: 6.0
-Stable tag: 4.4.5
+Stable tag: 4.4.6
 Requires PHP: 7.1
 License: GPLv3 or later
 License URI: http://www.opensource.org/licenses/gpl-license.php

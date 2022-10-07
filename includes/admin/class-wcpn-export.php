@@ -303,16 +303,13 @@ class WCPN_Export
      */
     public function sanitize_posted_array($array): array
     {
-        if (is_array($array)) {
-            return array_map('esc_attr', $array);
-        }
-
         if (is_string($array) && false !== strpos($array, '[')) {
             $array = json_decode(stripslashes($array), false);
         }
 
-        return array_map('esc_attr', (array) $array);
+        return array_map( 'sanitize_text_field', (array) $array);
     }
+
 
     /**
      * @param $order_ids
