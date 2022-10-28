@@ -779,16 +779,16 @@ class WCPOST_Admin
 
             $trackTraceUrl = sprintf(
                 'https://jouw.postnl.nl/track-and-trace/%s/%s/%s',
-                esc_url($track_trace),
-                esc_url($country),
-                esc_url($postcode)
+                $track_trace,
+                $country,
+                $postcode
             );
         } else {
             $trackTraceUrl = sprintf(
                 'https://www.internationalparceltracking.com/Main.aspx#/track/%s/%s/%s',
-                esc_url($track_trace),
-                esc_url($country),
-                esc_url($postcode)
+                $track_trace,
+                $country,
+                $postcode
             );
         }
 

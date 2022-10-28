@@ -63,10 +63,10 @@ class WCPN_Frontend_Track_Trace
                 __("You can track your order with the following Track & Trace link:", "woocommerce-postnl"),
                 $order
             )),
-            esc_attr(implode(
+            wp_kses(implode(
                 '<br />',
                 array_map($createLinkCallback, $trackTraceLinks)
-            ))
+            ),['a'=>['href'=>[]]])
         );
     }
 
