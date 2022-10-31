@@ -3,7 +3,7 @@ Contributors: richardperdaan, edielemoine
 Tags: woocommerce, export, delivery, packages, postnl
 Requires at least: 3.5.1 & WooCommerce 2.0+
 Tested up to: 6.0
-Stable tag: 4.4.6
+Stable tag: 4.4.7
 Requires PHP: 7.1
 License: GPLv3 or later
 License URI: http://www.opensource.org/licenses/gpl-license.php
@@ -89,6 +89,10 @@ function wcpostnl_new_email_text($track_trace_tekst) {
 5. PostNL information on the order details page
 
 == Changelog ==
+
+= 4.4.7 (2022-10-31) =
+
+* Fix: correct track trace link
 
 = 4.4.6 (2022-10-06) =
 
