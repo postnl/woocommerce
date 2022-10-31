@@ -250,7 +250,7 @@ class WCPN_Frontend
      */
     public function ajaxGetHighestShippingClass(): ?int
     {
-        echo WCPN_Frontend::get_cart_shipping_class();
+        echo esc_html(WCPN_Frontend::get_cart_shipping_class());
         die();
     }
 }

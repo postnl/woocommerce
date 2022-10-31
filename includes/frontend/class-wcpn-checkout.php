@@ -262,7 +262,7 @@ class WCPN_Checkout
     public function getDeliveryOptionsConfigAjax(): void
     {
         echo json_encode($this->getDeliveryOptionsConfig(), JSON_UNESCAPED_SLASHES);
-        die();
+        wp_die();
     }
 
     /**
@@ -346,8 +346,8 @@ class WCPN_Checkout
     {
         $order = WCX::get_order($order_id);
 
-        $shippingMethod       = Arr::get($_POST, "shipping_method");
-        $highestShippingClass = Arr::get($_POST, "postnl_highest_shipping_class") ?? $shippingMethod[0];
+        $shippingMethod       = filter_input(INPUT_POST, 'shipping_method');
+        $highestShippingClass = filter_input(INPUT_POST, 'postnl_highest_shipping_class') ?? $shippingMethod[0];
 
         /**
          * Save the current version of our plugin to the order.
@@ -375,7 +375,7 @@ class WCPN_Checkout
             );
         }
 
-        $deliveryOptionsFromPost          = Arr::get($_POST, WCPOST_Admin::META_DELIVERY_OPTIONS);
+        $deliveryOptionsFromPost          = filter_input(INPUT_POST, WCPOST_Admin::META_DELIVERY_OPTIONS);
         $deliveryOptionsFromShippingClass = $highestShippingClass
             ? [
                 'packageType' => WCPN_Export::getPackageTypeFromShippingMethod(

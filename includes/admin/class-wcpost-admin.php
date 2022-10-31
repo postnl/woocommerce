@@ -126,11 +126,11 @@ class WCPOST_Admin
         printf(
             "<div class=\"pickup-location\"><strong>%s:</strong><br /> %s<br />%s %s<br />%s %s</div>",
             __("Pickup location", "woocommerce-postnl"),
-            $pickup->getLocationName(),
-            $pickup->getStreet(),
-            $pickup->getNumber(),
-            $pickup->getPostalCode(),
-            $pickup->getCity()
+            esc_html($pickup->getLocationName()),
+            esc_html($pickup->getStreet()),
+            esc_html($pickup->getNumber()),
+            esc_html($pickup->getPostalCode()),
+            esc_html($pickup->getCity())
         );
 
         echo "<hr>";
@@ -162,10 +162,12 @@ class WCPOST_Admin
      */
     public function save_variation_hs_code_field($variationId, $loop)
     {
-        $hsCodeValue = $_POST[self::META_HS_CODE_VARIATION][$loop];
+        $post = wp_unslash(filter_input_array(INPUT_POST));
+
+        $hsCodeValue = sanitize_text_field($post[self::META_HS_CODE_VARIATION][$loop]);
 
         if (! empty($hsCodeValue)) {
-            update_post_meta($variationId, self::META_HS_CODE_VARIATION, esc_attr($hsCodeValue));
+            update_post_meta($variationId, self::META_HS_CODE_VARIATION, $hsCodeValue);
         }
     }
 
@@ -261,8 +263,8 @@ class WCPOST_Admin
             <div
                 class="wcpn__box wcpn__shipment-summary__list"
                 data-loaded=""
-                data-shipment_id="<?php echo $lastShipmentId; ?>"
-                data-order_id="<?php echo $order->get_id(); ?>"
+                data-shipment_id="<?php echo esc_html($lastShipmentId); ?>"
+                data-order_id="<?php echo esc_html($order->get_id()); ?>"
                 style="display: none;">
                 <?php self::renderSpinner(); ?>
             </div>
@@ -270,10 +272,10 @@ class WCPOST_Admin
 
         printf(
             '<a href="#" class="wcpn__shipment-options__show" data-order-id="%d">%s &#x25BE;</a>',
-            $order->get_id(),
-            WCPN_Data::getPackageTypeHuman(
+            esc_html($order->get_id()),
+            esc_html(WCPN_Data::getPackageTypeHuman(
                 $orderSettings->getPackageType() ?? AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME
-            )
+            ))
         );
 
         echo "</div>";
@@ -340,7 +342,7 @@ class WCPOST_Admin
               jQuery(document).ready(function () {
                   <?php foreach ($bulk_actions as $action => $title) { ?>
                 jQuery('<option>')
-                  .val('<?php echo $action; ?>')
+                  .val('<?php echo esc_attr($action); ?>')
                   .html('<?php echo esc_attr($title); ?>')
                   .appendTo('select[name=\'action\'], select[name=\'action2\']');
                   <?php }    ?>
@@ -387,14 +389,14 @@ class WCPOST_Admin
                     <div class="wcpn__pb--2">
                         <?php printf(
                             '<label for="%s">%s</label>',
-                            $class->getId(),
-                            __("Labels to skip", "woocommerce-postnl")
+                            esc_html($class->getId()),
+                            esc_html__('Labels to skip', 'woocommerce-postnl')
                         ); ?>
                     </div>
                     <div class="wcpn__d--flex wcpn__pb--2">
                         <?php woocommerce_form_field($field["name"], $class->getArguments(false), ""); ?>
                         <img
-                          src="<?php echo WCPOST()->plugin_url() . "/assets/img/offset.svg"; ?>"
+                          src="<?php echo esc_attr(WCPOST()->plugin_url()) . "/assets/img/offset.svg"; ?>"
                           alt="<?php implode(", ", WCPN_Export::DEFAULT_POSITIONS) ?>"
                           class="wcpn__offset-dialog__icon wcpn__pl--1"/>
                     </div>
@@ -428,8 +430,9 @@ class WCPOST_Admin
      */
     public function ajaxGetShipmentOptions(): void
     {
+        $post = wp_unslash(filter_input_array(INPUT_POST));
         // Order is used in views/html-order-shipment-options.php
-        $order = wc_get_order((int) $_POST['orderId']);
+        $order = wc_get_order((int) sanitize_text_field($post['orderId']));
 
         include('views/html-order-shipment-options.php');
 
@@ -568,7 +571,9 @@ class WCPOST_Admin
      */
     public function save_shipment_options_ajax(): void
     {
-        parse_str($_POST["form_data"], $form_data);
+        $post = wp_unslash(filter_input_array(INPUT_POST));
+
+        parse_str($post["form_data"], $form_data);
 
         foreach ($form_data[self::SHIPMENT_OPTIONS_FORM_NAME] as $order_id => $data) {
             $order         = WCX::get_order($order_id);
@@ -726,17 +731,20 @@ class WCPOST_Admin
      */
     public function productOptionsFieldSave(int $postId): void
     {
+        $post = wp_unslash(filter_input_array(INPUT_POST));
+
         foreach ($this->getProductOptions() as $productOption) {
             // check if hs code is passed and not an array (=variation hs code)
-            if (isset($_POST[$productOption['id']]) && ! is_array($_POST[$productOption['id']])) {
+            if (isset($post[$productOption['id']]) && ! is_array($post[$productOption['id']])) {
                 $product   = wc_get_product($postId);
-                $productId = $_POST[$productOption['id']];
+                $optionId  = sanitize_text_field($productOption['id']);
+                $productId = sanitize_text_field($post[$optionId]);
 
                 if (! empty($productId)) {
-                    WCX_Product::update_meta_data($product, $productOption['id'], esc_attr($productId));
+                    WCX_Product::update_meta_data($product, $optionId, $productId);
                 } else {
-                    if (isset($_POST[$productOption['id']]) && empty($productId)) {
-                        WCX_Product::delete_meta_data($product, $productOption['id']);
+                    if (isset($post[$optionId]) && empty($productId)) {
+                        WCX_Product::delete_meta_data($product, $optionId);
                     }
                 }
             }
@@ -874,7 +882,7 @@ class WCPOST_Admin
         $shipments = self::get_order_shipments($order, true);
 
         if (empty($shipments)) {
-            echo __("No label has been created yet.", "woocommerce-postnl");
+            esc_html_e("No label has been created yet.", "woocommerce-postnl");
 
             return;
         }
@@ -885,19 +893,19 @@ class WCPOST_Admin
             $printedStatuses  = [WCPOST_Admin::ORDER_STATUS_PRINTED_DIGITAL_STAMP, WCPOST_Admin::ORDER_STATUS_PRINTED_LETTER];
 
             if (in_array($shipmentStatusId, $printedStatuses)) {
-                echo __("The label has been printed.", "woocommerce-postnl");
+                esc_html_e("The label has been printed.", "woocommerce-postnl");
                 continue;
             }
 
             if (empty($shipment["track_trace"])) {
-                echo __("Concept created but not printed.", "woocommerce-postnl");
+                esc_html_e("Concept created but not printed.", "woocommerce-postnl");
                 continue;
             }
 
             printf(
                 '<a target="_blank" class="wcpn__barcode-link" title="%2$s" href="%1$s">%2$s</a><br>',
-                self::getTrackTraceUrl($order, $shipment["track_trace"]),
-                $shipment["track_trace"]
+                esc_html(self::getTrackTraceUrl($order, $shipment["track_trace"])),
+                esc_html($shipment["track_trace"])
             );
         }
         echo "</div>";
@@ -957,9 +965,9 @@ class WCPOST_Admin
         if ($showDeliveryDay && $deliveryOptions->getDate()) {
             printf(
                 '<div class="delivery-date"><strong>%s</strong><br />%s, %s</div>',
-                __("PostNL shipment:", "woocommerce-postnl"),
-                WCPN_Data::getDeliveryTypesHuman()[$deliveryOptions->getDeliveryType()],
-                wc_format_datetime(new WC_DateTime($deliveryOptions->getDate()), 'D d-m')
+                esc_html__("PostNL shipment:", "woocommerce-postnl"),
+                esc_html(WCPN_Data::getDeliveryTypesHuman()[$deliveryOptions->getDeliveryType()]),
+                esc_html(wc_format_datetime(new WC_DateTime($deliveryOptions->getDate()), 'D d-m'))
             );
         }
     }
@@ -1027,7 +1035,7 @@ class WCPOST_Admin
      */
     public function printThankYouConfirmation(?array $selectedDeliveryOptions): void
     {
-        printf($this->generateThankYouConfirmation($selectedDeliveryOptions));
+        echo wp_kses_post($this->generateThankYouConfirmation($selectedDeliveryOptions));
     }
 
     /**
@@ -1037,7 +1045,7 @@ class WCPOST_Admin
      */
     public function printEmailConfirmation(?array $selectedDeliveryOptions): void
     {
-        printf($this->generateEmailConfirmation($selectedDeliveryOptions));
+        echo wp_kses_post($this->generateEmailConfirmation($selectedDeliveryOptions));
     }
 
     /**
@@ -1117,14 +1125,14 @@ class WCPOST_Admin
             $arguments[] = "$arg=\"$value\"";
         }
 
-        $attributes = implode(" ", $arguments);
+        $attributes = esc_attr(implode(" ", $arguments));
 
         echo "<span $attributes>";
         foreach ($spinners as $spinnerState => $icon) {
             printf(
                 '<img class="wcpn__spinner__%1$s" alt="%1$s" src="%2$s" style="display: %3$s;" />',
-                $spinnerState,
-                $icon,
+                esc_html($spinnerState),
+                esc_attr($icon),
                 $state === $spinnerState ? "block" : "none"
             );
         }
@@ -1146,8 +1154,8 @@ class WCPOST_Admin
                 %4$s>
                 <img class="wcpn__action__img wcpn__m--auto" src="%3$s" alt="%2$s" />',
             wp_nonce_url($url, WCPOST::NONCE_ACTION),
-            $alt,
-            $icon,
+            esc_html($alt),
+            esc_attr($icon),
             wc_implode_html_attributes($rawAttributes)
         );
 
@@ -1179,7 +1187,7 @@ class WCPOST_Admin
             $track_trace_link = __("(Unknown)", "woocommerce-postnl");
         }
 
-        echo $track_trace_link;
+        echo wp_kses_post($track_trace_link);
     }
 
     /**
@@ -1188,7 +1196,7 @@ class WCPOST_Admin
      */
     public static function renderStatus(array $shipment, int $order_id): void
     {
-        echo $shipment["status"] ?? "–";
+        echo esc_html($shipment["status"] ?? "–");
 
         if (self::shipmentIsStatus($shipment, self::ORDER_STATUS_DELIVERED_AT_RECIPIENT)
             || self::shipmentIsStatus($shipment, self::ORDER_STATUS_DELIVERED_READY_FOR_PICKUP)

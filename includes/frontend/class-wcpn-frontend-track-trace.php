@@ -58,15 +58,15 @@ class WCPN_Frontend_Track_Trace
 
         printf(
             '<p>%s %s</p>',
-            apply_filters(
+            esc_attr(apply_filters(
                 "wcpostnl_email_text",
                 __("You can track your order with the following Track & Trace link:", "woocommerce-postnl"),
                 $order
-            ),
-            implode(
+            )),
+            wp_kses(implode(
                 '<br />',
                 array_map($createLinkCallback, $trackTraceLinks)
-            )
+            ),['a'=>['href'=>[]]])
         );
     }
 

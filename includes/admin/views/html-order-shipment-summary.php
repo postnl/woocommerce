@@ -11,8 +11,10 @@ if (! defined('ABSPATH')) {
     exit;
 } // Exit if accessed directly
 
-$order_id    = $_POST["order_id"];
-$shipment_id = $_POST["shipment_id"];
+$post = wp_unslash(filter_input_array(INPUT_POST));
+
+$order_id    = (int) sanitize_text_field($post['order_id']);
+$shipment_id = (int) sanitize_text_field($post['shipment_id']);
 
 $order = WCX::get_order($order_id);
 
@@ -39,8 +41,8 @@ echo '<ul class="wcpn__shipment-summary wcpn__ws--nowrap">';
  */
 printf(
     '%s: %s',
-    __("Shipment type", "woocommerce-postnl"),
-    WCPN_Data::getPackageTypeHuman(Arr::get($firstShipment, "shipment.options.package_type"))
+    esc_html__("Shipment type", "woocommerce-postnl"),
+    esc_html(WCPN_Data::getPackageTypeHuman(Arr::get($firstShipment, "shipment.options.package_type")))
 );
 
 foreach ($option_strings as $key => $label) {
@@ -52,14 +54,14 @@ foreach ($option_strings as $key => $label) {
 
 if ($insurance) {
     $price = number_format(Arr::get($insurance, "amount") / 100, 2);
-    printf('<li>%s: € %s</li>', __("insured_for", "woocommerce-postnl"), $price);
+    printf('<li>%s: € %s</li>', esc_html__("insured_for", "woocommerce-postnl"), esc_html($price));
 }
 
 if ($labelDescription) {
     printf(
         '<li>%s: %s</li>',
-        __("Label description", "woocommerce-postnl"),
-        $labelDescription
+        esc_html__("Label description", "woocommerce-postnl"),
+        esc_html($labelDescription)
     );
 }
 echo '</ul>';
@@ -81,9 +83,9 @@ foreach ($shipments as $shipment_id => $shipment) {
 
     printf(
         '<a href="%2$s" target="_blank" title="%3$s">%3$s</a><br/> %1$s: %4$s<br/>',
-        __("Status", "woocommerce-postnl"),
-        WCPOST_Admin::getTrackTraceUrl($order_id, $trackTrace),
-        $trackTrace,
-        Arr::get($shipment, "status")
+        esc_html__("Status", "woocommerce-postnl"),
+        esc_html(WCPOST_Admin::getTrackTraceUrl($order_id, $trackTrace)),
+        esc_html($trackTrace),
+        esc_html(Arr::get($shipment, "status"))
     );
 }

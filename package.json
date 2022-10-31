@@ -1,8 +1,8 @@
 {
   "name": "@postnl/woocommerce",
   "private": true,
-  "version": "4.1.0",
-  "description": "Welcome to the WooCommerce PostNL repository on GitHub. Here you can browse the source, look at open issues and keep track of development.",
+  "version": "4.4.7",
+  "description": "Welcome to the PostNL for WooCommerce repository on GitHub. Here you can browse the source, look at open issues and keep track of development.",
   "scripts": {
     "build": "gulp",
     "watch": "gulp watch",
@@ -36,14 +36,16 @@
     "gulp-clean": "^0.4.0",
     "gulp-po-sync": "^0.1.0",
     "gulp-postcss": "^9.0.0",
-    "gulp-sass": "^4.1.0",
+    "gulp-sass": "^5.0.0",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-tap": "^2.0.0",
     "gulp-uglify": "^3.0.2",
     "gulp-wp-pot": "^2.5.0",
     "gulp-zip": "^5.1.0",
+    "node-fetch": "^2.6.7",
     "papaparse": "^5.3.0",
-    "postcss": "^8.2.8",
+    "postcss": "^8.2.10",
+    "sass": "^1.43.2",
     "vinyl-buffer": "^1.0.1"
   }
 }

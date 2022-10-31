@@ -172,7 +172,7 @@ class WCPN_API extends WCPN_Rest
         if (! $display) {
             $collection->setLinkOfLabels($positions);
             $this->updateOrderBarcode($order_ids, $collection);
-            echo $collection->getLinkOfLabels();
+            echo esc_html($collection->getLinkOfLabels());
             die();
         }
     }
@@ -215,14 +215,31 @@ class WCPN_API extends WCPN_Rest
                 continue;
             }
 
-            $shipmentData = (new WCPN_Export())->getShipmentData($lastShipmentIds, $order);
-            $trackTrace   = $shipmentData["track_trace"] ?? null;
+            $trackTraceArray = $this->getTrackTraceForOrder($lastShipmentIds, $order);
+
+            WCPN_Export::addTrackTraceNoteToOrder($orderId, $trackTraceArray);
 
             $this->updateOrderStatus($order, WCPN_Settings_Data::CHANGE_STATUS_AFTER_PRINTING);
 
-            ChannelEngine::updateMetaOnExport($order, $trackTrace);
+            ChannelEngine::updateMetaOnExport($order, $trackTraceArray[0] ?? '');
+        }
+    }
+
+    /**
+     * @param  array     $lastShipmentIds
+     * @param  \WC_Order $order
+     *
+     * @return array
+     */
+    private function getTrackTraceForOrder(array $lastShipmentIds, WC_Order $order): array
+    {
+        $shipmentData    = (new WCPN_Export())->getShipmentData($lastShipmentIds, $order);
+        $trackTraceArray = [];
+
+        foreach ($shipmentData as $shipment) {
+            $trackTraceArray[] = $shipment['track_trace'] ?? null;
         }
 
-        WCPN_Export::saveTrackTracesToOrders($collection, $orderIds);
+        return $trackTraceArray;
     }
 }

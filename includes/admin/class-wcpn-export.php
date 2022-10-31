@@ -124,7 +124,7 @@ class WCPN_Export
     public function admin_notices()
     {
         // only do this when the user that initiated this
-        if (isset($_GET["postnl_done"])) {
+        if (filter_input(INPUT_GET, 'postnl_done')) {
             $action_return = get_option("wcpostnl_admin_notices");
             $print_queue   = get_option("wcpostnl_print_queue", []);
             $error_notice  = get_option("wcpostnl_admin_error_notices");
@@ -153,9 +153,9 @@ class WCPN_Export
 
                     printf(
                         '<div class="wcpn__notice is-dismissible notice notice-%s"><p>%s</p>%s</div>',
-                        $type,
-                        $message,
-                        $print_queue_store ?? ""
+                        esc_html($type),
+                        esc_html($message),
+                        wp_kses_post($print_queue_store ?? "")
                     );
                 }
                 // destroy after reading
@@ -167,33 +167,31 @@ class WCPN_Export
         if (! empty($error_notice)) {
             printf(
                 '<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p>%s</div>',
-                $error_notice,
-                $print_queue_store ?? ""
+                wp_kses_post($error_notice),
+                esc_attr($print_queue_store ?? "")
             );
             // destroy after reading
             delete_option("wcpostnl_admin_error_notices");
             wp_cache_delete("wcpostnl_admin_error_notices", "options");
         }
 
-        if (isset($_GET["postnl"])) {
-            switch ($_GET["postnl"]) {
-                case "no_consignments":
-                    $message = __(
-                        "You have to export the orders to PostNL before you can print the labels!",
-                        "woocommerce-postnl"
-                    );
-                    printf('<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p></div>', $message);
-                    break;
-                default:
-                    break;
-            }
+        switch (filter_input(INPUT_GET, 'postnl')) {
+            case "no_consignments":
+                $message = esc_html__(
+                    "You have to export the orders to PostNL before you can print the labels!",
+                    "woocommerce-postnl"
+                );
+                printf('<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p></div>', $message);
+                break;
+            default:
+                break;
         }
 
-        if (isset($_COOKIE['postnl_response'])) {
-            $response = $_COOKIE['postnl_response'];
+        if (filter_input(INPUT_COOKIE, 'postnl_response')) {
+            $response = sanitize_text_field(filter_input(INPUT_COOKIE, 'postnl_response'));
             printf(
                 '<div class="wcpn__notice is-dismissible notice notice-error"><p>%s</p></div>',
-                $response
+                wp_kses_post($response)
             );
         }
     }
@@ -229,20 +227,21 @@ class WCPN_Export
                 "You do not have sufficient permissions to access this page.",
                 "woocommerce-postnl"
             );
-            echo json_encode($return);
+            echo filter_var(json_encode($return), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             die();
         }
 
-        $dialog  = $_REQUEST["dialog"] ?? null;
-        $print   = $_REQUEST["print"] ?? null;
+        $dialog  = null;
+        $print   = sanitize_text_field($_REQUEST["print"] ?? null);
         $offset  = (int) ($_REQUEST["offset"] ?? 0);
-        $request = $_REQUEST["request"];
+        $request = sanitize_text_field($_REQUEST["request"]);
 
         /**
          * @var $order_ids
          */
-        $order_ids    = $this->sanitize_posted_array($_REQUEST["order_ids"] ?? []);
-        $shipment_ids = $this->sanitize_posted_array($_REQUEST["shipment_ids"] ?? []);
+        $order_ids     = $this->sanitize_posted_array($_REQUEST["order_ids"] ?? []);
+        $shipment_ids  = $this->sanitize_posted_array($_REQUEST["shipment_ids"] ?? []);
+        $postnlOptions = $this->sanitize_posted_array($_REQUEST['postnl_options'] ?? []);
 
         if (empty($shipment_ids) && empty($order_ids)) {
             $this->errors[] = __("You have not selected any orders!", "woocommerce-postnl");
@@ -256,7 +255,7 @@ class WCPN_Export
 
                     // Creating a return shipment.
                     case self::ADD_RETURN:
-                        $return = $this->addReturn($order_ids, $_REQUEST['postnl_options']);
+                        $return = $this->addReturn($order_ids, $postnlOptions);
                         break;
 
                     // Downloading labels.
@@ -278,7 +277,7 @@ class WCPN_Export
 
         // display errors directly if PDF requested or modal
         if (! empty($this->errors) && in_array($request, [self::ADD_RETURN, self::GET_LABELS, self::MODAL_DIALOG])) {
-            echo $this->parse_errors($this->errors);
+            echo wp_kses_post($this->parse_errors($this->errors));
             die();
         }
 
@@ -292,29 +291,25 @@ class WCPN_Export
             $this->modal_success_page($request, $return);
         } else {
             // return JSON response
-            echo json_encode($return);
+            echo filter_var(json_encode($return), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             die();
         }
     }
 
     /**
-     * @param string|array $array
+     * @param  string|array $array
      *
      * @return array
      */
     public function sanitize_posted_array($array): array
     {
-        if (is_array($array)) {
-            return $array;
+        if (is_string($array) && false !== strpos($array, '[')) {
+            $array = json_decode(stripslashes($array), false);
         }
 
-        // check for JSON
-        if (is_string($array) && strpos($array, "[") !== false) {
-            $array = json_decode(stripslashes($array));
-        }
-
-        return (array) $array;
+        return array_map( 'sanitize_text_field', (array) $array);
     }
+
 
     /**
      * @param $order_ids
@@ -950,6 +945,10 @@ class WCPN_Export
      */
     public static function getPackageTypeFromShippingMethod($shippingMethod, $shippingClass): string
     {
+        if (null === $shippingMethod) {
+            return AbstractConsignment::DEFAULT_PACKAGE_TYPE_NAME;
+        }
+
         $packageType           = AbstractConsignment::PACKAGE_TYPE_PACKAGE_NAME;
         $shippingMethodIdClass = $shippingMethod;
 
