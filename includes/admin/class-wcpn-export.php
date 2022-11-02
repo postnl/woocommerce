@@ -155,7 +155,7 @@ class WCPN_Export
                         '<div class="wcpn__notice is-dismissible notice notice-%s"><p>%s</p>%s</div>',
                         esc_html($type),
                         esc_html($message),
-                        wp_kses_post($print_queue_store ?? "")
+                        $print_queue_store ?? ""
                     );
                 }
                 // destroy after reading
