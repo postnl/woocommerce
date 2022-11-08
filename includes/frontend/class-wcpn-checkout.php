@@ -346,7 +346,7 @@ class WCPN_Checkout
     {
         $order = WCX::get_order($order_id);
 
-        $shippingMethod = wp_filter_post_kses($_POST['shipping_method'][0]);
+        $shippingMethod       = filter_var($_POST['shipping_method'][0]);
         $highestShippingClass = filter_input(INPUT_POST, 'postnl_highest_shipping_class') ?? $shippingMethod;
 
         /**
