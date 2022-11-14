@@ -180,37 +180,56 @@
                     
        <h1 id="4">4 Verzendklassen en verzendprijs</h1>
                         <p>
-                            In het orderoverzicht kunt u eenvoudig zien wat voor zending de nieuwe bestelling betreft. Ook kunt u makkelijk het pakkettype wijzigen indien dit gewenst is. Wanneer U op <span class="nice">Pakket</span> klikt verschijnt het venster eronder. Hierin is het mogelijk om verzendopties uit te schakelen of juist toe te voegen of het soort zending aan te passen.
+                        Met de installatie van de PostNL plug-in is ook een <span class="nice">PostNL Verzendmethode</span> aangemaakt.
+                            Deze verzendmethode koppelen je aan de WooCommerce <span class="nice">Verzendzones</span>. 
+                            Per verzendzones kan je de <span class="nice">verzendprijs</span> bepalen.  
                         </p>
-
-                        <p>Na het kiezen van uw gewenste opties of het wijzigen van het <span class="nice">Soort zending</span> klikt u op <span class="nice">Opslaan</span> en daarna kunt u deze keuze exporteren naar PostNL en het gewenste label aanmaken.<br><br>
-                            <img src="media/PostNL_order_aanpassen.png"><br><br>
-
-                        <p>
-                            U kunt op twee manieren uw orders doorzetten naar PostNL en hier vervolgens een label voor uitprinten. Namelijk door een order (of meerdere orders) te selecteren en vervolgens naar <span class="nice">Acties</span> te gaan. Daar kunt u uw keuze maken <span class="nice">Exporteren</span>, <span class="nice">Printen</span> of <span class="nice">Exporteren en Printen</span>. <br><br>
-                            <b>Let op</b>: We raden u aan om niet meer dan 20 orders tegelijk in bulk te verwerken.
-                            Zowel bij bulk als bij een enkele export wordt er een laadicoontje zichtbaar.
-                            Vervolgens wordt de pagina ook direct ververst. (zie voorbeeld hieronder)<br><br>
-                        </p<br><br>
-
-                        <img src="media/PostNL_export_laden.png">
-                        <img src="media/PostNL_order_exporteren.png"><br><br>
-
-                        <i>Let op! Als u de eerste keer het label probeert te printen, is het mogelijk dat een pop-up blocker de download blokkeert.</i>
 
       <h1 id="5">5 Orders verwerken</h1>
-                        <p>Uiteraard is het ook mogelijk om zendingen vanuit de order detailpagina zendingen aan te maken. Door op een order te klikken komt u op een pagina waar meer details over deze bestelling te vinden is.</p>
-                        <img src="media/PostNL_orderdetails.png">
-
-      <h1 id="6">6 Zending informatie</h1>
-                        <p>
-                            Als u informatie over uw zending wilt zien is het niet nodig om dit te bekijken in uw PostNL account. U kunt deze informatie bekijken in uw order overzicht in WooCommerce.<br><br>
-                            Bij elke order die wordt doorgezet naar PostNL en waarvoor een label is aangemaakt komt een <span class="nice">ⓘ</span> te staan. Door hierop te klikken wordt er meer informatie getoond over de status van de zending.
+                        <h2 id="5_1">5.1 Orderoverzicht</h2>
+                        <p>In het orderoverzicht is te zien voor welke bestelling gekozen is voor verzending met PostNL. 
+                            Deze bestellingen zijn te herkennen doordat via PostNL onder de bestemming staat. 
+                            In de PostNL Tracking kolom is de barcode te zien van de zending van deze order. 
+                            Dit is ook een link naar de consumenten Track & Trace pagina van PostNL.</p>
+                        
+                        <h2 id="5_2">5.2 Orderpagina</h2>
+                        <p>Open een order. Rechts boven op de orderpagina is het PostNL menu te zien. 
+                            Hierin is te zien om welke Type bezorging het gaat; standaard bezorging, ophalen bij een PostNL-punt, Avonbezorging, Europese bezorging of Wereldzending.  
+                            Ook is de ‘Bezorgdatum’ van de bestelling te zien. 
+                            <b>Let op</b>, houdt rekening met deze bezorgdatum om te bepalen wanneer de pakketten aan PostNL overhandigd moeten worden. </p>
+                                    
+                        <h2 id="5_3">5.3 Extra verzendopties</h2>
+                        <p>Het is mogelijk om een extra verzendoptie toe te voegen aan de PostNL zending. </p>
+                        <p>Afhankelijk van het type bezorging is het mogelijk om de zending: 
+                        -	te verzekeren (verzekerd bedrag is totale verzendbedrag)
+                        -	retour te sturen als ontvanger niet thuis is
+                        -	handtekening voor ontvangst te vragen
+                        -	het pakket alleen bij de ontvanger te bezorger (niet bij buren) 
+                        -	of het type bezorging te wijzigen naar Brievenbuspakje. 
                         </p>
-
-                        <img src="media/PostNL_zening_informatie.png">
-
-      <h1 id="7">7 Contactgegevens</h1>
+                                    
+                        <h2 id="5_4">5.4 Aantal labels</h2>
+                        <p>In het PostNL menu is het mogelijk om het aantal labels van een zending te wijzigen. 
+                            Zo kan het bijvoorbeeld voorkomen dat een zending opgedeeld moet worden naar twee pakketten omdat de zending anders te groot of te zwaar is. 
+                            Verander het aantal labels in dit geval naar 2.</p>
+                                    
+                        <h2 id="5_5">5.5 Creëer retourlabel</h2>
+                        <p>Bij de Retour Instellingen is aangegeven of er wel/niet altijd een retour-label geprint moet worden bij het aanmaken van het heenzending. 
+                            Deze instelling wordt in dit menu overgenomen. 
+                            Aan de hand van het ‘Creëer retourlabel’ vinkje is het mogelijk om de Retour Instellingen te overschrijven.</p>
+                                    
+                        <h2 id="5_6">5.6 Zending aanmaken en verzendlabel printen</h2>
+                        <p>Staan alle vinkjes in het PostNL menu zoals gewenst? Klik dan onderaan in het menu op ‘Zending aanmaken’. 
+                            Met deze actie wordt de zending voormeld bij PostNL. 
+                            Klik vervolgens op ‘Print Label’ om het verzendlabel te downloaden. </p>
+                                                            
+                        <h2 id="5_7">5.7 Meerdere Labels tegelijk aanmaken</h2>
+                        <p>Om tijd te besparen is het handig om meerdere labels tegelijk te kunnen printen. 
+                            Selecteer in het orderoverzicht de bestellingen waarvoor je een label wil printen → klik op Bulkacties → ‘PostNL Create Label’. </p>
+                                    
+                        <p>Selecteer vervolgens in het PostNL menu of je nog extra verzendopties wil toevoegen → Klik op Submit → Klik op Download file → De verzendlabels van de verschillende orders worden in één document gedownload. </p>
+                                    
+      <h1 id="6">6 Contactgegevens</h1>
                         <p>Vragen over de WooCommerce plug-in? Neem dan gerust contact op met onze Digitale Klant Support. Zij zijn te bereiken via digitaleklantsupport@postnl.nl. 
                         </p>
                 </div>
