@@ -30,8 +30,10 @@
                 </ul>
                 
                 <p>De plug-in kan zowel door <b>Nederlandse</b> als <b>Belgische</b> webwinkeliers gebruikt worden. 
-             
                 </p>
+
+                <p><b>Let op, de plug-in is vernieuwd. Alle versies hoger dan v5.0.0. worden beschouwd als nieuw. Als je voor het eerst de vernieuwde plug-in installeert, 
+                    dan dien je de plug-in opnieuw te configureren.</b></p>
 
                 <h1>Inhoud</h1>
                 <div class="menu"></div>
@@ -61,7 +63,7 @@
                         <li>Wanneer de download klaar is klikt u op <span class="nice">Plugin activeren</span>. </li>
                     </ol>
                     
-                    <h2 id="2_2">2.2 Via de WordPress plugin directory (vanaf 6 februari 2023)</h2>
+                    <h2 id="2_2">2.2 Via de WordPress plugin directory (vanaf 6 februari 2023 23:59)</h2>
                     <p>Om de PostNL plugin te installeren via de WordPress plugin directory volgt u onderstaande stappen:</p>
                     <ol>
                         <li>Ga in WordPress naar het menu <span class="nice">Plugins → Nieuwe plugin</span>. </li>
@@ -81,7 +83,7 @@
                                 <h3 id="3_1_1">Modus omgeving</h3>
                                 
                                 <p>Je kunt de WooCommerce-omgeving koppelen aan de <span class="nice">Sandbox-</span> of <span class="nice">Productie</span> omgeving van PostNL. 
-                                    Let op: de Sandbox omgeving is een testomgeving. Hier kun je test-zending maken. Alleen zendingen die in de Productieomgeving zijn voorgemeld kun je inleveren bij PostNL. 
+                                    <b>Let op</b>, de Sandbox omgeving is een testomgeving. Hier kun je test-zending maken. Alleen zendingen die in de Productieomgeving zijn voorgemeld kun je inleveren bij PostNL. 
                                     Een zending wordt in rekening gebracht zodra hij de eerste scan krijgt bij PostNL.</p>
 
                                 <h3 id="3_1_2">API Key</h3>
@@ -96,7 +98,7 @@
 
                                 <h3 id="3_1_4">Klantgegevens</h3>
                                 <p>Vul jouw <span class="nice">PostNL-klantnummer</span> (bijv. 123456) en <span class="nice">klantcode</span> (bijv. ABCD) in. 
-                                Deze gegevens vind je in jouw <a href="https://mijn.postnl.nl/c/BP2_Mod_Login.app?inresponseto=&amp;RelayState=&amp;startURL=%2F">Mijn PostNL-omgeving</a>.</p>
+                                Deze gegevens vind je in jouw <a href="https://mijn.postnl.nl/c/BP2_Mod_Login.app?inresponseto=&amp;RelayState=&amp;startURL=%2F">Mijn PostNL-</a> omgeving.</p>
 
                         <h2 id="3_2">3.2 Retour Instellingen</h2>
 
@@ -141,24 +143,32 @@
                                 <p><b>Let op, er moet rekening met de gekozen bezorgdag gehouden worden bij het overhandigen van de pakketten aan PostNL.</b> Kiest de consument om volgende week donderdag de bestelling te ontvangen, dan dien jij op 
                                     woensdag het pakket aan PostNL te overhandigen (uitgaande van een overkomstduur van 1 dag).</p>
                                 
-                                <h3 id="3_3_3">Avondbezorging & Toeslag</h3>
+                                <h3 id="3_3_3">Ochtend bezorging & Toeslag</h3>
+                                <p>Voor klanten die hun pakket alleen overdag in ontvangst kunnen nemen kan je gebruik maken van ochtend bezorging. 
+                                    Door <span class="nice">Ochtend bezorging</span> te activeren geef je jouw klanten deze mogelijkheid. De kosten voor ochtend bezorging liggen hoger. 
+                                    Jij kunt een deel van deze kosten doorberekenen aan jouw klanten door een <span class="nice">toeslag voor ochtend bezorging</span> te vragen. </p>
+                    
+                                <h3 id="3_3_4">Avondbezorging & Toeslag</h3>
                                 <p>Consumenten die overdag niet huis zijn geven de voorkeur om ’s avonds hun bestelling te ontvangen. 
                                     Door <span class="nice">Avondbezorging</span> te activeren geef je jouw klanten deze mogelijkheid. De kosten voor een avondzending liggen hoger. 
                                     Jij kunt een deel van deze hogere kosten doorberekenen aan jouw klanten door een <span class="nice">toeslag voor avondbezorging</span> te vragen. </p>
                     
-                                <h3 id="3_3_4">Overkomstduur</h3>
+                                <h3 id="3_3_5">Overkomstduur</h3>
                                 <p>Met de <span class="nice">overkomstduur</span> geef je aan hoeveel dagen je nodig hebt om de bestelling gereed te  maken. 
                                     Stel dat er vandaag een bestelling wordt geplaatst die je morgen al kan bezorgen, dan is de overkomstduur 1. </p>
                                 
-                                <h3 id="3_3_5">Cut off tijd</h3>
+                                <h3 id="3_3_6">Cut off tijd</h3>
                                 <p>De <span class="nice">cut off tijd</span> geeft aan tot wel tijdstip een bestelling geplaatst kan worden zodat de overkomstduur gehaald kan worden. 
                                     Voor bestellingen die na de cut off tijd besteld worden, wordt er één dag bij de overkomstduur opgeteld. </p>
                                 
-                                <h3 id="3_3_6">Verzenddagen</h3>
+                                <h3 id="3_3_7">Verzenddagen</h3>
                                 <p>Geef aan op welke dagen je de pakketten aan PostNL overhandigd. 
                                     Deze gegevens zijn nodig om het eerst volgende bezorgmoment te kunnen bepalen. </p>
+
+                                <p>Overhandig jij ook op zondag pakketten aan PostNL? Zorg dan dat het contractueel is vastgelegd dat PostNL 
+                                    jouw pakketten op zondag sorteert. Alleen dan kunnen jouw klanten op maandag hun bestelling ontvangen.</p>
                                                     
-                                <h3 id="3_3_7">Valideer Nederlandse adressen & Gebruik PostNL adresvelden</h3>
+                                <h3 id="3_3_8">Valideer Nederlandse adressen & Gebruik PostNL adresvelden</h3>
                                 <p>Om te voorkomen dat foutieve adressen worden ingevoerd, kan de <span class="nice">adrescheck</span> geactiveerd worden. Deze adrescheck valideert Nederlandse adressen. 
                                     Als het adres niet bekend is wordt de consument gewaarschuwd zodat hij/zij het adres kan aanpassen.</p>
                             
