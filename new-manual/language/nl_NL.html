@@ -142,6 +142,10 @@
                                 <p>De PostNL plug-in kan gebruikt worden met alle verzendmethoden die in WooCommerce beschikbaar zijn. Geef hier aan voor welke verzendmethode(n)
                                 je gebruik wil maken van de diensten van PostNL. Selecteer je hier bijvoorbeeld 'Vast tarief', dan kunnen de orders die met de verzendmethode 'Vast
                                 tarief' zijn binnen gekomen direct worden voorgemeld bij PostNL.</p>
+
+                                <p>Verzendmethode 'PostNL' hoeft niet gekoppeld te worden aan de checkout in het kader Shipping Methods, deze verzendmethode is 
+                                direct te gebruiken. Verzendmethoden die <strong> niet <strong> verzendmethode 'PostNL' zijn, moeten wel altijd gekoppeld worden aan de checkout. </p>
+
                     
                                 <h3 id="3_3_2">Ophalen bij een PostNL-punt</h3>
                                 <p>Door de functionaliteit <span class="nice">Ophalen bij een PostNL-punt</span> te activeren kunnen jouw klanten in de checkout kiezen om hun bestelling op te halen bij een PostNL-punt i.p.v. de bestelling thuis te ontvangen. 
@@ -171,11 +175,11 @@
                                     Stel dat er vandaag een bestelling wordt geplaatst die je morgen al kan bezorgen, dan is de overkomstduur 1. </p>
                                 
                                 <h3 id="3_3_7">Cut off tijd</h3>
-                                <p>De <span class="nice">cut off tijd</span> geeft aan tot wel tijdstip een bestelling geplaatst kan worden zodat de overkomstduur gehaald kan worden. 
+                                <p>De <span class="nice">cut off tijd</span> geeft aan tot welk tijdstip een bestelling geplaatst kan worden zodat de overkomstduur gehaald kan worden. 
                                     Voor bestellingen die na de cut off tijd besteld worden, wordt er één dag bij de overkomstduur opgeteld. </p>
                                 
                                 <h3 id="3_3_8">Verzenddagen</h3>
-                                <p>Geef aan op welke dagen je de pakketten aan PostNL overhandigd. 
+                                <p>Geef aan op welke dagen je de pakketten aan PostNL overhandigt. 
                                     Deze gegevens zijn nodig om het eerst volgende bezorgmoment te kunnen bepalen. </p>
 
                                 <p>Overhandig jij ook op zondag pakketten aan PostNL? Zorg dan dat het contractueel is vastgelegd dat PostNL 
@@ -184,7 +188,10 @@
                                 <h3 id="3_3_9">Valideer Nederlandse adressen & Gebruik PostNL adresvelden</h3>
                                 <p>Om te voorkomen dat foutieve adressen worden ingevoerd, kan de <span class="nice">adrescheck</span> geactiveerd worden. Deze adrescheck valideert Nederlandse adressen. 
                                     Als het adres niet bekend is wordt de consument gewaarschuwd zodat hij/zij het adres kan aanpassen.</p>
-                            
+                                    
+                                   <p>  Wanneer er problemen optreden met ontbrekende of verkeerde adresvelden op de labels, kan dit een indicatie zijn dat de gebruikte adresvelden niet compatibel 
+                                    zijn met de plug-in. In dat geval kan het activeren van PostNL Adresvelden een oplossing bieden. </p>
+                                    
                                 <p>Het is aan te raden om de <span class="nice">PostNL adresvelden</span> te activeren. In de checkout worden dan aparte velden getoond voor de straatnaam, huisnummer en huisnummertoevoeging. 
                                     Aan de hand van deze velden is het makkelijker om de adressen te valideren. </p>
                                 
@@ -197,6 +204,9 @@
                                      Vul jouw <span class="nice">Globalpack Barcode Type</span> en <span class="nice">Globalpack Klantcode</span> in. 
                                      Deze gegevens zijn terug te vinden in jouw <a href="https://mijn.postnl.nl/c/BP2_Mod_Login.app?inresponseto=&amp;RelayState=&amp;startURL=%2F">Zakelijke PostNL</a> omgeving. <p/>
 
+                                 <p> Bij Globalpack Barcode Type dienen enkel de twee letters van de Globalpack Klantcode ingevuld te worden en bij Globalpack klantcode enkel de vier cijfers. 
+                                Ook hier geldt dat er slechts één Globalpack klantcode gebruikt kan worden. </p>
+                                         
                                  <h3 id="3_4_2">GS tarief code en land van herkomst</h3>
                                 <p>De <span class="nice">GS tarief code</span> en <span class="nice">land van herkomst</span> is benodigde informatie voor de douaneformulieren. 
                                     Deze gegevens dienen voor elk product dat in jouw webshop wordt aangeboden beschikbaar te zijn. </p>
@@ -217,7 +227,9 @@
                                 <h3 id="3_5_1">Labelformaat</h3>
                                 <p>Welke type printer gebruik je om labels te printen? Gebruik je een labelprinter selecteer dan <span class="nice">A6</span> labelformaat. 
                                     Selecteer labelformaat <span class="nice">A4</span> als je gebruik maak van een reguliere printer.</p>
-                    
+
+                               <p> Wanneer er gekozen wordt voor labelformaat A4 kan er tijdens het aanmaken van de labels gekozen worden voor een startpositie op het A4-blad. </p>
+
                                 <h3 id="3_5_2">WooCommerce Email en Tekst</h3>
                                 <p>Wil je jouw klanten vanuit WooCommerce een Track & Trace mail sturen? Zet het vinkje achter <span class="nice">WooCommerce Email</span> dan aan. 
                                     In het <span class="nice">WooCommerce Email Tekst</span> veld kan je aangeven welke tekst er in deze mail word meegestuurd. 
@@ -230,7 +242,10 @@
                             Geen probleem! Ook deze kan je koppelen aan de PostNL functionaliteiten, zie '3.3. Verzendmethode(n)'.
                             Per verzendzones kan je de <span class="nice">verzendprijs</span> bepalen.  
                         </p>
-                    
+
+                         <p> Wanneer je geen gebruik wil maken van gratis verzenden boven een bepaald bedrag dient dit veld leeggelaten te worden.  </p>
+            
+                                    
                         <img class='center-large-image' alt="" src="media/7 Verzendmethode PostNL_3.jpg">
 
                          <p>
@@ -248,7 +263,9 @@
                             Dit is ook een link naar de consumenten Track & Trace pagina van PostNL.</p>
                     
                         <img class='center-large-image' alt="" src="media/8 orderoverzicht pagina.jpg">
-                        
+
+                        <p>Aan de rechterzijde vind je in de kolom Acties tevens een knop waarmee direct een label aangemaakt kan worden. </p>
+                                    
                         <h2 id="5_2">Orderpagina</h2>
                         <p>Open een order. Rechts boven op de orderpagina is het PostNL menu te zien. 
                             Hierin is te zien om welke Type bezorging het gaat; standaard bezorging, ophalen bij een PostNL-punt, Avonbezorging, Europese bezorging of Wereldzending.  
@@ -278,6 +295,11 @@
                         <p>Bij de Retour Instellingen is aangegeven of er wel/niet altijd een retour-label geprint moet worden bij het aanmaken van het heenzending. 
                             Deze instelling wordt in dit menu overgenomen. 
                             Aan de hand van het ‘Creëer retourlabel’ vinkje is het mogelijk om de Retour Instellingen te overschrijven.</p>
+
+                         <h2 id="5_6">Label verwijderen</h2>
+                         <p>
+                            Wil je na het aanmaken van een zending de opties wijzigen en een ander type zending aanmaken voor de betreffende order? 
+                            Klik dan op Verwijder Label en maak opnieuw het label aan met de juiste verzendopties. <p>                     
                                     
                         <h2 id="5_6">Zending aanmaken en verzendlabel printen</h2>
                         <p>Staan alle vinkjes in het PostNL menu zoals gewenst? Klik dan onderaan in het menu op ‘Zending aanmaken’. 
