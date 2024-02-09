@@ -17,4 +17,4 @@ This WooCommerce extension allows you to export your orders to the PostNL servic
 
 A PostNL API account is required for this plugin! You can create this in your account or contact PostNL at info@postnl.nl
 
-Voor de handleiding ga naar: https://postnl.github.io/woocommerce/new-manual/
+Voor de handleiding ga naar: https://postnl.github.io/woocommerce
