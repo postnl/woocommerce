@@ -1,4 +1,4 @@
-﻿<script src="js/auto_menu.js" xmlns="http://www.w3.org/1999/html"></script>
+<script src="js/auto_menu.js" xmlns="http://www.w3.org/1999/html"></script>
 <div class="container-fluid">
     <div class="row">
         <div class="menu col-xs-4 col-lg-3">
@@ -194,6 +194,15 @@
                                     
                                 <p>Het is aan te raden om de <span class="nice">PostNL adresvelden</span> te activeren. In de checkout worden dan aparte velden getoond voor de straatnaam, huisnummer en huisnummertoevoeging. 
                                     Aan de hand van deze velden is het makkelijker om de adressen te valideren. </p>
+								<h3 id="3_3_10">Automatische toewijzing van brievenbuspakjes</h3>
+									<h4><i>(Let op: deze functie is alleen beschikbaar voor Nederlandse webshops)</i></h4>
+								   <p>De plug-in beschikt over een functie waarmee automatisch het product Brievenbuspakje gekoppeld wordt aan zendingen die door een brievenbus passen. Deze functie past ook de check-out daarop aan zodat klanten weten 
+								   dat ze niet thuis hoeven te blijven voor hun bestelling. Om gebruik te maken van deze functie moet deze per product worden ingeschakeld, en tevens moet aangegeven worden hoe vaak dit product in een enkel 
+								   brievenbuspakje past (inclusief eventueel verpakkingsmateriaal). Ga hiervoor naar Producten → Open een product → Productgegevens – Verzendmethoden. In het daaropvolgende scherm vink je de optie 
+								   “Activeer automatische toewijzing Brievenbuspakje” aan en vul je in het kader daaronder in hoe vaak dit product in een brievenbuspakje past. Herhaal dit voor ieder product waar automatische toewijzing van 
+								   Brievenbuspakje gewenst en mogelijk is:</p>
+								   
+								   <img class='center-large-image' alt="" src="media/AutomatischBBP.jpg">
                                 
                          <h2 id="3_4">3.4 Versturen buiten Europa</h2>
 
@@ -235,6 +244,14 @@
                                     Onze tekstsuggestie is <i>"Gebruik deze link om jouw zending te volgen: {tracking-link}</i>"</p>
 
                                  <p> Wil je meer controle  over de notificaties? Bekijk dan de mogelijkheden in de Notficatie sectie in MijnPostNL Zakelijk.  <p>
+						
+						<h2 id="3_6">3.6 Standaard verzendopties instellen</h2>
+						<h4><i>(Let op: deze functie is alleen beschikbaar voor Nederlandse webshops)</i></h4>
+						<p>Indien je veelal gebruik maakt van hetzelfde verzendproduct (per levergebied), kun je dit nu vastleggen als standaard verzendoptie. Dit betekent dat alle orders 
+						voor dat levergebied automatisch deze verzendoptie krijgen. Wanneer automatische toewijzing van brievenbuspakjes geactiveerd is zal deze de standaard verzendoptie 
+						overschrijven om er een brievenbuspakje van te maken, mits dit past volgens de berekening. Indien er voor bepaalde orders  afgeweken moet worden van de 
+						geconfigureerde standaardoptie, dan kan  dit ad hoc aangepast worden in het order detailscherm of in het orderoverzicht middels het bulkactie-menu.</p>
+								 
                                      
        <h1 id="4">4 Verzendklassen en verzendprijs</h1>
                         <p>
@@ -307,15 +324,24 @@
                             Met deze actie wordt de zending voormeld bij PostNL. 
                             Klik vervolgens op ‘Print Label’ om het verzendlabel te downloaden. </p>
                                                             
-                        <h2 id="5_7">Meerdere Labels tegelijk aanmaken</h2>
-                        <p>Om tijd te besparen is het handig om meerdere labels tegelijk te kunnen printen. 
-                            Selecteer in het orderoverzicht de bestellingen waarvoor je een label wil printen → klik op Bulkacties → ‘PostNL Create Label’. </p>
+                        <h2 id="5_7">PostNL Bulkacties</h2>
+                        
+						<h4 id="5_7_1">PostNL Label Aanmaken</h4>
+						<p>Met deze actie kun je in één keer alle geselecteerde orders afdrukken, die vervolgens in één PDF bestand gedownload kunnen worden. Dit betekent dat 
+						de plug-in op basis van de geconfigureerde Standaard Verzendopties en de automatische brievenbusberekening (mits in gebruik) productcodes toewijst 
+						aan de geselecteerde orders. Op basis daarvan worden de labels gegenereerd.  In dit menu kun je tevens aangeven uit hoeveel labels de orders moeten 
+						bestaan, wat de startpositie is voor printen op A4-papier en of er retour labels  aangemaakt moeten worden.</p>
                 
                         <img class='center-large-image' alt="" src="media/10 bulk labels creeeren.jpg">
-                                    
-                        <p>Selecteer vervolgens in het PostNL menu of je nog extra verzendopties wil toevoegen → Klik op Submit → Klik op Download file → De verzendlabels van de verschillende orders worden in één document gedownload. </p>
-                                    
+                        <p> Wanneer je op Uitvoeren klikt zal er bovenin een downloadlink verschijnen waarmee je alle aangemaakte labels kunt downloaden.</p>            
                         <img class='center-large-image' alt="" src="media/11 bulk labels download.jpg">
+						
+						<h4 id="5_7_2">PostNL Verander verzendopties</h4>
+						<p>Wil je voor één of meerdere zendingen afwijken van de geconfigureerde standaard verzendoptie of de automatische brievenbuspakje-toewijzing? Gebruik 
+						dan deze functie. Hiermee worden in één keer de geselecteerde orders aangepast met een andere verzendoptie. Let wel op dat er geen overlap zit in de 
+						binnenlandse en buitenlandse producten. Als de verzendopties van meerdere orders tegelijkertijd aangepast moeten worden, dan kan dit alleen als alle 
+						geselecteerde orders naar dezelfde  levergebieden (Nederland, België, EU, non-EU) verstuurd zullen worden.</p>
+						<img class='center-large-image' alt="" src="media/VeranderVerzendopties.jpg">
                 
       <h1 id="6">6 Contactgegevens</h1>
                         <p>Vragen over de WooCommerce plug-in? Neem dan gerust contact op met het team van <b>PostNL Customer Integrations </b>. Zij zijn te bereiken via digitaleklantsupport@postnl.nl. 
